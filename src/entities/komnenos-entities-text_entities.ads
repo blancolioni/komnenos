@@ -27,7 +27,7 @@ private
       Table  : access Entity_Table_Interface'Class;
       Parent : access Entity_Visual'Class;
       Visual : access Entity_Visual'Class;
-      Offset : Natural);
+      Offset : Pixel_Position);
 
    overriding procedure Render
      (Entity : not null access Root_Text_Entity_Reference;
