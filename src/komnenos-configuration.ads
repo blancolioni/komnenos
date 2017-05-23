@@ -12,6 +12,7 @@ package Komnenos.Configuration is
    procedure Get_Connector_Metrics
      (Class_Name   : String;
       Colour       : out Komnenos.Colours.Komnenos_Colour;
+      Curved       : out Boolean;
       Line_Width   : out Positive;
       Arrow_Length : out Positive;
       Arrow_Width  : out Positive);

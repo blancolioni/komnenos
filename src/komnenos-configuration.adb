@@ -74,6 +74,7 @@ package body Komnenos.Configuration is
    procedure Get_Connector_Metrics
      (Class_Name   : String;
       Colour       : out Komnenos.Colours.Komnenos_Colour;
+      Curved       : out Boolean;
       Line_Width   : out Positive;
       Arrow_Length : out Positive;
       Arrow_Width  : out Positive)
@@ -96,6 +97,7 @@ package body Komnenos.Configuration is
             Line_Width := Config.Get ("line_width", 2);
             Arrow_Length := Config.Get ("arrow_length", 8);
             Arrow_Width := Config.Get ("arrow_width", 4);
+            Curved := Config.Get ("curved");
          end;
       else
          Colour :=
@@ -103,6 +105,7 @@ package body Komnenos.Configuration is
          Line_Width := 2;
          Arrow_Length := 8;
          Arrow_Width := 4;
+         Curved := True;
       end if;
    end Get_Connector_Metrics;
 
