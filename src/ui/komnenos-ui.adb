@@ -40,7 +40,7 @@ package body Komnenos.UI is
    ---------------
 
    function Create_UI
-     (Config_Folder_Path : String)
+     (Config_Folder_Path : String := Komnenos.Paths.Config_Path)
       return Komnenos_UI
    is
    begin

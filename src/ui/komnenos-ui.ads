@@ -4,6 +4,8 @@ with Komnenos.Entities;
 with Komnenos.Fragments;
 with Komnenos.Session_Objects;
 
+with Komnenos.Paths;
+
 package Komnenos.UI is
 
    type Root_Komnenos_UI is
@@ -130,7 +132,7 @@ package Komnenos.UI is
    type Komnenos_UI is access all Root_Komnenos_UI'Class;
 
    function Create_UI
-     (Config_Folder_Path : String)
+     (Config_Folder_Path : String := Komnenos.Paths.Config_Path)
       return Komnenos_UI;
 
    function Current_UI return Komnenos_UI;
