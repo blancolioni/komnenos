@@ -1,3 +1,4 @@
 syntax: glob
 build
 komnenos.gpr
+src/komnenos-paths.ads

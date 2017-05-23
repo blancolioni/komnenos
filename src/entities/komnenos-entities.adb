@@ -104,8 +104,9 @@ package body Komnenos.Entities is
      (Item         : in out Root_Entity_Reference'Class;
       Identifier   : in String;
       Class_Name   : in String;
-      Display_Text : in String := "";
-      Description  : in String := "")
+      Path         : in String;
+      Display_Text : in String;
+      Description  : in String)
    is
    begin
       Item.Identifier :=
@@ -113,6 +114,9 @@ package body Komnenos.Entities is
 
       Item.Class :=
         Ada.Strings.Unbounded.To_Unbounded_String (Class_Name);
+
+      Item.Path :=
+        Ada.Strings.Unbounded.To_Unbounded_String (Path);
 
       if Display_Text /= "" then
          Item.Display_Text :=
