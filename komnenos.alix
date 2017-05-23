@@ -1,0 +1,18 @@
+project_name = Komnenos
+source_dir = src
+source_dir = src/entities
+source_dir = src/fragments
+source_dir = src/styles
+source_dir = src/ui
+source_dir = src/ui/gtk
+main_unit = komnenos-demo_driver
+exec_name = komnenos-demo
+depend = { project = gtkada external = yes }
+depend = { project = aqua version = any }
+depend = { project = tropos version = any }
+depend = { project = lith version = any }
+depend = { project = wlib version = any }
+config_dir = config
+path_unit = { unit = Komnenos.Paths
+              path = src/komnenos-paths.ads }
+              

@@ -1,0 +1,77 @@
+fixed_font =
+{
+  font_family = "Consolas"
+  font_size = 12
+  foreground = black
+}
+
+classes =
+{
+    default =
+    {
+    }
+    reserved_identifier =
+    {
+      --  bold = true
+      foreground = blue
+    }
+    implied_token =
+    {
+      foreground = lightgrey
+    }
+    link =
+    {
+       foreground = blue
+       underline = true
+       mouse_cursor = hand
+    }
+    comment =
+    {
+      foreground = grey
+    }
+    string =
+    {
+      foreground = rosybrown
+    }
+    package_name =
+    {
+      foreground =
+      {
+        r = 166
+        g = 0
+        b = 217
+      }
+    }
+    function_name =
+    {
+      foreground =
+      {
+        r = 166
+        g = 0
+        b = 217
+      }
+    }
+    variable_name =
+    {
+      foreground = darkgoldenrod
+    }
+    type_name =
+    {
+      foreground = forestgreen
+    }
+    warning =
+    {
+      underline = true
+    }
+    error =
+    {
+      foreground = red
+      --  bold = true
+      underline = true
+    }
+    selected_error =
+    {
+      foreground = white
+      background = red
+    }
+}
