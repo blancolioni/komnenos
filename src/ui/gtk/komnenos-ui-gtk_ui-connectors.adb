@@ -148,7 +148,6 @@ package body Komnenos.UI.Gtk_UI.Connectors is
             Boundary : constant Layout_Rectangle :=
                          Con.Connector.Layout_Boundary;
             Line     : constant Layout_Line := Con.Connector.Layout_Path;
-            PX, PY   : Gdouble := 0.0;
          begin
             if Komnenos.Configuration.Enabled ("connector_background") then
                Cairo.Set_Source_Rgba (Cr, 1.0, 0.0, 0.0, 0.5);
@@ -165,10 +164,14 @@ package body Komnenos.UI.Gtk_UI.Connectors is
                Line_Width   : Positive;
                Arrow_Length : Positive;
                Arrow_Width  : Positive;
+               Curved       : Boolean;
                RGB          : Gdk.RGBA.Gdk_RGBA;
+               Xs           : array (Line'Range) of Gdouble;
+               Ys           : array (Line'Range) of Gdouble;
             begin
                Komnenos.Configuration.Get_Connector_Metrics
-                 ("default", Colour, Line_Width, Arrow_Length, Arrow_Width);
+                 ("default", Colour, Curved,
+                  Line_Width, Arrow_Length, Arrow_Width);
                RGB := Komnenos.Colours.Gtk_Colours.To_Gdk_RGBA (Colour);
                Cairo.Set_Source_Rgba
                  (Cr, RGB.Red, RGB.Green, RGB.Blue, RGB.Alpha);
@@ -185,46 +188,75 @@ package body Komnenos.UI.Gtk_UI.Connectors is
                      Y : constant Glib.Gdouble :=
                            Glib.Gdouble
                              (Line (I).Y - Boundary.Y + Draw_Border_Height);
-                     L : constant Gdouble :=
-                           Gdouble (Arrow_Length);
-                     W : constant Gdouble :=
-                           Gdouble (Arrow_Width);
                   begin
-                     if I = Line'First then
-                        Cairo.Move_To (Cr, X, Y);
-                     else
-                        Cairo.Line_To (Cr, X, Y);
-
-                        if I = Line'Last then
-                           if PX /= X then
-                              declare
-                                 Offset : constant Gdouble :=
-                                            (if PX < X then -L else L);
-                              begin
-                                 Cairo.Line_To
-                                   (Cr, X + Offset, Y - W);
-                                 Cairo.Move_To (Cr, X, Y);
-                                 Cairo.Line_To
-                                   (Cr, X + Offset, Y + W);
-                              end;
-                           else
-                              declare
-                                 Offset : constant Gdouble :=
-                                            (if PY < Y then -L else L);
-                              begin
-                                 Cairo.Line_To
-                                   (Cr, X - W, Y + Offset);
-                                 Cairo.Move_To (Cr, X, Y);
-                                 Cairo.Line_To
-                                   (Cr, X + W, Y + Offset);
-                              end;
-                           end if;
-                        end if;
-                     end if;
-                     PX := X;
-                     PY := Y;
+                     Xs (I) := X;
+                     Ys (I) := Y;
                   end;
                end loop;
+
+               if Line'Length = 2 then
+                  Cairo.Move_To (Cr, Xs (Xs'First), Ys (Ys'First));
+                  Cairo.Line_To (Cr, Xs (Xs'Last), Ys (Ys'Last));
+               elsif not Curved then
+                  for I in Xs'Range loop
+                     if I = Xs'First then
+                        Cairo.Move_To (Cr, Xs (I), Ys (I));
+                     else
+                        Cairo.Line_To (Cr, Xs (I), Ys (I));
+                     end if;
+                  end loop;
+               elsif Line'Length = 3 then
+                  Cairo.Move_To (Cr, Xs (Xs'First), Ys (Ys'First));
+                  Cairo.Curve_To
+                    (Cr,
+                     Xs (Xs'First + 1), Ys (Ys'First + 1),
+                     Xs (Xs'First + 1), Ys (Ys'First + 1),
+                     Xs (Xs'First + 2), Ys (Ys'First + 2));
+               else
+                  for I in 1 .. Xs'Last - 3 loop
+                     Cairo.Move_To (Cr, Xs (I), Ys (I));
+                     Cairo.Curve_To
+                       (Cr,
+                        Xs (I + 1), Ys (I + 1),
+                        Xs (I + 2), Ys (I + 2),
+                        Xs (I + 3), Ys (I + 3));
+                  end loop;
+               end if;
+
+               declare
+                  L : constant Gdouble :=
+                        Gdouble (Arrow_Length);
+                  W : constant Gdouble :=
+                        Gdouble (Arrow_Width);
+                  X : constant Gdouble := Xs (Xs'Last);
+                  Y : constant Gdouble := Ys (Ys'Last);
+                  PX : constant Gdouble := Xs (Xs'Last - 1);
+                  PY : constant Gdouble := Ys (Ys'Last - 1);
+               begin
+                  if PX /= X then
+                     declare
+                        Offset : constant Gdouble :=
+                                   (if PX < X then -L else L);
+                     begin
+                        Cairo.Line_To
+                          (Cr, X + Offset, Y - W);
+                        Cairo.Move_To (Cr, X, Y);
+                        Cairo.Line_To
+                          (Cr, X + Offset, Y + W);
+                     end;
+                  else
+                     declare
+                        Offset : constant Gdouble :=
+                                   (if PY < Y then -L else L);
+                     begin
+                        Cairo.Line_To
+                          (Cr, X - W, Y + Offset);
+                        Cairo.Move_To (Cr, X, Y);
+                        Cairo.Line_To
+                          (Cr, X + W, Y + Offset);
+                     end;
+                  end if;
+               end;
             end;
             Cairo.Stroke (Cr);
          end;
