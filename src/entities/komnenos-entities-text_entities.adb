@@ -23,9 +23,9 @@ package body Komnenos.Entities.Text_Entities is
       Entity.Create
         (Identifier   => Name,
          Class_Name   => "text",
+         Path         => File_Name,
          Display_Text => Name,
          Description  => "Text entity");
-      Entity.File_Name := To_Unbounded_String (File_Name);
       Entity.Contents := To_Unbounded_String (Contents);
       Result := new Root_Text_Entity_Reference'(Entity);
       return Result;

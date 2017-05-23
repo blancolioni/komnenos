@@ -495,6 +495,9 @@ package body Komnenos.Fragments is
       Result.Set_Content (Entity);
       Result.Set_Position (100, 100);
       Result.Set_Entity_Key (Entity.Name);
+      Result.Path :=
+        Ada.Strings.Unbounded.To_Unbounded_String
+          (Entity.Path);
       return Result;
    end New_Fragment;
 

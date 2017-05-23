@@ -98,6 +98,10 @@ package Komnenos.Entities is
      (Item : Root_Entity_Reference)
       return String;
 
+   function Path
+     (Item : Root_Entity_Reference)
+      return String;
+
    function Top_Level
      (Item : Root_Entity_Reference)
       return Boolean
@@ -167,8 +171,9 @@ package Komnenos.Entities is
      (Item         : in out Root_Entity_Reference'Class;
       Identifier   : String;
       Class_Name   : String;
-      Display_Text : String := "";
-      Description  : String := "");
+      Path         : String;
+      Display_Text : String;
+      Description  : String);
 
 --     procedure Execute_Command
 --       (Item    : not null access Root_Entity_Reference;
@@ -431,6 +436,7 @@ private
          Display_Text   : Ada.Strings.Unbounded.Unbounded_String;
          Description    : Ada.Strings.Unbounded.Unbounded_String;
          Key            : Ada.Strings.Unbounded.Unbounded_String;
+         Path           : Ada.Strings.Unbounded.Unbounded_String;
          References     : Reference_Vectors.Vector;
          Table          : Entity_Table_Access;
       end record;
@@ -445,6 +451,11 @@ private
      (Item           : Root_Entity_Reference;
       Recursive_Show : access
         function (Value : Aqua.Word) return String) return String;
+
+   function Path
+     (Item : Root_Entity_Reference)
+      return String
+   is (Ada.Strings.Unbounded.To_String (Item.Path));
 
    package Entity_Maps is
      new Ada.Containers.Indefinite_Hashed_Maps

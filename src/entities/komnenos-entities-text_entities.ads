@@ -18,7 +18,6 @@ private
      new Root_Entity_Reference with
       record
          Name      : Ada.Strings.Unbounded.Unbounded_String;
-         File_Name : Ada.Strings.Unbounded.Unbounded_String;
          Contents  : Ada.Strings.Unbounded.Unbounded_String;
       end record;
 
