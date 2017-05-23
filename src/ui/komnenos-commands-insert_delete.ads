@@ -10,7 +10,7 @@ package Komnenos.Commands.Insert_Delete is
 
    function Delete_Text_At_Cursor
      (Forward : Boolean;
-      Count   : Text_Offset_Range)
+      Count   : Text_Offset)
       return Root_Komnenos_Command'Class;
 
 end Komnenos.Commands.Insert_Delete;

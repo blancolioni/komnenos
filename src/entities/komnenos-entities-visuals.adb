@@ -56,7 +56,7 @@ package body Komnenos.Entities.Visuals is
                      Bound_Entity_Map.Element (Entity.Key);
          begin
             for Visual of List loop
-               Visual.Delete_From_Cursor (Offset);
+               Visual.Delete_From_Cursor ((Character_Unit, Offset));
             end loop;
          end;
       end if;

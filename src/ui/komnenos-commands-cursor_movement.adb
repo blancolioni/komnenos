@@ -17,7 +17,7 @@ package body Komnenos.Commands.Cursor_Movement is
    type Move_Cursor_Relative_Command is
      new Root_Move_Cursor_Command with
       record
-         Offset   : Text_Offset;
+         Movement : Text_Movement;
       end record;
 
    overriding procedure Execute
@@ -41,7 +41,7 @@ package body Komnenos.Commands.Cursor_Movement is
    is ("[]");
 
    function Move_Command
-     (Offset   : Text_Offset)
+     (Movement   : Text_Movement)
       return Root_Komnenos_Command'Class;
 
    -------------
@@ -53,8 +53,8 @@ package body Komnenos.Commands.Cursor_Movement is
    is
    begin
       Command.Entity.Move_Cursor
-        (Cursor => Komnenos.Entities.Point,
-         Offset => Command.Offset);
+        (Cursor => Point,
+         Movement => Command.Movement);
    end Execute;
 
    -------------
@@ -65,7 +65,7 @@ package body Komnenos.Commands.Cursor_Movement is
      (Command : in out Move_Cursor_Absolute_Command)
    is
    begin
-      Command.Entity.Set_Cursor (Komnenos.Entities.Point,
+      Command.Entity.Set_Cursor (Point,
                                  Command.New_Position);
    end Execute;
 
@@ -74,11 +74,11 @@ package body Komnenos.Commands.Cursor_Movement is
    -------------------------------
 
    function Move_By_Character_Command
-     (Offset : Text_Offset_Range)
+     (Offset : Text_Offset)
       return Root_Komnenos_Command'Class
    is
    begin
-      return Move_Command ((Character_Offset, Offset));
+      return Move_Command ((Character_Unit, Offset));
    end Move_By_Character_Command;
 
    --------------------------
@@ -86,12 +86,12 @@ package body Komnenos.Commands.Cursor_Movement is
    --------------------------
 
    function Move_By_Line_Command
-     (Offset : Text_Offset_Range)
+     (Offset : Text_Offset)
       return Root_Komnenos_Command'Class
    is
    begin
       return Move_Command
-        ((Line_Offset, Offset));
+        ((Line_Unit, Offset));
    end Move_By_Line_Command;
 
    ------------------
@@ -99,12 +99,12 @@ package body Komnenos.Commands.Cursor_Movement is
    ------------------
 
    function Move_Command
-     (Offset   : Text_Offset)
+     (Movement   : Text_Movement)
       return Root_Komnenos_Command'Class
    is
    begin
       return Result : Move_Cursor_Relative_Command do
-         Result.Offset := Offset;
+         Result.Movement := Movement;
       end return;
    end Move_Command;
 
@@ -131,7 +131,7 @@ package body Komnenos.Commands.Cursor_Movement is
    is
    begin
       Command.Entity.Set_Cursor
-        (Komnenos.Entities.Point, Command.Old_Position);
+        (Point, Command.Old_Position);
    end Undo;
 
 end Komnenos.Commands.Cursor_Movement;

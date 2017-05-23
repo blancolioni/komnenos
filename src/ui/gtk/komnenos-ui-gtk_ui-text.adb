@@ -262,7 +262,7 @@ package body Komnenos.UI.Gtk_UI.Text is
 
    overriding procedure Delete_From_Cursor
      (Text_View : in out Komnenos_Text_View_Record;
-      Offset    : in     Text_Offset)
+      Movement  : Text_Movement)
    is
       use Glib;
       Start_Iter, End_Iter : Gtk.Text_Iter.Gtk_Text_Iter;
@@ -272,7 +272,7 @@ package body Komnenos.UI.Gtk_UI.Text is
         (Start_Iter, Text_View.Buffer.Get_Insert);
 
       End_Offset := Gtk.Text_Iter.Get_Offset (Start_Iter);
-      End_Offset := End_Offset + Gint (Offset.Size);
+      End_Offset := End_Offset + Gint (Movement.Offset);
       Text_View.Buffer.Get_Iter_At_Offset (End_Iter, End_Offset);
 
       Text_View.Buffer.Delete (Start_Iter, End_Iter);
@@ -300,7 +300,8 @@ package body Komnenos.UI.Gtk_UI.Text is
             Text_View.Get_Iter_Location (Iter, Location);
             Entity.Select_Entity
               (Current_UI, Display.Fragment, null,
-               Natural (Location.Y) + Natural (Location.Height) / 2);
+               Pixel_Position (Location.Y)
+               + Pixel_Position (Location.Height) / 2);
             Display.Highlights.Append
               ((Entity, Location.Y, Location.Height,
                Komnenos.Colours.From_String

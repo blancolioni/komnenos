@@ -2,26 +2,34 @@ with Tropos;
 
 package Komnenos is
 
-   type Line_Number is range 1 .. Integer'Last;
-   type Column_Number is range 1 .. Integer'Last;
+   type Line_Offset is new Integer;
+   type Column_Offset is new Integer;
 
-   type Text_Offset_Unit is
-     (Character_Offset,
-      Word_Offset,
-      Line_Offset,
-      Page_Offset,
-      Buffer_Offset);
+   subtype Line_Number is Line_Offset range 1 .. Line_Offset'Last;
+   subtype Column_Number is Column_Offset range 1 .. Column_Offset'Last;
 
-   type Text_Offset_Range is new Integer;
+   type Text_Movement_Unit is
+     (Character_Unit,
+      Word_Unit,
+      Line_Unit,
+      Page_Unit,
+      Buffer_Unit);
+
+   type Text_Offset is new Integer;
 
    subtype Text_Position is
-     Text_Offset_Range range 0 .. Text_Offset_Range'Last;
+     Text_Offset range 0 .. Text_Offset'Last;
 
-   type Text_Offset is
+   type Text_Movement is
       record
-         Unit : Text_Offset_Unit;
-         Size : Text_Offset_Range;
+         Unit   : Text_Movement_Unit;
+         Offset : Text_Offset;
       end record;
+
+   type Cursor_Type is (Point, Mark, Selection_Start, Selection_End);
+
+   type Cursor_Position_Array is
+     array (Cursor_Type) of Text_Position;
 
    type Element_State is (Normal, Hover, Selected, Disabled);
 

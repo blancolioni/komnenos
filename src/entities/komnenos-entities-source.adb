@@ -1,11 +1,8 @@
 with Ada.Text_IO;
 
-with Komnenos.Source;
 with Komnenos.Themes;
 
 with Komnenos.Entities.Visuals;
-with Komnenos.Fragments.Rendering;
-with Komnenos.Fragments.Source;
 with Komnenos.UI;
 
 package body Komnenos.Entities.Source is
@@ -13,18 +10,18 @@ package body Komnenos.Entities.Source is
    type Source_Cursor_Array is
      array (Cursor_Type) of Text_Position;
 
-   type Root_Komnenos_Source_Entity is
+   type Root_Source_Entity is
      new Root_Source_Entity_Reference with
       record
          Top_Level              : Boolean;
          Changed                : Boolean;
-         Compilation_Unit       : Source_Tree;
-         Entity_Spec            : Source_Tree;
-         Entity_Body            : Source_Tree;
-         Entity_Tree            : Source_Tree;
-         Update_Tree            : Source_Tree;
+         Compilation_Unit       : Komnenos.Source.Source_Tree;
+         Entity_Spec            : Komnenos.Source.Source_Tree;
+         Entity_Body            : Komnenos.Source.Source_Tree;
+         Entity_Tree            : Komnenos.Source.Source_Tree;
+         Update_Tree            : Komnenos.Source.Source_Tree;
          Cursors                : Source_Cursor_Array := (others => 0);
-         Edit_Tree              : Source_Tree;
+         Edit_Tree              : Komnenos.Source.Source_Tree;
          Left_Of_Tree           : Boolean := True;
          Buffer_Offset          : Text_Position_Offset := 0;
          Edit_Buffer            : Ada.Strings.Unbounded.Unbounded_String;
