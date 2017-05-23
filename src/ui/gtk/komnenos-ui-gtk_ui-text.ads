@@ -62,7 +62,7 @@ private
 
    overriding procedure Delete_From_Cursor
      (Text_View : in out Komnenos_Text_View_Record;
-      Offset    : in     Text_Offset);
+      Movement  : Text_Movement);
 
    overriding procedure Set_Cursor
      (Text_View    : in out Komnenos_Text_View_Record;

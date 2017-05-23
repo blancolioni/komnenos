@@ -26,7 +26,7 @@ package Komnenos.Fragments is
 
    procedure Delete_From_Cursor
      (Editor : in out Text_Editor_Display;
-      Offset : in     Text_Offset)
+      Movement : Text_Movement)
    is abstract;
 
    procedure Set_Cursor
@@ -193,6 +193,10 @@ package Komnenos.Fragments is
 
    type Fragment_Type is access all Root_Fragment_Type'Class;
 
+   function New_Fragment
+     (Entity : not null access Komnenos.Entities.Root_Entity_Reference'Class)
+      return Fragment_Type;
+
    procedure Register;
 
 private
@@ -270,7 +274,7 @@ private
 
    overriding procedure Set_Cursor
      (Fragment : in out Root_Fragment_Type;
-      Cursor   : Komnenos.Entities.Cursor_Type;
+      Cursor   : Cursor_Type;
       Position : Text_Position);
 
    overriding procedure Insert_At_Cursor
@@ -279,7 +283,7 @@ private
 
    overriding procedure Delete_From_Cursor
      (Fragment  : in out Root_Fragment_Type;
-      Offset    : Text_Offset);
+      Movement  : Text_Movement);
 
    overriding procedure Invalidate
      (Fragment : not null access Root_Fragment_Type);

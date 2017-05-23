@@ -11,7 +11,7 @@ package body Komnenos.Commands.Insert_Delete is
    type Delete_From_Cursor_Command is
      new Root_Delete_Command with
       record
-         Offset : Text_Offset;
+         Movement : Text_Movement;
       end record;
 
    overriding procedure Execute
@@ -50,16 +50,16 @@ package body Komnenos.Commands.Insert_Delete is
 
    function Delete_Text_At_Cursor
      (Forward : Boolean;
-      Count   : Text_Offset_Range)
+      Count   : Text_Offset)
       return Root_Komnenos_Command'Class
    is
    begin
       return Result : Delete_From_Cursor_Command do
-         Result.Offset.Unit := Character_Offset;
+         Result.Movement.Unit := Character_Unit;
          if Forward then
-            Result.Offset.Size := Count;
+            Result.Movement.Offset := Count;
          else
-            Result.Offset.Size := -Count;
+            Result.Movement.Offset := -Count;
          end if;
       end return;
    end Delete_Text_At_Cursor;
@@ -91,7 +91,7 @@ package body Komnenos.Commands.Insert_Delete is
       New_Mark : constant Text_Position :=
                    Text_Position'Max
                      (Command.Entity.Get_Cursor (Point)
-                      + Command.Offset.Size,
+                      + Command.Movement.Offset,
                       0);
    begin
       Command.Entity.Set_Cursor (Mark, New_Mark);

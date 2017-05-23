@@ -21,6 +21,11 @@ package Komnenos.Source is
       return Column_Number
       is abstract;
 
+   function Source_Position
+     (Source : Source_Tree_Interface)
+      return Text_Position
+      is abstract;
+
    function Source_Root
      (Source : not null access Source_Tree_Interface)
       return access Source_Tree_Interface'Class

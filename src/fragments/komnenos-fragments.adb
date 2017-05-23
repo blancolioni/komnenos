@@ -16,7 +16,7 @@ package body Komnenos.Fragments is
 
    overriding procedure Delete_From_Cursor
      (Null_Display : in out Null_Text_Display;
-      Offset       : in     Text_Offset)
+      Movement     : Text_Movement)
    is null;
 
    overriding procedure Set_Cursor
@@ -95,10 +95,10 @@ package body Komnenos.Fragments is
 
    overriding procedure Delete_From_Cursor
      (Fragment  : in out Root_Fragment_Type;
-      Offset    : Text_Offset)
+      Movement  : Text_Movement)
    is
    begin
-      Fragment.Display.Delete_From_Cursor (Offset);
+      Fragment.Display.Delete_From_Cursor (Movement);
    end Delete_From_Cursor;
 
    --------------
@@ -478,6 +478,26 @@ package body Komnenos.Fragments is
       return Result;
    end New_Fragment;
 
+   ------------------
+   -- New_Fragment --
+   ------------------
+
+   function New_Fragment
+     (Entity : not null access Komnenos.Entities.Root_Entity_Reference'Class)
+      return Fragment_Type
+   is
+      Result : constant Fragment_Type := new Root_Fragment_Type;
+   begin
+      Result.Editable := True;
+      Result.Background_Colour := Komnenos.Colours.From_String ("seashell");
+      Result.Foreground_Colour := Komnenos.Colours.From_String ("black");
+      Result.Border_Colour     := Komnenos.Colours.From_String ("#660066");
+      Result.Set_Content (Entity);
+      Result.Set_Position (100, 100);
+      Result.Set_Entity_Key (Entity.Name);
+      return Result;
+   end New_Fragment;
+
    --------------
    -- New_Line --
    --------------
@@ -623,10 +643,10 @@ package body Komnenos.Fragments is
 
    overriding procedure Set_Cursor
      (Fragment : in out Root_Fragment_Type;
-      Cursor   : Komnenos.Entities.Cursor_Type;
+      Cursor   : Cursor_Type;
       Position : Text_Position)
    is
-      use all type Komnenos.Entities.Cursor_Type;
+      use all type Cursor_Type;
    begin
       case Cursor is
          when Point =>

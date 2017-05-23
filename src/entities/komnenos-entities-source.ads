@@ -5,11 +5,9 @@ package Komnenos.Entities.Source is
    type Root_Source_Entity_Reference is
      abstract new Root_Entity_Reference with private;
 
-   type Source_Entity_Reference is
-     access all Root_Source_Entity_Reference'Class;
-
-   function Create_Source_Entity
-     (Table            : not null access Entity_Table_Interface'Class;
+   procedure Initialize
+     (Entity           : in out Root_Source_Entity_Reference'Class;
+      Table            : not null access Entity_Table_Interface'Class;
       Name             : String;
       File_Name        : String;
       Class            : String;
@@ -21,8 +19,7 @@ package Komnenos.Entities.Source is
       Entity_Spec      : not null access
         Komnenos.Source.Source_Tree_Interface'Class;
       Entity_Body      : access
-        Komnenos.Source.Source_Tree_Interface'Class)
-      return Entity_Reference;
+        Komnenos.Source.Source_Tree_Interface'Class);
 
    procedure Set_Entity_Body
      (Entity      : Entity_Reference;

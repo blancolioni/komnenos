@@ -1,7 +1,7 @@
 package Komnenos.Paths is
 
    Config_Path : constant String :=
-     "C:\Users\fwilson\Documents\kiln\komnenos\config";
+     "C:/Users/fwilson/alix\config\komnenos";
 
    function Config_File
      (File_Path : String)

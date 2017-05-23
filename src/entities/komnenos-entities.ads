@@ -11,12 +11,11 @@ with Komnenos.Styles;
 
 --  with Komnenos.Commands;
 with Komnenos.Session_Objects;
+with Komnenos.Source;
 
 with Aqua.Objects;
 
 package Komnenos.Entities is
-
-   type Cursor_Type is (Point, Mark, Selection_Start, Selection_End);
 
    type Entity_Visual is interface;
 
@@ -64,8 +63,8 @@ package Komnenos.Entities is
    is abstract;
 
    procedure Delete_From_Cursor
-     (Visual    : in out Entity_Visual;
-      Offset    : Text_Offset)
+     (Visual   : in out Entity_Visual;
+      Movement : Text_Movement)
    is abstract;
 
    procedure Invalidate
@@ -137,7 +136,7 @@ package Komnenos.Entities is
    procedure Move_Cursor
      (Item     : in out Root_Entity_Reference;
       Cursor   : Cursor_Type;
-      Offset   : Text_Offset)
+      Movement : Text_Movement)
    is null;
 
    procedure Insert_Text
@@ -184,7 +183,7 @@ package Komnenos.Entities is
       Table  : access Entity_Table_Interface'Class;
       Parent : access Entity_Visual'Class;
       Visual : access Entity_Visual'Class;
-      Offset : Natural)
+      Offset : Pixel_Position)
    is abstract;
 
    procedure Render
@@ -202,6 +201,11 @@ package Komnenos.Entities is
    procedure Save
      (Store : not null access Program_Store_Interface)
    is abstract;
+
+   procedure On_Edit
+     (Store : in out Program_Store_Interface;
+      Item  : not null access Komnenos.Source.Source_Tree_Interface'Class)
+   is null;
 
    function Program_Store
      (Table : Entity_Table_Interface)
