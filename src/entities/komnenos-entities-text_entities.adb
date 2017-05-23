@@ -54,7 +54,7 @@ package body Komnenos.Entities.Text_Entities is
       Table  : access Entity_Table_Interface'Class;
       Parent : access Entity_Visual'Class;
       Visual : access Entity_Visual'Class;
-      Offset : Natural)
+      Offset : Pixel_Position)
    is
       use Ada.Strings.Unbounded;
       Fragment : constant Komnenos.Fragments.Fragment_Type :=
@@ -71,7 +71,7 @@ package body Komnenos.Entities.Text_Entities is
 
       if Visual = null then
          Komnenos.UI.Current_UI.Place_Fragment
-           (Parent, Pixel_Position (Offset), Fragment);
+           (Parent, Offset, Fragment);
       end if;
 
       Fragment.Rendered;
