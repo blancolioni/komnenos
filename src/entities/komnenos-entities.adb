@@ -413,7 +413,7 @@ package body Komnenos.Entities is
    --------------
 
    procedure Put_Line
-     (Visual   : in out Entity_Visual'Class;
+     (Visual   : in out Text_Entity_Visual'Class;
       Text     : in     String;
       Style    : in     Komnenos.Styles.Komnenos_Style;
       Tool_Tip : in     String := "";

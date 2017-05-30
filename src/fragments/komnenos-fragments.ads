@@ -115,24 +115,11 @@ package Komnenos.Fragments is
    function Entity_Key (Fragment : Root_Fragment_Type'Class)
                         return String;
 
-   overriding procedure Put
-     (Fragment : in out Root_Fragment_Type;
-      Text     : in     String;
-      Style    : in     Komnenos.Styles.Komnenos_Style;
-      Tool_Tip : in     String;
-      Link     : access Komnenos.Entities.Root_Entity_Reference'Class);
-
-   overriding procedure New_Line (Fragment : in out Root_Fragment_Type);
-
    overriding procedure Clear (Fragment : in out Root_Fragment_Type);
 
    procedure On_Key_Press
      (Fragment : in out Root_Fragment_Type;
       Key      : Komnenos.Keys.Komnenos_Key);
-
-   procedure On_Cursor_Move
-     (Fragment     : in out Root_Fragment_Type;
-      New_Position : Text_Position);
 
    function Editable
      (Fragment : Root_Fragment_Type)
@@ -150,26 +137,48 @@ package Komnenos.Fragments is
      (Fragment : Root_Fragment_Type)
       return Komnenos.Colours.Komnenos_Colour;
 
+   type Fragment_Type is access all Root_Fragment_Type'Class;
+
+   type Text_Fragment_Type is
+     new Root_Fragment_Type
+     and Komnenos.Entities.Text_Entity_Visual
+   with private;
+
+   type Text_Fragment is access all Text_Fragment_Type'Class;
+
+   overriding procedure Put
+     (Fragment : in out Text_Fragment_Type;
+      Text     : in     String;
+      Style    : in     Komnenos.Styles.Komnenos_Style;
+      Tool_Tip : in     String;
+      Link     : access Komnenos.Entities.Root_Entity_Reference'Class);
+
+   overriding procedure New_Line (Fragment : in out Text_Fragment_Type);
+
+   procedure On_Cursor_Move
+     (Fragment     : in out Text_Fragment_Type;
+      New_Position : Text_Position);
+
    function Text_Contents
-     (Fragment : Root_Fragment_Type)
+     (Fragment : Text_Fragment_Type)
       return String;
 
    function Get_Link
-     (Fragment : Root_Fragment_Type;
+     (Fragment : Text_Fragment_Type;
       Offset   : Positive)
       return Komnenos.Entities.Entity_Reference;
    --  If the text at the given offset has an associated reference, return it
    --  otherwise, return null.
 
    function Get_Tool_Tip
-     (Fragment : Root_Fragment_Type;
+     (Fragment : Text_Fragment_Type;
       Position : Text_Position)
       return String;
    --  Return the tool tip (if any) at the given position.
    --  If there is no tool tip, return ""
 
    procedure Get_Style
-     (Fragment : Root_Fragment_Type;
+     (Fragment : Text_Fragment_Type;
       State    : Element_State;
       Offset   : Positive;
       Style    : out Komnenos.Styles.Komnenos_Style;
@@ -177,13 +186,13 @@ package Komnenos.Fragments is
       Finish   : out Natural);
 
    function Get_Style
-     (Fragment : Root_Fragment_Type;
+     (Fragment : Text_Fragment_Type;
       State    : Element_State;
       Offset   : Positive)
       return Komnenos.Styles.Komnenos_Style;
 
    procedure Iterate
-     (Fragment : Root_Fragment_Type;
+     (Fragment : Text_Fragment_Type;
       Put      : not null access
         procedure (Text : String;
                    Style : Komnenos.Styles.Komnenos_Style;
@@ -191,9 +200,7 @@ package Komnenos.Fragments is
                    Link  : Komnenos.Entities.Entity_Reference);
       New_Line : not null access procedure);
 
-   type Fragment_Type is access all Root_Fragment_Type'Class;
-
-   function New_Fragment
+   function New_Text_Fragment
      (Entity : not null access Komnenos.Entities.Root_Entity_Reference'Class)
       return Fragment_Type;
 
@@ -272,24 +279,36 @@ private
       return access Komnenos.Entities.Root_Entity_Reference'Class
    is (Fragment.Content);
 
-   overriding procedure Set_Cursor
-     (Fragment : in out Root_Fragment_Type;
-      Cursor   : Cursor_Type;
-      Position : Text_Position);
-
-   overriding procedure Insert_At_Cursor
-     (Fragment : in out Root_Fragment_Type;
-      Text     : String);
-
-   overriding procedure Delete_From_Cursor
-     (Fragment  : in out Root_Fragment_Type;
-      Movement  : Text_Movement);
-
    overriding procedure Invalidate
      (Fragment : not null access Root_Fragment_Type);
 
    function Needs_Render
      (Fragment : Root_Fragment_Type)
       return Boolean;
+
+   function Get_Style_Info
+     (Fragment : Root_Fragment_Type'Class;
+      Offset   : Positive)
+      return Style_Info;
+
+   type Text_Fragment_Type is
+     new Root_Fragment_Type
+     and Komnenos.Entities.Text_Entity_Visual with
+      record
+         null;
+      end record;
+
+   overriding procedure Set_Cursor
+     (Fragment : in out Text_Fragment_Type;
+      Cursor   : Cursor_Type;
+      Position : Text_Position);
+
+   overriding procedure Insert_At_Cursor
+     (Fragment : in out Text_Fragment_Type;
+      Text     : String);
+
+   overriding procedure Delete_From_Cursor
+     (Fragment  : in out Text_Fragment_Type;
+      Movement  : Text_Movement);
 
 end Komnenos.Fragments;

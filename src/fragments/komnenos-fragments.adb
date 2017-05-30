@@ -36,12 +36,7 @@ package body Komnenos.Fragments is
 
    Local_Null_Text_Display : aliased Null_Text_Display;
 
-   function Get_Style_Info
-     (Fragment : Root_Fragment_Type;
-      Offset   : Positive)
-      return Style_Info;
-
-   function New_Fragment
+   function New_Text_Fragment
      return access Komnenos.Session_Objects.Session_Object_Interface'Class;
 
    ------------
@@ -94,7 +89,7 @@ package body Komnenos.Fragments is
    ------------------------
 
    overriding procedure Delete_From_Cursor
-     (Fragment  : in out Root_Fragment_Type;
+     (Fragment  : in out Text_Fragment_Type;
       Movement  : Text_Movement)
    is
    begin
@@ -208,7 +203,7 @@ package body Komnenos.Fragments is
    --------------
 
    function Get_Link
-     (Fragment : Root_Fragment_Type;
+     (Fragment : Text_Fragment_Type;
       Offset   : Positive)
       return Komnenos.Entities.Entity_Reference
    is
@@ -221,7 +216,7 @@ package body Komnenos.Fragments is
    ---------------
 
    function Get_Style
-     (Fragment : Root_Fragment_Type;
+     (Fragment : Text_Fragment_Type;
       State    : Element_State;
       Offset   : Positive)
       return Komnenos.Styles.Komnenos_Style
@@ -229,7 +224,7 @@ package body Komnenos.Fragments is
       Style : Komnenos.Styles.Komnenos_Style;
       Start, Finish : Natural;
    begin
-      Root_Fragment_Type'Class (Fragment).Get_Style
+      Text_Fragment_Type'Class (Fragment).Get_Style
         (State, Offset, Style, Start, Finish);
       return Style;
    end Get_Style;
@@ -239,7 +234,7 @@ package body Komnenos.Fragments is
    ---------------
 
    procedure Get_Style
-     (Fragment : Root_Fragment_Type;
+     (Fragment : Text_Fragment_Type;
       State    : Element_State;
       Offset   : Positive;
       Style    : out Komnenos.Styles.Komnenos_Style;
@@ -299,7 +294,7 @@ package body Komnenos.Fragments is
    --------------------
 
    function Get_Style_Info
-     (Fragment : Root_Fragment_Type;
+     (Fragment : Root_Fragment_Type'Class;
       Offset   : Positive)
       return Style_Info
    is
@@ -343,7 +338,7 @@ package body Komnenos.Fragments is
    ------------------
 
    function Get_Tool_Tip
-     (Fragment : Root_Fragment_Type;
+     (Fragment : Text_Fragment_Type;
       Position : Text_Position)
       return String
    is
@@ -359,7 +354,7 @@ package body Komnenos.Fragments is
    overriding procedure Initialize (Fragment : in out Root_Fragment_Type) is
    begin
       Fragment.Display := Local_Null_Text_Display'Access;
-      Fragment.Layout_Rec := (0, 0, 350, 400);
+      Fragment.Layout_Rec := (0, 0, 350, 200);
       Fragment.Lines.Append (new Line_Info);
       Fragment.Default_Style := Komnenos.Themes.Active_Theme.Default_Style;
       Fragment.Bindings.Default_Bindings;
@@ -370,7 +365,7 @@ package body Komnenos.Fragments is
    ----------------------
 
    overriding procedure Insert_At_Cursor
-     (Fragment : in out Root_Fragment_Type;
+     (Fragment : in out Text_Fragment_Type;
       Text     : String)
    is
    begin
@@ -394,7 +389,7 @@ package body Komnenos.Fragments is
    -------------
 
    procedure Iterate
-     (Fragment : Root_Fragment_Type;
+     (Fragment : Text_Fragment_Type;
       Put      : not null access
         procedure (Text : String;
                    Style : Komnenos.Styles.Komnenos_Style;
@@ -466,27 +461,36 @@ package body Komnenos.Fragments is
       return Fragment.Needs_Render;
    end Needs_Render;
 
-   ------------------
-   -- New_Fragment --
-   ------------------
+   --------------
+   -- New_Line --
+   --------------
 
-   function New_Fragment
+   overriding procedure New_Line (Fragment : in out Text_Fragment_Type) is
+   begin
+      Fragment.Lines.Append (new Line_Info);
+   end New_Line;
+
+   -----------------------
+   -- New_Text_Fragment --
+   -----------------------
+
+   function New_Text_Fragment
      return access Komnenos.Session_Objects.Session_Object_Interface'Class
    is
       Result :  constant Fragment_Type := new Root_Fragment_Type;
    begin
       return Result;
-   end New_Fragment;
+   end New_Text_Fragment;
 
-   ------------------
-   -- New_Fragment --
-   ------------------
+   -----------------------
+   -- New_Text_Fragment --
+   -----------------------
 
-   function New_Fragment
+   function New_Text_Fragment
      (Entity : not null access Komnenos.Entities.Root_Entity_Reference'Class)
       return Fragment_Type
    is
-      Result : constant Fragment_Type := new Root_Fragment_Type;
+      Result : Text_Fragment_Type;
    begin
       Result.Editable := True;
       Result.Background_Colour := Komnenos.Colours.From_String ("seashell");
@@ -501,24 +505,15 @@ package body Komnenos.Fragments is
       Result.Title :=
         Ada.Strings.Unbounded.To_Unbounded_String
           (Entity.Display_Text);
-      return Result;
-   end New_Fragment;
-
-   --------------
-   -- New_Line --
-   --------------
-
-   overriding procedure New_Line (Fragment : in out Root_Fragment_Type) is
-   begin
-      Fragment.Lines.Append (new Line_Info);
-   end New_Line;
+      return new Text_Fragment_Type'(Result);
+   end New_Text_Fragment;
 
    --------------------
    -- On_Cursor_Move --
    --------------------
 
    procedure On_Cursor_Move
-     (Fragment     : in out Root_Fragment_Type;
+     (Fragment     : in out Text_Fragment_Type;
       New_Position : Text_Position)
    is
       Move : Komnenos.Commands.Root_Komnenos_Command'Class :=
@@ -571,7 +566,7 @@ package body Komnenos.Fragments is
    ---------
 
    overriding procedure Put
-     (Fragment : in out Root_Fragment_Type;
+     (Fragment : in out Text_Fragment_Type;
       Text     : in     String;
       Style    : in     Komnenos.Styles.Komnenos_Style;
       Tool_Tip : in     String;
@@ -617,7 +612,7 @@ package body Komnenos.Fragments is
    procedure Register is
    begin
       Komnenos.Session_Objects.Register_Session_Object
-        ("fragment", New_Fragment'Access);
+        ("fragment", New_Text_Fragment'Access);
    end Register;
 
    --------------
@@ -648,7 +643,7 @@ package body Komnenos.Fragments is
    ----------------
 
    overriding procedure Set_Cursor
-     (Fragment : in out Root_Fragment_Type;
+     (Fragment : in out Text_Fragment_Type;
       Cursor   : Cursor_Type;
       Position : Text_Position)
    is
@@ -726,7 +721,7 @@ package body Komnenos.Fragments is
    -------------------
 
    function Text_Contents
-     (Fragment : Root_Fragment_Type)
+     (Fragment : Text_Fragment_Type)
       return String
    is
       use Ada.Strings.Unbounded;

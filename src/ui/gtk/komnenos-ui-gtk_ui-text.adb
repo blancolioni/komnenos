@@ -155,7 +155,7 @@ package body Komnenos.UI.Gtk_UI.Text is
    ----------------------
 
    function Create_Text_View
-     (Fragment : Komnenos.Fragments.Fragment_Type)
+     (Fragment : Komnenos.Fragments.Text_Fragment)
       return Komnenos_Text_View
    is
       Result : constant Komnenos_Text_View :=
@@ -535,7 +535,8 @@ package body Komnenos.UI.Gtk_UI.Text is
    begin
       Fragment.Clear;
       Fragment.Get_Content.Render (Fragment);
-      Fragment.Iterate (Put'Access, New_Line'Access);
+      Komnenos.Fragments.Text_Fragment (Fragment)
+        .Iterate (Put'Access, New_Line'Access);
    end Render_Fragment;
 
    -----------------
@@ -580,7 +581,7 @@ package body Komnenos.UI.Gtk_UI.Text is
 
       Display : constant Komnenos_Text_View :=
                   Komnenos_Text_View (Text_View);
-      Fragment : constant Komnenos.Fragments.Fragment_Type :=
+      Fragment : constant Komnenos.Fragments.Text_Fragment :=
                    Display.Fragment;
       Style         : Komnenos_Style;
       Current_Style : Komnenos_Style;

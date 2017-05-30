@@ -39,40 +39,42 @@ package Komnenos.Entities is
       return access Root_Entity_Reference'class
       is abstract;
 
+   procedure Clear (Visual : in out Entity_Visual) is abstract;
+
+   procedure Invalidate
+     (Visual   : not null access Entity_Visual)
+   is abstract;
+
+   type Text_Entity_Visual is interface and Entity_Visual;
+
    procedure Put
-     (Visual   : in out Entity_Visual;
+     (Visual   : in out Text_Entity_Visual;
       Text     : in     String;
       Style    : in     Komnenos.Styles.Komnenos_Style;
       Tool_Tip : in     String;
       Link     : access Root_Entity_Reference'Class)
    is abstract;
 
-   procedure New_Line (Visual : in out Entity_Visual) is abstract;
-
-   procedure Clear (Visual : in out Entity_Visual) is abstract;
+   procedure New_Line (Visual : in out Text_Entity_Visual) is abstract;
 
    procedure Set_Cursor
-     (Visual   : in out Entity_Visual;
+     (Visual   : in out Text_Entity_Visual;
       Cursor   : Cursor_Type;
       Position : in     Text_Position)
    is abstract;
 
    procedure Insert_At_Cursor
-     (Visual : in out Entity_Visual;
+     (Visual : in out Text_Entity_Visual;
       Text   : String)
    is abstract;
 
    procedure Delete_From_Cursor
-     (Visual   : in out Entity_Visual;
+     (Visual   : in out Text_Entity_Visual;
       Movement : Text_Movement)
    is abstract;
 
-   procedure Invalidate
-     (Visual   : not null access Entity_Visual)
-   is abstract;
-
    procedure Put_Line
-     (Visual   : in out Entity_Visual'Class;
+     (Visual   : in out Text_Entity_Visual'Class;
       Text     : in     String;
       Style    : in     Komnenos.Styles.Komnenos_Style;
       Tool_Tip : in     String := "";
