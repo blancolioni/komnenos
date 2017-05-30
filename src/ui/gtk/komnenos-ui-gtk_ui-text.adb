@@ -613,7 +613,6 @@ package body Komnenos.UI.Gtk_UI.Text is
                                       Gdk.Cursor.Gdk_Cursor_New
                                         (Gdk.Cursor.Xterm));
             when Hand =>
-               Ada.Text_IO.Put_Line ("hand mouse cursor");
                Gdk.Window.Set_Cursor (Window,
                                       Gdk.Cursor.Gdk_Cursor_New
                                         (Gdk.Cursor.Hand2));

@@ -14,7 +14,10 @@ package Komnenos.Entities.Visuals is
       Label_Style : Komnenos.Styles.Komnenos_Style;
       Tool_Tip    : String;
       Link        : access Root_Entity_Reference'Class)
-   is abstract;
+   is abstract
+     with Pre'Class =>
+       Key /= ""
+       and then not (Komnenos.Styles."=" (Label_Style, null));
 
    procedure Move_Node
      (Visual   : in out Diagram_Visual;

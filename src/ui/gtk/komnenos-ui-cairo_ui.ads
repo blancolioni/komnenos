@@ -1,5 +1,7 @@
 with Cairo;
 
+with Komnenos.Fonts;
+
 package Komnenos.UI.Cairo_UI is
 
    procedure Create_Line_Path
@@ -12,5 +14,9 @@ package Komnenos.UI.Cairo_UI is
      (Context       : Cairo.Cairo_Context;
       Rectangle     : Layout_Rectangle;
       Corner_Radius : Pixel_Length);
+
+   procedure Set_Font
+     (Context : Cairo.Cairo_Context;
+      Font    : Komnenos.Fonts.Komnenos_Font);
 
 end Komnenos.UI.Cairo_UI;

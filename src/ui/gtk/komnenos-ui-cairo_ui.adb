@@ -126,4 +126,26 @@ package body Komnenos.UI.Cairo_UI is
          Height => Gdouble (Rectangle.Height));
    end Create_Rectangle_Path;
 
+   --------------
+   -- Set_Font --
+   --------------
+
+   procedure Set_Font
+     (Context : Cairo.Cairo_Context;
+      Font    : Komnenos.Fonts.Komnenos_Font)
+   is
+   begin
+      Cairo.Select_Font_Face
+        (Cr     => Context,
+         Family => Font.Name,
+         Slant  => (if Font.Is_Italic
+                    then Cairo.Cairo_Font_Slant_Italic
+                    else Cairo.Cairo_Font_Slant_Normal),
+         Weight => (if Font.Is_Bold
+                    then Cairo.Cairo_Font_Weight_Bold
+                    else Cairo.Cairo_Font_Weight_Normal));
+      Cairo.Set_Font_Size
+        (Context, Glib.Gdouble (Font.Size));
+   end Set_Font;
+
 end Komnenos.UI.Cairo_UI;

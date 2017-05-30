@@ -47,6 +47,7 @@ private
       record
          Key         : Ada.Strings.Unbounded.Unbounded_String;
          X, Y        : Positive;
+         Rectangle   : Layout_Rectangle;
          Style       : Komnenos.Entities.Visuals.Node_Style;
          Label_Text  : Ada.Strings.Unbounded.Unbounded_String;
          Label_Style : Komnenos.Styles.Komnenos_Style;

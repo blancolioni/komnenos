@@ -16,7 +16,7 @@ package Komnenos.Displays is
 
    procedure Draw_Text
      (Canvas    : in out Canvas_Display;
-      Top_Left  : Layout_Point;
+      Rectangle : in out Layout_Rectangle;
       Font      : Komnenos.Fonts.Komnenos_Font;
       Text      : String)
    is abstract;

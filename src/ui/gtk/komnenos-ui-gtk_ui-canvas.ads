@@ -43,7 +43,7 @@ private
 
    overriding procedure Draw_Text
      (Canvas    : in out Komnenos_Canvas_View_Record;
-      Top_Left  : Layout_Point;
+      Rectangle : in out Layout_Rectangle;
       Font      : Komnenos.Fonts.Komnenos_Font;
       Text      : String);
 
