@@ -1,3 +1,5 @@
+with Ada.Numerics;
+
 with Glib;
 
 package body Komnenos.UI.Cairo_UI is
@@ -5,6 +7,13 @@ package body Komnenos.UI.Cairo_UI is
    Line_Width   : constant Positive := 2;
    Arrow_Length : constant Positive := 10;
    Arrow_Width  : constant Positive := 5;
+
+   procedure Draw_Rounded_Rectangle
+     (Cr            : Cairo.Cairo_Context;
+      X, Y          : Glib.Gdouble;
+      Width, Height : Glib.Gdouble;
+      Aspect        : Glib.Gdouble;
+      Corner_Radius : Glib.Gdouble);
 
    ----------------------
    -- Create_Line_Path --
@@ -116,15 +125,52 @@ package body Komnenos.UI.Cairo_UI is
       Corner_Radius : Pixel_Length)
    is
       use Glib;
-      pragma Unreferenced (Corner_Radius);
    begin
-      Cairo.Rectangle
-        (Cr     => Context,
-         X      => Gdouble (Rectangle.X),
-         Y      => Gdouble (Rectangle.Y),
-         Width  => Gdouble (Rectangle.Width),
-         Height => Gdouble (Rectangle.Height));
+      if Corner_Radius = 0 then
+         Cairo.Rectangle
+           (Cr     => Context,
+            X      => Gdouble (Rectangle.X),
+            Y      => Gdouble (Rectangle.Y),
+            Width  => Gdouble (Rectangle.Width),
+            Height => Gdouble (Rectangle.Height));
+      else
+         Draw_Rounded_Rectangle
+           (Cr            => Context,
+            X             => Gdouble (Rectangle.X),
+            Y             => Gdouble (Rectangle.Y),
+            Width         => Gdouble (Rectangle.Width),
+            Height        => Gdouble (Rectangle.Height),
+            Aspect        => 1.0,
+            Corner_Radius => Gdouble (Corner_Radius));
+      end if;
    end Create_Rectangle_Path;
+
+   ----------------------------
+   -- Draw_Rounded_Rectangle --
+   ----------------------------
+
+   procedure Draw_Rounded_Rectangle
+     (Cr            : Cairo.Cairo_Context;
+      X, Y          : Glib.Gdouble;
+      Width, Height : Glib.Gdouble;
+      Aspect        : Glib.Gdouble;
+      Corner_Radius : Glib.Gdouble)
+   is
+      use Glib;
+      Pi : constant := Ada.Numerics.Pi;
+      Radius : constant Gdouble := Corner_Radius / Aspect;
+   begin
+      Cairo.New_Sub_Path (Cr);
+      Cairo.Arc (Cr, X + Width - Radius, Y + Radius, Radius,
+                 -Pi / 2.0, 0.0);
+      Cairo.Arc (Cr, X + Width - Radius, Y + Height - Radius, Radius,
+                 0.0, Pi / 2.0);
+      Cairo.Arc (Cr, X + Radius, Y + Height - Radius, Radius,
+                 Pi / 2.0, Pi);
+      Cairo.Arc (Cr, X + Radius, Y + Radius, Radius,
+                 Pi, Pi * 1.5);
+      Cairo.Close_Path (Cr);
+   end Draw_Rounded_Rectangle;
 
    --------------
    -- Set_Font --

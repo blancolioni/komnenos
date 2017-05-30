@@ -39,15 +39,20 @@ package body Komnenos.Fragments.Diagrams is
       if Fragment.Canvas /= null then
          for Node of Fragment.Nodes loop
             declare
-               Width     : constant Pixel_Length :=
-                             Fragment.Width / Pixel_Length (Fragment.Columns);
-               Height    : constant Pixel_Length :=
-                             Fragment.Height / Pixel_Length (Fragment.Rows);
+               Default_Size : constant Pixel_Length := 8;
+               Width        : constant Pixel_Length :=
+                                Fragment.Width
+                                  / Pixel_Length (Fragment.Columns);
+               Height       : constant Pixel_Length :=
+                                Fragment.Height
+                                  / Pixel_Length (Fragment.Rows);
             begin
                Node.Rectangle :=
-                 (Pixel_Position (Node.X - 1) * Width + Width / 2,
-                  Pixel_Position (Node.Y - 1) * Height + Height / 2,
-                  2, 2);
+                 (Pixel_Position (Node.X - 1) * Width + Width / 2
+                  - Default_Size / 2,
+                  Pixel_Position (Node.Y - 1) * Height + Height / 2
+                  - Default_Size / 2,
+                  Default_Size, Default_Size);
                Render (Node, Fragment.Canvas);
             end;
          end loop;
@@ -99,6 +104,8 @@ package body Komnenos.Fragments.Diagrams is
    begin
       return Diagram : constant Diagram_Fragment := New_Diagram do
          Diagram.Set_Content (Entity);
+         Diagram.Layout_Rec.Width := 500;
+         Diagram.Layout_Rec.Height := 200;
       end return;
    end New_Diagram;
 
@@ -142,18 +149,34 @@ package body Komnenos.Fragments.Diagrams is
      (Node      : in out Diagram_Node;
       Display   : not null access Komnenos.Displays.Canvas_Display'Class)
    is
+      use Komnenos.Entities.Visuals;
+      Label : constant String := -Node.Label_Text;
    begin
-      Display.Draw_Text
-        (Rectangle => Node.Rectangle,
-         Font      => Node.Label_Style.Font,
-         Text      => -Node.Label_Text);
 
-      Display.Draw_Rectangle
-        (Rectangle         => Node.Rectangle,
-         Border_Colour     => Komnenos.Colours.Black,
-         Background_Colour => Komnenos.Colours.White,
-         Filled            => False,
-         Corner_Radius     => 15);
+      if Label /= "" then
+         Display.Draw_Text
+           (Rectangle => Node.Rectangle,
+            Font      => Node.Label_Style.Font,
+            Text      => -Node.Label_Text);
+      end if;
+
+      declare
+         Corner_Radius : constant Pixel_Length :=
+                           (case Node.Style is
+                               when Box         => 0,
+                               when Rounded_Box =>
+                                  Node.Rectangle.Height / 3,
+                               when Small_Circle =>
+                                  Node.Rectangle.Height / 2,
+                               when Internal     => 0);
+      begin
+         Display.Draw_Rectangle
+           (Rectangle         => Node.Rectangle,
+            Border_Colour     => Komnenos.Colours.Black,
+            Background_Colour => Komnenos.Colours.White,
+            Filled            => False,
+            Corner_Radius     => Corner_Radius);
+      end;
 
    end Render;
 
