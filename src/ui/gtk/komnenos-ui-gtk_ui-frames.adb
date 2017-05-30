@@ -9,6 +9,7 @@ with Gtk.Button;
 with Gtk.Event_Box;
 with Gtk.Label;
 
+with Komnenos.UI.Gtk_UI.Canvas;
 with Komnenos.UI.Gtk_UI.Text;
 
 with Komnenos.Colours.Gtk_Colours;
@@ -41,6 +42,10 @@ package body Komnenos.UI.Gtk_UI.Frames is
    procedure On_Close_Frame_Clicked
      (Self : access Glib.Object.GObject_Record'Class);
 
+   function Create_Content_Widget
+     (Fragment : Komnenos.Fragments.Fragment_Type)
+      return Gtk.Widget.Gtk_Widget;
+
    -------------------
    -- Border_Colour --
    -------------------
@@ -53,6 +58,25 @@ package body Komnenos.UI.Gtk_UI.Frames is
       return Komnenos.Colours.Gtk_Colours.To_Gdk_RGBA
         (Fragment.Fragment.Border_Colour);
    end Border_Colour;
+
+   ---------------------------
+   -- Create_Content_Widget --
+   ---------------------------
+
+   function Create_Content_Widget
+     (Fragment : Komnenos.Fragments.Fragment_Type)
+      return Gtk.Widget.Gtk_Widget
+   is
+   begin
+      if Fragment.all in Komnenos.Fragments.Text_Fragment_Type'Class then
+         return Gtk.Widget.Gtk_Widget
+           (Komnenos.UI.Gtk_UI.Text.Create_Text_View
+              (Komnenos.Fragments.Text_Fragment (Fragment)));
+      else
+         return Gtk.Widget.Gtk_Widget
+           (Komnenos.UI.Gtk_UI.Canvas.Create_Canvas_View (Fragment));
+      end if;
+   end Create_Content_Widget;
 
    --------------
    -- Fragment --
@@ -81,9 +105,11 @@ package body Komnenos.UI.Gtk_UI.Frames is
                  (Orientation => Gtk.Enums.Orientation_Horizontal,
                   Spacing     => 0);
       Close : Gtk.Button.Gtk_Button;
-      Text : constant Komnenos.UI.Gtk_UI.Text.Komnenos_Text_View :=
-               Komnenos.UI.Gtk_UI.Text.Create_Text_View
-                 (Komnenos.Fragments.Text_Fragment (Fragment));
+      Content : constant Gtk.Widget.Gtk_Widget :=
+                  Create_Content_Widget (Fragment);
+--        Text : constant Komnenos.UI.Gtk_UI.Text.Komnenos_Text_View :=
+--                 Komnenos.UI.Gtk_UI.Text.Create_Text_View
+--                   (Komnenos.Fragments.Text_Fragment (Fragment));
       Label  : Gtk.Label.Gtk_Label;
       Events : Gtk.Event_Box.Gtk_Event_Box;
       Object : constant Frame_Object_Access := new Frame_Object_Record;
@@ -134,7 +160,7 @@ package body Komnenos.UI.Gtk_UI.Frames is
                    Top    => 1,
                    Width  => 1,
                    Height => 1);
-      Grid.Attach (Text,
+      Grid.Attach (Content,
                    Left   => 1,
                    Top    => 2,
                    Width  => 1,
@@ -146,7 +172,7 @@ package body Komnenos.UI.Gtk_UI.Frames is
 
       Grid.Show_All;
 
-      Fragment.Set_Text_Display (Text);
+      --  Fragment.Set_Text_Display (Text);
 
       return Grid;
 

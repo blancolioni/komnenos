@@ -34,7 +34,8 @@ package body Komnenos.Fragments is
       Fragment     : not null access Fragments.Root_Fragment_Type'Class)
    is null;
 
-   Local_Null_Text_Display : aliased Null_Text_Display;
+   Local_Null_Text_Display : aliased Null_Text_Display
+     with Unreferenced;
 
    function New_Text_Fragment
      return access Komnenos.Session_Objects.Session_Object_Interface'Class;
@@ -77,7 +78,7 @@ package body Komnenos.Fragments is
    -- Clear --
    -----------
 
-   overriding procedure Clear (Fragment : in out Root_Fragment_Type) is
+   overriding procedure Clear (Fragment : in out Text_Fragment_Type) is
    begin
       Fragment.Lines.Clear;
       Fragment.Display.Set_Content ("");
@@ -353,7 +354,6 @@ package body Komnenos.Fragments is
 
    overriding procedure Initialize (Fragment : in out Root_Fragment_Type) is
    begin
-      Fragment.Display := Local_Null_Text_Display'Access;
       Fragment.Layout_Rec := (0, 0, 350, 200);
       Fragment.Lines.Append (new Line_Info);
       Fragment.Default_Style := Komnenos.Themes.Active_Theme.Default_Style;
@@ -377,7 +377,7 @@ package body Komnenos.Fragments is
    ----------------
 
    overriding procedure Invalidate
-     (Fragment : not null access Root_Fragment_Type)
+     (Fragment : not null access Text_Fragment_Type)
    is
    begin
       Fragment.Display.Render_Fragment (Fragment);
@@ -477,7 +477,7 @@ package body Komnenos.Fragments is
    function New_Text_Fragment
      return access Komnenos.Session_Objects.Session_Object_Interface'Class
    is
-      Result :  constant Fragment_Type := new Root_Fragment_Type;
+      Result :  constant Fragment_Type := new Text_Fragment_Type;
    begin
       return Result;
    end New_Text_Fragment;
@@ -626,6 +626,18 @@ package body Komnenos.Fragments is
       Fragment.Needs_Render := False;
    end Rendered;
 
+   ----------------
+   -- Set_Canvas --
+   ----------------
+
+   procedure Set_Canvas
+     (Fragment : in out Root_Fragment_Type'Class;
+      Canvas   : access Komnenos.Displays.Canvas_Display'Class)
+   is
+   begin
+      Fragment.Canvas := Canvas;
+   end Set_Canvas;
+
    -----------------
    -- Set_Content --
    -----------------
@@ -704,17 +716,17 @@ package body Komnenos.Fragments is
    -- Set_Text_Display --
    ----------------------
 
-   procedure Set_Text_Display
-     (Fragment : in out Root_Fragment_Type;
-      Display  : access Text_Editor_Display'Class)
-   is
-   begin
-      if Display = null then
-         Fragment.Display := Local_Null_Text_Display'Access;
-      else
-         Fragment.Display := Display;
-      end if;
-   end Set_Text_Display;
+--     procedure Set_Text_Display
+--       (Fragment : in out Root_Fragment_Type;
+--        Display  : access Text_Editor_Display'Class)
+--     is
+--     begin
+--        if Display = null then
+--           Fragment.Display := Local_Null_Text_Display'Access;
+--        else
+--           Fragment.Display := Display;
+--        end if;
+--     end Set_Text_Display;
 
    -------------------
    -- Text_Contents --
