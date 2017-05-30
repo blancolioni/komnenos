@@ -22,7 +22,7 @@ package Komnenos.UI.Gtk_UI.Text is
    type Komnenos_Text_View is access all Komnenos_Text_View_Record'Class;
 
    function Create_Text_View
-     (Fragment : Komnenos.Fragments.Fragment_Type)
+     (Fragment : Komnenos.Fragments.Text_Fragment)
       return Komnenos_Text_View;
 
 private
@@ -47,7 +47,7 @@ private
          Hover_Start            : Natural  := 0;
          Hover_Finish           : Natural := 0;
          Hover_Style            : Komnenos.Styles.Komnenos_Style;
-         Fragment               : Komnenos.Fragments.Fragment_Type;
+         Fragment               : Komnenos.Fragments.Text_Fragment;
          Highlights             : List_Of_Line_Highlights.List;
          Current_Line_Highlight : Komnenos.Colours.Komnenos_Colour;
          Initialising           : Boolean := True;

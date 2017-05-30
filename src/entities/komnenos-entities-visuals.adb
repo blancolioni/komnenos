@@ -56,7 +56,8 @@ package body Komnenos.Entities.Visuals is
                      Bound_Entity_Map.Element (Entity.Key);
          begin
             for Visual of List loop
-               Visual.Delete_From_Cursor ((Character_Unit, Offset));
+               Text_Entity_Visual'Class (Visual.all)
+                 .Delete_From_Cursor ((Character_Unit, Offset));
             end loop;
          end;
       end if;
@@ -79,7 +80,8 @@ package body Komnenos.Entities.Visuals is
                      Bound_Entity_Map.Element (Entity.Key);
          begin
             for Visual of List loop
-               Visual.Insert_At_Cursor (Text);
+               Text_Entity_Visual'Class (Visual.all)
+                 .Insert_At_Cursor (Text);
             end loop;
          end;
       end if;
@@ -153,7 +155,8 @@ package body Komnenos.Entities.Visuals is
                      Bound_Entity_Map.Element (Entity.Key);
          begin
             for Visual of List loop
-               Visual.Set_Cursor (Cursor, Position);
+               Text_Entity_Visual'Class (Visual.all)
+                 .Set_Cursor (Cursor, Position);
             end loop;
          end;
       end if;

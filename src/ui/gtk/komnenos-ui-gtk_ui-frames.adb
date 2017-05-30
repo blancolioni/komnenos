@@ -83,7 +83,7 @@ package body Komnenos.UI.Gtk_UI.Frames is
       Close : Gtk.Button.Gtk_Button;
       Text : constant Komnenos.UI.Gtk_UI.Text.Komnenos_Text_View :=
                Komnenos.UI.Gtk_UI.Text.Create_Text_View
-                 (Fragment);
+                 (Komnenos.Fragments.Text_Fragment (Fragment));
       Label  : Gtk.Label.Gtk_Label;
       Events : Gtk.Event_Box.Gtk_Event_Box;
       Object : constant Frame_Object_Access := new Frame_Object_Record;
