@@ -7,9 +7,11 @@ package body Komnenos.Fragments.Diagrams is
    function "+" (S : String) return Ada.Strings.Unbounded.Unbounded_String
                  renames Ada.Strings.Unbounded.To_Unbounded_String;
 
+   function "-" (S : Ada.Strings.Unbounded.Unbounded_String) return String
+                 renames Ada.Strings.Unbounded.To_String;
+
    procedure Render
-     (Node      : Diagram_Node;
-      Rectangle : Layout_Rectangle;
+     (Node      : in out Diagram_Node;
       Display   : not null access Komnenos.Displays.Canvas_Display'Class);
 
    overriding procedure Clear (Fragment : in out Diagram_Fragment_Type)
@@ -41,12 +43,12 @@ package body Komnenos.Fragments.Diagrams is
                              Fragment.Width / Pixel_Length (Fragment.Columns);
                Height    : constant Pixel_Length :=
                              Fragment.Height / Pixel_Length (Fragment.Rows);
-               Rectangle : constant Layout_Rectangle :=
-                             (Pixel_Position (Node.X - 1) * Width,
-                              Pixel_Position (Node.Y - 1) * Height,
-                              Width, Height);
             begin
-               Render (Node, Rectangle, Fragment.Canvas);
+               Node.Rectangle :=
+                 (Pixel_Position (Node.X - 1) * Width + Width / 2,
+                  Pixel_Position (Node.Y - 1) * Height + Height / 2,
+                  2, 2);
+               Render (Node, Fragment.Canvas);
             end;
          end loop;
       end if;
@@ -119,6 +121,7 @@ package body Komnenos.Fragments.Diagrams is
         (Key         => +Key,
          X           => X,
          Y           => Y,
+         Rectangle   => (0, 0, 1, 1),
          Style       => Style,
          Label_Text  => +Label_Text,
          Label_Style => Label_Style,
@@ -136,23 +139,22 @@ package body Komnenos.Fragments.Diagrams is
    ------------
 
    procedure Render
-     (Node      : Diagram_Node;
-      Rectangle : Layout_Rectangle;
+     (Node      : in out Diagram_Node;
       Display   : not null access Komnenos.Displays.Canvas_Display'Class)
    is
-      pragma Unreferenced (Node);
    begin
-      Ada.Text_IO.Put_Line
-        ("draw rectangle:"
-         & Rectangle.X'Img & Rectangle.Y'Img
-         & Rectangle.Width'Img & Rectangle.Height'Img);
+      Display.Draw_Text
+        (Rectangle => Node.Rectangle,
+         Font      => Node.Label_Style.Font,
+         Text      => -Node.Label_Text);
 
       Display.Draw_Rectangle
-        (Rectangle         => Rectangle,
+        (Rectangle         => Node.Rectangle,
          Border_Colour     => Komnenos.Colours.Black,
          Background_Colour => Komnenos.Colours.White,
          Filled            => False,
          Corner_Radius     => 15);
+
    end Render;
 
 end Komnenos.Fragments.Diagrams;

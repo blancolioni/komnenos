@@ -1,5 +1,7 @@
 with Ada.Text_IO;
 
+with Interfaces.C.Strings;
+
 with Glib;
 
 with Gdk.Event;
@@ -170,7 +172,7 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       Context : constant Cairo.Cairo_Context :=
                   Cairo.Create (Canvas.Surface);
    begin
-      Cairo.Set_Line_Width (Context, 4.0);
+      Cairo.Set_Line_Width (Context, 3.0);
 
       Cairo.Set_Line_Cap (Context, Cairo.Cairo_Line_Cap_Butt);
       Cairo.Set_Line_Join (Context, Cairo.Cairo_Line_Join_Round);
@@ -200,9 +202,49 @@ package body Komnenos.UI.Gtk_UI.Canvas is
 
    overriding procedure Draw_Text
      (Canvas    : in out Komnenos_Canvas_View_Record;
-      Top_Left  : Layout_Point;
+      Rectangle : in out Layout_Rectangle;
       Font      : Komnenos.Fonts.Komnenos_Font;
       Text      : String)
-   is null;
+   is
+      use Glib;
+      Extents : aliased Cairo.Cairo_Text_Extents;
+      Context : constant Cairo.Cairo_Context :=
+                  Cairo.Create (Canvas.Surface);
+      C_Text  : Interfaces.C.Strings.chars_ptr :=
+                  Interfaces.C.Strings.New_String (Text);
+   begin
+      Komnenos.UI.Cairo_UI.Set_Font (Context, Font);
+      Cairo.Text_Extents (Context, C_Text, Extents'Access);
+      Cairo.Move_To
+        (Context,
+         Glib.Gdouble (Rectangle.X + Rectangle.Width / 2)
+         - Extents.Width / 2.0,
+         Glib.Gdouble (Rectangle.Y - Rectangle.Height / 2)
+         + Extents.Height / 2.0);
+      Cairo.Show_Text (Context, Text);
+      Interfaces.C.Strings.Free (C_Text);
+      Cairo.Destroy (Context);
+
+      if Pixel_Length (Extents.Width * 1.3) > Rectangle.Width then
+         declare
+            D : constant Pixel_Length :=
+                  Pixel_Length (Extents.Width * 1.3) - Rectangle.Width;
+         begin
+            Rectangle.X := Rectangle.X - D / 2 - 1;
+            Rectangle.Width := Rectangle.Width + D + 2;
+         end;
+      end if;
+
+      if Pixel_Length (Extents.Height) * 2 > Rectangle.Height then
+         declare
+            D : constant Pixel_Length :=
+                  Pixel_Length (Extents.Height) * 2 - Rectangle.Height;
+         begin
+            Rectangle.Y := Rectangle.Y - D / 2 - 1;
+            Rectangle.Height := Rectangle.Height + D + 2;
+         end;
+      end if;
+
+   end Draw_Text;
 
 end Komnenos.UI.Gtk_UI.Canvas;
