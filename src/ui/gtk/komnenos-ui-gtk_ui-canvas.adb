@@ -170,6 +170,11 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       Context : constant Cairo.Cairo_Context :=
                   Cairo.Create (Canvas.Surface);
    begin
+      Cairo.Set_Line_Width (Context, 4.0);
+
+      Cairo.Set_Line_Cap (Context, Cairo.Cairo_Line_Cap_Butt);
+      Cairo.Set_Line_Join (Context, Cairo.Cairo_Line_Join_Round);
+
       Cairo_UI.Create_Rectangle_Path
         (Context       => Context,
          Rectangle     => Rectangle,
