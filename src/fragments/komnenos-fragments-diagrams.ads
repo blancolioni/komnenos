@@ -1,3 +1,4 @@
+private with Ada.Containers.Doubly_Linked_Lists;
 private with Ada.Containers.Vectors;
 
 with Komnenos.Entities.Visuals;
@@ -28,7 +29,10 @@ package Komnenos.Fragments.Diagrams is
 
    overriding procedure Connect_Nodes
      (Diagram     : in out Diagram_Fragment_Type;
-      From, To    : String);
+      From_Key    : String;
+      From_Edge   : Komnenos.Entities.Visuals.Node_Edge;
+      To_Key      : String;
+      To_Edge     : Komnenos.Entities.Visuals.Node_Edge);
 
    overriding procedure Invalidate
      (Fragment : not null access Diagram_Fragment_Type);
@@ -43,6 +47,15 @@ package Komnenos.Fragments.Diagrams is
 
 private
 
+   type Node_Connection is
+      record
+         From, To : Positive;
+         From_Edge, To_Edge : Komnenos.Entities.Visuals.Node_Edge;
+      end record;
+
+   package Node_Connection_Lists is
+     new Ada.Containers.Doubly_Linked_Lists (Node_Connection);
+
    type Diagram_Node is
       record
          Key         : Ada.Strings.Unbounded.Unbounded_String;
@@ -53,6 +66,7 @@ private
          Label_Style : Komnenos.Styles.Komnenos_Style;
          Tool_Tip    : Ada.Strings.Unbounded.Unbounded_String;
          Link        : Komnenos.Entities.Entity_Reference;
+         Connections : Node_Connection_Lists.List;
       end record;
 
    package Node_Vectors is

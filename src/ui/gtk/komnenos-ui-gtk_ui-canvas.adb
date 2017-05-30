@@ -1,5 +1,3 @@
-with Ada.Text_IO;
-
 with Interfaces.C.Strings;
 
 with Glib;
@@ -38,9 +36,6 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       Result : constant Komnenos_Canvas_View :=
                  new Komnenos_Canvas_View_Record;
    begin
-
-      Ada.Text_IO.Put_Line
-        ("gtk: new canvas view");
 
       Gtk.Drawing_Area.Initialize (Result);
       Result.Fragment := Fragment;
@@ -122,10 +117,6 @@ package body Komnenos.UI.Gtk_UI.Canvas is
            Width   => Event.Width,
            Height  => Event.Height);
 
-      Ada.Text_IO.Put_Line
-        ("canvas:" & Integer'Image (Integer (Event.Width))
-         & " x" & Integer'Image (Integer (Event.Height)));
-
       Canvas.Fragment.Invalidate;
 
       return True;
@@ -141,8 +132,6 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       return Boolean
    is
    begin
-      Ada.Text_IO.Put_Line
-        ("gtk: canvas: draw");
       Cairo.Set_Source_Surface
         (Cr, Komnenos_Canvas_View_Record (Widget.all).Surface,
          0.0, 0.0);
@@ -160,7 +149,103 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       Colour    : Komnenos.Colours.Komnenos_Colour;
       Curved    : Boolean;
       Arrow     : Boolean)
-   is null;
+   is
+      use Glib;
+      Cr           : constant Cairo.Cairo_Context :=
+                       Cairo.Create (Canvas.Surface);
+      Line_Width   : constant Positive := 2;
+      Arrow_Length : constant Positive := 6;
+      Arrow_Width  : constant Positive := 3;
+      Xs           : array (Line'Range) of Gdouble;
+      Ys           : array (Line'Range) of Gdouble;
+
+   begin
+
+      if Curved and then Line'Length > 4 then
+         Draw_Line (Canvas, Line (Line'First .. Line'First + 3),
+                    Colour, Curved, False);
+         Draw_Line (Canvas, Line (Line'First + 3 .. Line'Last),
+                    Colour, Curved, Arrow);
+         return;
+      end if;
+
+      Komnenos.Colours.Cairo_Colours.Set_Source_Rgb (Cr, Colour);
+
+      Cairo.Set_Line_Width (Cr, Glib.Gdouble (Line_Width));
+      Cairo.Set_Line_Cap (Cr, Cairo.Cairo_Line_Cap_Butt);
+      Cairo.Set_Line_Join (Cr, Cairo.Cairo_Line_Join_Round);
+
+      for I in Line'Range loop
+         Xs (I) := Gdouble (Line (I).X);
+         Ys (I) := Gdouble (Line (I).Y);
+      end loop;
+
+      if Line'Length = 2 then
+         Cairo.Move_To (Cr, Xs (Xs'First), Ys (Ys'First));
+         Cairo.Line_To (Cr, Xs (Xs'Last), Ys (Ys'Last));
+      elsif not Curved then
+         for I in Xs'Range loop
+            if I = Xs'First then
+               Cairo.Move_To (Cr, Xs (I), Ys (I));
+            else
+               Cairo.Line_To (Cr, Xs (I), Ys (I));
+            end if;
+         end loop;
+      elsif Line'Length = 3 then
+         Cairo.Move_To (Cr, Xs (Xs'First), Ys (Ys'First));
+         Cairo.Curve_To
+           (Cr,
+            Xs (Xs'First + 1), Ys (Ys'First + 1),
+            Xs (Xs'First + 1), Ys (Ys'First + 1),
+            Xs (Xs'First + 2), Ys (Ys'First + 2));
+      else
+         Cairo.Move_To (Cr, Xs (Xs'First), Ys (Ys'First));
+         Cairo.Curve_To
+           (Cr,
+            Xs (Xs'First + 1), Ys (Ys'First + 1),
+            Xs (Xs'First + 2), Ys (Ys'First + 2),
+            Xs (Xs'First + 3), Ys (Ys'First + 3));
+      end if;
+
+      if Arrow then
+         declare
+            L  : constant Gdouble :=
+                   Gdouble (Arrow_Length);
+            W  : constant Gdouble :=
+                   Gdouble (Arrow_Width);
+            X  : constant Gdouble := Xs (Xs'Last);
+            Y  : constant Gdouble := Ys (Ys'Last);
+            PX : constant Gdouble := Xs (Xs'Last - 1);
+            PY : constant Gdouble := Ys (Ys'Last - 1);
+         begin
+            if PX /= X then
+               declare
+                  Offset : constant Gdouble :=
+                             (if PX < X then -L else L);
+               begin
+                  Cairo.Line_To
+                    (Cr, X + Offset, Y - W);
+                  Cairo.Move_To (Cr, X, Y);
+                  Cairo.Line_To
+                    (Cr, X + Offset, Y + W);
+               end;
+            else
+               declare
+                  Offset : constant Gdouble :=
+                             (if PY < Y then -L else L);
+               begin
+                  Cairo.Line_To
+                    (Cr, X - W, Y + Offset);
+                  Cairo.Move_To (Cr, X, Y);
+                  Cairo.Line_To
+                    (Cr, X + W, Y + Offset);
+               end;
+            end if;
+         end;
+      end if;
+      Cairo.Stroke (Cr);
+      Cairo.Destroy (Cr);
+   end Draw_Line;
 
    --------------------
    -- Draw_Rectangle --
