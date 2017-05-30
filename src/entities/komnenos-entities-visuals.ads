@@ -1,28 +1,30 @@
 package Komnenos.Entities.Visuals is
 
-   procedure Bind_Visual
-     (Visual : not null access Entity_Visual'Class;
-      Entity : not null access Root_Entity_Reference'Class);
+   type Node_Style is
+     (Box, Rounded_Box, Small_Circle, Internal);
 
-   procedure Unbind_Visual
-     (Visual : not null access Entity_Visual'Class);
+   type Diagram_Visual is interface and Entity_Visual;
 
-   procedure Invalidate_Visuals
-     (Entity : in out Root_Entity_Reference'Class);
+   procedure Put_Node
+     (Visual      : in out Diagram_Visual;
+      Key         : String;
+      X, Y        : Positive;
+      Style       : Node_Style;
+      Label_Text  : String;
+      Label_Style : Komnenos.Styles.Komnenos_Style;
+      Tool_Tip    : String;
+      Link        : access Root_Entity_Reference'Class)
+   is abstract;
 
-   procedure Update_Cursor
-     (Entity   : in out Root_Entity_Reference'Class;
-      Cursor   : Cursor_Type;
-      Position : Text_Position);
+   procedure Move_Node
+     (Visual   : in out Diagram_Visual;
+      Key      : String;
+      X, Y     : Positive)
+   is abstract;
 
-   procedure Insert_At_Cursor
-     (Entity : in out Root_Entity_Reference'Class;
-      Cursor : Cursor_Type;
-      Text   : String);
-
-   procedure Delete_At_Cursor
-     (Entity : in out Root_Entity_Reference'Class;
-      Cursor : Cursor_Type;
-      Offset : Text_Offset);
+   procedure Connect_Nodes
+     (Visual   : in out Diagram_Visual;
+      From, To : String)
+   is abstract;
 
 end Komnenos.Entities.Visuals;

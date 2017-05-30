@@ -9,6 +9,7 @@ with Komnenos.Colours;
 with Komnenos.Keys.Sequences;
 with Komnenos.Styles;
 
+with Komnenos.Displays;
 with Komnenos.Entities;
 with Komnenos.Session_Objects;
 
@@ -40,12 +41,12 @@ package Komnenos.Fragments is
    is abstract;
 
    type Root_Fragment_Type is
-     new Komnenos.Entities.Entity_Visual
+     abstract new Komnenos.Entities.Entity_Visual
      and Komnenos.Session_Objects.Session_Object_Interface
    with private;
 
    procedure Render_Fragment
-     (Editor : in out Text_Editor_Display;
+     (Editor   : in out Text_Editor_Display;
       Fragment : not null access Root_Fragment_Type'Class)
    is abstract;
 
@@ -88,9 +89,9 @@ package Komnenos.Fragments is
      (Fragment : Root_Fragment_Type) return Pixel_Length
    is (Fragment.Rectangle.Height);
 
-   procedure Set_Text_Display
-     (Fragment : in out Root_Fragment_Type;
-      Display  : access Text_Editor_Display'Class);
+--     procedure Set_Text_Display
+--       (Fragment : in out Root_Fragment_Type;
+--        Display  : access Text_Editor_Display'Class);
 
    procedure Execute
      (Fragment : in out Root_Fragment_Type'Class;
@@ -115,8 +116,6 @@ package Komnenos.Fragments is
    function Entity_Key (Fragment : Root_Fragment_Type'Class)
                         return String;
 
-   overriding procedure Clear (Fragment : in out Root_Fragment_Type);
-
    procedure On_Key_Press
      (Fragment : in out Root_Fragment_Type;
       Key      : Komnenos.Keys.Komnenos_Key);
@@ -137,6 +136,10 @@ package Komnenos.Fragments is
      (Fragment : Root_Fragment_Type)
       return Komnenos.Colours.Komnenos_Colour;
 
+   procedure Set_Canvas
+     (Fragment : in out Root_Fragment_Type'Class;
+      Canvas   : access Komnenos.Displays.Canvas_Display'Class);
+
    type Fragment_Type is access all Root_Fragment_Type'Class;
 
    type Text_Fragment_Type is
@@ -145,6 +148,8 @@ package Komnenos.Fragments is
    with private;
 
    type Text_Fragment is access all Text_Fragment_Type'Class;
+
+   overriding procedure Clear (Fragment : in out Text_Fragment_Type);
 
    overriding procedure Put
      (Fragment : in out Text_Fragment_Type;
@@ -235,12 +240,11 @@ private
        (Positive, Line_Info_Access);
 
    type Root_Fragment_Type is
-     new Ada.Finalization.Controlled
+     abstract new Ada.Finalization.Controlled
      and Komnenos.Entities.Entity_Visual
      and Komnenos.Session_Objects.Session_Object_Interface with
       record
          Content           : Komnenos.Entities.Entity_Reference;
-         Display           : access Text_Editor_Display'Class;
          Point             : Text_Position := 0;
          Commands          : Komnenos.Commands.Manager.Command_Manager;
          Default_Style     : Komnenos.Styles.Komnenos_Style;
@@ -255,6 +259,7 @@ private
          Key_Sequence      : Komnenos.Keys.Sequences.Key_Sequence;
          Bindings          : Komnenos.Commands.Bindings.Binding_Table;
          Lines             : Line_Vectors.Vector;
+         Canvas            : access Komnenos.Displays.Canvas_Display'Class;
          Needs_Render      : Boolean := False;
       end record;
 
@@ -279,9 +284,6 @@ private
       return access Komnenos.Entities.Root_Entity_Reference'Class
    is (Fragment.Content);
 
-   overriding procedure Invalidate
-     (Fragment : not null access Root_Fragment_Type);
-
    function Needs_Render
      (Fragment : Root_Fragment_Type)
       return Boolean;
@@ -295,8 +297,11 @@ private
      new Root_Fragment_Type
      and Komnenos.Entities.Text_Entity_Visual with
       record
-         null;
+         Display : access Text_Editor_Display'Class;
       end record;
+
+   overriding procedure Invalidate
+     (Fragment : not null access Text_Fragment_Type);
 
    overriding procedure Set_Cursor
      (Fragment : in out Text_Fragment_Type;

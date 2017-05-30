@@ -4,7 +4,7 @@ with Ada.Containers.Hashed_Maps;
 with Ada.Strings.Unbounded.Equal_Case_Insensitive;
 with Ada.Strings.Unbounded.Hash_Case_Insensitive;
 
-package body Komnenos.Entities.Visuals is
+package body Komnenos.Entities.Visual_Manager is
 
    package List_Of_Visuals is
      new Ada.Containers.Doubly_Linked_Lists (Entity_Visual_Access);
@@ -162,4 +162,4 @@ package body Komnenos.Entities.Visuals is
       end if;
    end Update_Cursor;
 
-end Komnenos.Entities.Visuals;
+end Komnenos.Entities.Visual_Manager;

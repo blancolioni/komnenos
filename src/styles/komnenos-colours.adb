@@ -9,7 +9,7 @@ package body Komnenos.Colours is
 
    function Black return Komnenos_Colour is
    begin
-      return From_String ("white");
+      return From_String ("black");
    end Black;
 
    --------------
