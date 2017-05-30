@@ -12,6 +12,11 @@ with Komnenos.UI.Cairo_UI;
 
 package body Komnenos.UI.Gtk_UI.Canvas is
 
+   Min_Width         : constant := 30;
+   Min_Height        : constant := 30;
+   Margin_Across     : constant := 4;
+   Margin_Down       : constant := 3;
+
    function Draw_Area_Draw_Handler
      (Widget : access Gtk.Widget.Gtk_Widget_Record'Class;
       Cr     : Cairo.Cairo_Context)
@@ -219,31 +224,41 @@ package body Komnenos.UI.Gtk_UI.Canvas is
         (Context,
          Glib.Gdouble (Rectangle.X + Rectangle.Width / 2)
          - Extents.Width / 2.0,
-         Glib.Gdouble (Rectangle.Y - Rectangle.Height / 2)
+         Glib.Gdouble (Rectangle.Y + Rectangle.Height / 2)
          + Extents.Height / 2.0);
       Cairo.Show_Text (Context, Text);
       Interfaces.C.Strings.Free (C_Text);
       Cairo.Destroy (Context);
 
-      if Pixel_Length (Extents.Width * 1.3) > Rectangle.Width then
-         declare
-            D : constant Pixel_Length :=
-                  Pixel_Length (Extents.Width * 1.3) - Rectangle.Width;
-         begin
-            Rectangle.X := Rectangle.X - D / 2 - 1;
-            Rectangle.Width := Rectangle.Width + D + 2;
-         end;
-      end if;
+      declare
+         W_Min : constant Pixel_Length :=
+                   Pixel_Length'Max
+                     (Pixel_Length (Extents.Width) + 2 * Margin_Across,
+                      Min_Width);
+         D     : constant Pixel_Length :=
+                   (if W_Min < Rectangle.Width then 0
+                    else W_Min - Rectangle.Width);
+      begin
+         if D > 0 then
+            Rectangle.X := Rectangle.X - D / 2;
+            Rectangle.Width := Rectangle.Width + D;
+         end if;
+      end;
 
-      if Pixel_Length (Extents.Height) * 2 > Rectangle.Height then
-         declare
-            D : constant Pixel_Length :=
-                  Pixel_Length (Extents.Height) * 2 - Rectangle.Height;
-         begin
-            Rectangle.Y := Rectangle.Y - D / 2 - 1;
-            Rectangle.Height := Rectangle.Height + D + 2;
-         end;
-      end if;
+      declare
+         H_Min : constant Pixel_Length :=
+                   Pixel_Length'Max
+                     (Pixel_Length (Extents.Height) + 2 * Margin_Down,
+                      Min_Height);
+         D     : constant Pixel_Length :=
+                   (if H_Min < Rectangle.Height then 0
+                    else H_Min - Rectangle.Height);
+      begin
+         if D > 0 then
+            Rectangle.Y := Rectangle.Y - D / 2;
+            Rectangle.Height := Rectangle.Height + D;
+         end if;
+      end;
 
    end Draw_Text;
 
