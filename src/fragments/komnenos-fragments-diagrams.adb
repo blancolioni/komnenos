@@ -1,5 +1,3 @@
-with Ada.Text_IO;
-
 with Komnenos.Displays;
 
 package body Komnenos.Fragments.Diagrams is
@@ -93,44 +91,45 @@ package body Komnenos.Fragments.Diagrams is
                Arrow  => To.Style /= Internal);
          else
             declare
-               Line : constant Layout_Line :=
-                        (Start,
-                         (Start.X + 6, Start.Y),
-                         (Start.X + 6, Start.Y - 6),
-                         (Start.X + 6, Start.Y - 32),
-                         (Start.X + 12, Start.Y - 40),
-                         (Finish.X - 12, Start.Y - 40),
-                         (Finish.X - 6, Start.Y - 32),
-                         (Finish.X - 6, Finish.Y - 6),
-                         Finish);
+               use Komnenos.Displays;
+               Path : constant Komnenos.Displays.Turtle_Path :=
+                        (Turn (North, 6),
+                         Move (15),
+                         Turn (East, 6),
+                         Move (Finish.X - Start.X - 42),
+                         Turn (South, 6),
+                         Move (15),
+                         Turn (East, 6),
+                         Move (18));
             begin
-               Display.Draw_Line
-                 (Line   => Line,
-                  Colour => Komnenos.Colours.Black,
-                  Curved => True,
-                  Arrow  => To.Style /= Internal);
+               Display.Draw_Turtle_Path
+                 (Start_Location  => Start,
+                  Start_Direction => East,
+                  Path            => Path,
+                  Colour          => Komnenos.Colours.Black,
+                  Arrow           => To.Style /= Internal);
             end;
          end if;
       else
          declare
-            Line : constant Layout_Line :=
-                     (Start,
-                      (Start.X + 6, Start.Y),
-                      (Start.X + 6, Start.Y + 6),
-                      (Start.X + 6, Start.Y + 32),
-                      (Start.X + 12, Start.Y + 40),
-                      (Finish.X - 12, Start.Y + 40),
-                      (Finish.X - 6, Start.Y + 32),
-                      (Finish.X - 6, Finish.Y + 6),
-                      Finish);
+            use Komnenos.Displays;
+            Path : constant Komnenos.Displays.Turtle_Path :=
+                     (Turn (South, 6),
+                      Move (15),
+                      Turn (West, 6),
+                      Move (Start.X - Finish.X),
+                      Turn (North, 6),
+                      Move (15),
+                      Turn (East, 6),
+                      Move (18));
          begin
-            Display.Draw_Line
-              (Line   => Line,
-               Colour => Komnenos.Colours.Black,
-               Curved => True,
-               Arrow  => To.Style /= Internal);
+            Display.Draw_Turtle_Path
+              (Start_Location  => Start,
+               Start_Direction => East,
+               Path            => Path,
+               Colour          => Komnenos.Colours.Black,
+               Arrow           => To.Style /= Internal);
          end;
-
       end if;
    end Draw_Connection;
 
@@ -174,8 +173,6 @@ package body Komnenos.Fragments.Diagrams is
       end Straight_Line;
 
    begin
-      Ada.Text_IO.Put_Line
-        ("invalidate: " & Ada.Strings.Unbounded.To_String (Fragment.Title));
       if Fragment.Canvas /= null then
          for Node of Fragment.Nodes loop
             declare
@@ -336,7 +333,6 @@ package body Komnenos.Fragments.Diagrams is
          Link        => Komnenos.Entities.Entity_Reference (Link),
          Connections => Node_Connection_Lists.Empty_List);
    begin
-      Ada.Text_IO.Put_Line ("diagram: put-node: " & Label_Text);
       Diagram.Nodes.Append (Node);
       Diagram.Columns := Natural'Max (Diagram.Columns, X);
       Diagram.Rows := Natural'Max (Diagram.Rows, Y);

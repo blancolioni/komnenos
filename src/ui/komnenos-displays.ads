@@ -36,4 +36,44 @@ package Komnenos.Displays is
       Arrow     : Boolean)
    is abstract;
 
+   type Compass_Direction is (East, North, West, South);
+   type Turtle_Atom is (Move, Turn);
+
+   type Turtle_Command is
+      record
+         Atom      : Turtle_Atom;
+         Length    : Pixel_Length;
+         Direction : Compass_Direction;
+      end record;
+
+   function Move (Length : Pixel_Length) return Turtle_Command;
+   function Turn (Direction : Compass_Direction) return Turtle_Command;
+   function Turn (Direction : Compass_Direction;
+                  Radius  : Pixel_Length)
+                  return Turtle_Command;
+
+   type Turtle_Path is array (Positive range <>) of Turtle_Command;
+
+   procedure Draw_Turtle_Path
+     (Canvas          : in out Canvas_Display;
+      Start_Location  : Layout_Point;
+      Start_Direction : Compass_Direction;
+      Path            : Turtle_Path;
+      Colour          : Komnenos.Colours.Komnenos_Colour;
+      Arrow           : Boolean)
+   is abstract;
+
+private
+
+   function Move (Length : Pixel_Length) return Turtle_Command
+   is (Move, Length, North);
+
+   function Turn (Direction : Compass_Direction) return Turtle_Command
+   is (Turn, 0, Direction);
+
+   function Turn (Direction : Compass_Direction;
+                  Radius    : Pixel_Length)
+                  return Turtle_Command
+   is (Turn, Radius, Direction);
+
 end Komnenos.Displays;

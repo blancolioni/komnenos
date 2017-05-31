@@ -60,4 +60,12 @@ private
       Curved    : Boolean;
       Arrow     : Boolean);
 
+   overriding procedure Draw_Turtle_Path
+     (Canvas          : in out Komnenos_Canvas_View_Record;
+      Start_Location  : Layout_Point;
+      Start_Direction : Komnenos.Displays.Compass_Direction;
+      Path            : Komnenos.Displays.Turtle_Path;
+      Colour          : Komnenos.Colours.Komnenos_Colour;
+      Arrow           : Boolean);
+
 end Komnenos.UI.Gtk_UI.Canvas;
