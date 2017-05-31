@@ -1,3 +1,6 @@
+with Ada.Numerics;
+with Ada.Text_IO;
+
 with Interfaces.C.Strings;
 
 with Glib;
@@ -315,6 +318,115 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       Cairo.Destroy (Context);
 
    end Draw_Text;
+
+   ----------------------
+   -- Draw_Turtle_Path --
+   ----------------------
+
+   overriding procedure Draw_Turtle_Path
+     (Canvas          : in out Komnenos_Canvas_View_Record;
+      Start_Location  : Layout_Point;
+      Start_Direction : Komnenos.Displays.Compass_Direction;
+      Path            : Komnenos.Displays.Turtle_Path;
+      Colour          : Komnenos.Colours.Komnenos_Colour;
+      Arrow           : Boolean)
+   is
+      pragma Unreferenced (Arrow);
+      use Glib;
+      use Komnenos.Displays;
+      Pi : constant := Ada.Numerics.Pi;
+      X : Gdouble := Gdouble (Start_Location.X);
+      Y : Gdouble := Gdouble (Start_Location.Y);
+      D : Compass_Direction := Start_Direction;
+      R : Gdouble;
+      Cr : constant Cairo.Cairo_Context :=
+             Cairo.Create (Canvas.Surface);
+      Cos : constant array (Compass_Direction) of Gdouble :=
+              (1.0, 0.0, -1.0, 0.0);
+      Sin : constant array (Compass_Direction) of Gdouble :=
+              (0.0, 1.0, 0.0, -1.0);
+   begin
+      Cairo.Move_To (Cr, X, Y);
+      Komnenos.Colours.Cairo_Colours.Set_Source_Rgb (Cr, Colour);
+      for Command of Path loop
+         Ada.Text_IO.Put_Line
+           ("current:" & Integer'Image (Integer (X))
+            & Integer'Image (Integer (Y))
+            & " facing " & D'Img);
+
+         R := Gdouble (Command.Length);
+         case Command.Atom is
+            when Move =>
+               Ada.Text_IO.Put_Line ("move:" & Natural'Image (Natural (R)));
+               X := X + R * Cos (D);
+               Y := Y - R * Sin (D);
+               Cairo.Line_To (Cr, X, Y);
+            when Turn =>
+               declare
+                  New_D : constant Compass_Direction := Command.Direction;
+                  Xc    : constant Gdouble :=
+                            X + R * Cos (D) + R * Cos (New_D);
+                  Yc    : constant Gdouble :=
+                            Y - R * Sin (D) - R * Sin (New_D);
+                  A_1   : constant Gdouble :=
+                            (case New_D is
+                                when East   => Pi,
+                                when West   => 0.0,
+                                when North  => 3.0 * Pi / 2.0,
+                                when South  => Pi / 2.0);
+                  A_2   : constant Gdouble :=
+                            (case D is
+                                when North => Pi / 2.0,
+                                when South => 3.0 * Pi / 2.0,
+                                when East  => 0.0,
+                                when West  => Pi);
+                  Left_Turn : constant Boolean :=
+                                (D = Compass_Direction'Last
+                                 and then New_D = Compass_Direction'First)
+                    or else (D /= Compass_Direction'Last
+                             and then New_D = Compass_Direction'Succ (D));
+               begin
+                  if Command.Length > 0 then
+                     Ada.Text_IO.Put_Line
+                       ("turn: " & New_D'Img
+                        & " r =" & Natural'Image (Natural (R))
+                        & "; Xc =" & Natural'Image (Natural (Xc))
+                        & "; Yc =" & Natural'Image (Natural (Yc))
+                        & "; A1 = "
+                        & Integer'Image (Integer (A_1 * 180.0 / Pi))
+                        & "; A2 = "
+                        & Integer'Image (Integer (A_2 * 180.0 / Pi)));
+
+                     if Left_Turn then
+                        Cairo.Arc_Negative
+                          (Cr     => Cr,
+                           Xc     => Xc,
+                           Yc     => Yc,
+                           Radius => R,
+                           Angle1 => 2.0 * Pi - A_1,
+                           Angle2 => 2.0 * Pi - A_2);
+                     else
+                        Cairo.Arc
+                          (Cr     => Cr,
+                           Xc     => Xc,
+                           Yc     => Yc,
+                           Radius => R,
+                           Angle1 => 2.0 * Pi - A_1,
+                           Angle2 => 2.0 * Pi - A_2);
+                     end if;
+
+                     X := Xc + R * Cos (D);
+                     Y := Yc - R * Sin (D);
+
+                  end if;
+                  D := New_D;
+               end;
+         end case;
+      end loop;
+
+      Cairo.Stroke (Cr);
+      Cairo.Destroy (Cr);
+   end Draw_Turtle_Path;
 
    ----------------------------
    -- Get_Bounding_Rectangle --
