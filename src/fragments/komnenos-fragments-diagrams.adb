@@ -185,6 +185,8 @@ package body Komnenos.Fragments.Diagrams is
                                 (if -Node.Label_Text /= ""
                                  then Fragment.Canvas.Get_Bounding_Rectangle
                                    (Node.Label_Style.Font, Text)
+                                 elsif Node.Style = Internal
+                                 then  (0, 0, 0, 0)
                                  else (0, 0, Default_Size, Default_Size));
             begin
                Node.Rectangle := Size_Rec;
