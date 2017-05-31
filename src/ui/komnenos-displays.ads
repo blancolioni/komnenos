@@ -5,6 +5,13 @@ package Komnenos.Displays is
 
    type Canvas_Display is interface;
 
+   function Get_Bounding_Rectangle
+     (Canvas    : Canvas_Display;
+      Font      : Komnenos.Fonts.Komnenos_Font;
+      Text      : String)
+      return Layout_Rectangle
+      is abstract;
+
    procedure Draw_Rectangle
      (Canvas            : in out Canvas_Display;
       Rectangle         : Layout_Rectangle;
@@ -16,7 +23,7 @@ package Komnenos.Displays is
 
    procedure Draw_Text
      (Canvas    : in out Canvas_Display;
-      Rectangle : in out Layout_Rectangle;
+      Rectangle : Layout_Rectangle;
       Font      : Komnenos.Fonts.Komnenos_Font;
       Text      : String)
    is abstract;
