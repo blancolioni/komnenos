@@ -26,38 +26,13 @@ package body Komnenos.Fragments.Diagrams is
 
    overriding procedure Connect_Nodes
      (Diagram     : in out Diagram_Fragment_Type;
-      From_Key    : String;
-      From_Edge   : Komnenos.Entities.Visuals.Node_Edge;
-      To_Key      : String;
-      To_Edge     : Komnenos.Entities.Visuals.Node_Edge)
+      From        : Node_Reference;
+      From_Edge   : Node_Edge;
+      To          : Node_Reference;
+      To_Edge     : Node_Edge)
    is
       use Ada.Strings.Unbounded;
-      From, To : Natural := 0;
    begin
-      for I in 1 .. Diagram.Nodes.Last_Index loop
-         declare
-            Node : Diagram_Node renames Diagram.Nodes (I);
-         begin
-            if Node.Key = From_Key then
-               From := I;
-            end if;
-            if Node.Key = To_Key then
-               To := I;
-            end if;
-            exit when From /= 0 and then To /= 0;
-         end;
-      end loop;
-
-      if From = 0 then
-         raise Constraint_Error with
-           "cannot find 'from' node in connection: " & From_Key;
-      end if;
-
-      if To = 0 then
-         raise Constraint_Error with
-           "cannot find 'to' node in connection: " & From_Key;
-      end if;
-
       Diagram.Nodes (From).Connections.Append
         ((From, To, From_Edge, To_Edge));
 
@@ -96,7 +71,8 @@ package body Komnenos.Fragments.Diagrams is
                         (Turn (North, 6),
                          Move (15),
                          Turn (East, 6),
-                         Move (Finish.X - Start.X - 42),
+                         Move (Pixel_Offset'Max
+                           (Finish.X - Start.X - 42, 0)),
                          Turn (South, 6),
                          Move (15),
                          Turn (East, 6),
@@ -261,21 +237,15 @@ package body Komnenos.Fragments.Diagrams is
    ---------------
 
    overriding procedure Move_Node
-     (Diagram     : in out Diagram_Fragment_Type;
-      Key         : String;
-      X, Y        : Positive)
+     (Diagram : in out Diagram_Fragment_Type;
+      Node    : Node_Reference;
+      X, Y    : Positive)
    is
-      use Ada.Strings.Unbounded;
    begin
-      for Node of Diagram.Nodes loop
-         if Node.Key = Key then
-            Node.X := X;
-            Node.Y := Y;
-            return;
-         end if;
-      end loop;
-      raise Constraint_Error with
-        "no such node: " & Key;
+      Diagram.Nodes (Node).X := X;
+      Diagram.Nodes (Node).Y := Y;
+      Diagram.Columns := Natural'Max (Diagram.Columns, X);
+      Diagram.Rows := Natural'Max (Diagram.Rows, Y);
    end Move_Node;
 
    -----------------
@@ -310,20 +280,18 @@ package body Komnenos.Fragments.Diagrams is
    -- Put_Node --
    --------------
 
-   overriding procedure Put_Node
+   overriding function Put_Node
      (Diagram     : in out Diagram_Fragment_Type;
-      Key         : String;
       X, Y        : Positive;
-      Style       : Komnenos.Entities.Visuals.Node_Style;
+      Style       : Node_Style;
       Label_Text  : String;
       Label_Style : Komnenos.Styles.Komnenos_Style;
       Tool_Tip    : String;
       Link        : access Komnenos.Entities.Root_Entity_Reference'Class)
+      return Node_Reference
    is
-
       Node : constant Diagram_Node := Diagram_Node'
-        (Key         => +Key,
-         X           => X,
+        (X           => X,
          Y           => Y,
          Rectangle   => (0, 0, 1, 1),
          Style       => Style,
@@ -336,6 +304,7 @@ package body Komnenos.Fragments.Diagrams is
       Diagram.Nodes.Append (Node);
       Diagram.Columns := Natural'Max (Diagram.Columns, X);
       Diagram.Rows := Natural'Max (Diagram.Rows, Y);
+      return Diagram.Nodes.Last_Index;
    end Put_Node;
 
    ------------

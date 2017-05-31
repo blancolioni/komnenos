@@ -58,4 +58,11 @@ package Komnenos is
 
    type Layout_Line is array (Positive range <>) of Layout_Point;
 
+   type Node_Style is
+     (Box, Rounded_Box, Circle, Internal);
+
+   type Node_Edge is (Left, Top, Right, Bottom);
+
+   type Node_Reference is new Positive;
+
 end Komnenos;
