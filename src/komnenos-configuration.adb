@@ -7,7 +7,10 @@ package body Komnenos.Configuration is
    Komnenos_Config : Tropos.Configuration;
    Have_Config     : Boolean := False;
 
+   Local_Diagram_Config : Diagram_Config;
+
    procedure Check_Configuration;
+   procedure Load_Diagram_Config;
 
    -------------------------
    -- Check_Configuration --
@@ -20,6 +23,7 @@ package body Komnenos.Configuration is
            Tropos.Reader.Read_Config
              (Komnenos.Paths.Config_File
                 ("komnenos.config"));
+         Load_Diagram_Config;
          Have_Config := True;
       end if;
    exception
@@ -108,5 +112,126 @@ package body Komnenos.Configuration is
          Curved := True;
       end if;
    end Get_Connector_Metrics;
+
+   ------------------------
+   -- Get_Diagram_Config --
+   ------------------------
+
+   function Get_Diagram_Config return Diagram_Config is
+   begin
+      Check_Configuration;
+
+      return Local_Diagram_Config;
+   end Get_Diagram_Config;
+
+   procedure Load_Diagram_Config is
+   begin
+      Local_Diagram_Config := Diagram_Config'
+        (Node_Label_Font      =>
+           Komnenos.Fonts.Create_Font
+             ("Courier", 12),
+         Node_Border_Width    => 2,
+         Node_Border_Colour   => Komnenos.Colours.From_String ("black"),
+         Node_Selected_Colour => Komnenos.Colours.From_String ("blue"),
+         Connector_Width      => 2,
+         Connector_Colour     => Komnenos.Colours.From_String ("black"),
+         Connector_Corner_Radius => 15,
+         Arrow_Length         => 8,
+         Arrow_Width          => 6,
+         Min_Node_Width       => 30,
+         Min_Node_Height      => 30,
+         Node_Across_Margin   => 4,
+         Node_Down_Margin     => 3);
+
+      if Komnenos_Config.Contains ("diagram") then
+         declare
+            Config : constant Tropos.Configuration :=
+                       Komnenos_Config.Child ("diagram");
+         begin
+            if Config.Contains ("label_font") then
+               declare
+                  Font_Config : constant Tropos.Configuration :=
+                                  Config.Child ("label_font");
+               begin
+                  Local_Diagram_Config.Node_Label_Font :=
+                    Komnenos.Fonts.Create_Font
+                      (Name       => Font_Config.Get ("family"),
+                       Size       => Font_Config.Get ("size"),
+                       Foreground =>
+                         Komnenos.Colours.From_String
+                           (Font_Config.Get ("colour", "black")),
+                       Bold       =>
+                         Font_Config.Get ("bold"),
+                       Italic     =>
+                         Font_Config.Get ("italic"),
+                       Underlined =>
+                         Font_Config.Get ("underline"));
+               end;
+            end if;
+            if Config.Contains ("node") then
+               declare
+                  Node_Config : constant Tropos.Configuration :=
+                                  Config.Child ("node");
+               begin
+                  if Node_Config.Contains ("margin") then
+                     Local_Diagram_Config.Node_Across_Margin :=
+                       Pixel_Length (Natural'
+                                       (Node_Config.Child ("margin").Get (1)));
+                     Local_Diagram_Config.Node_Down_Margin :=
+                       Pixel_Length (Natural'
+                                       (Node_Config.Child ("margin").Get (2)));
+                  end if;
+                  if Node_Config.Contains ("minimum_size") then
+                     Local_Diagram_Config.Min_Node_Width :=
+                       Pixel_Length
+                         (Natural'
+                            (Node_Config.Child ("minimum_size").Get (1)));
+                     Local_Diagram_Config.Min_Node_Height :=
+                       Pixel_Length
+                         (Natural'
+                            (Node_Config.Child ("minimum_size").Get (2)));
+                  end if;
+                  if Node_Config.Contains ("border") then
+                     Local_Diagram_Config.Node_Border_Width :=
+                       Pixel_Length
+                         (Natural'
+                            (Node_Config.Child ("border").Get ("width", 2)));
+                     Local_Diagram_Config.Node_Border_Colour :=
+                       Komnenos.Colours.From_String
+                         (Node_Config.Child ("border").Get
+                          ("colour", "black"));
+                     Local_Diagram_Config.Node_Selected_Colour :=
+                       Komnenos.Colours.From_String
+                         (Node_Config.Child ("border").Get
+                          ("colour", "blue"));
+                  end if;
+               end;
+            end if;
+            if Config.Contains ("connector") then
+               declare
+                  Connector_Config : constant Tropos.Configuration :=
+                                       Config.Child ("connector");
+               begin
+                  Local_Diagram_Config.Connector_Width :=
+                    Pixel_Length
+                      (Natural'
+                         (Connector_Config.Get ("line_width", 2)));
+                  Local_Diagram_Config.Arrow_Width :=
+                    Pixel_Length
+                      (Natural'
+                         (Connector_Config.Get ("arrow_width", 4)));
+                  Local_Diagram_Config.Arrow_Length :=
+                    Pixel_Length
+                      (Natural'
+                         (Connector_Config.Get ("arrow_length", 4)));
+                  Local_Diagram_Config.Connector_Corner_Radius :=
+                    Pixel_Length
+                      (Natural'
+                         (Connector_Config.Get ("corner_radius", 10)));
+               end;
+            end if;
+         end;
+      end if;
+   end Load_Diagram_Config;
 
 end Komnenos.Configuration;

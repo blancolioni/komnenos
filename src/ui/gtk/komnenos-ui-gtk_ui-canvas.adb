@@ -5,15 +5,12 @@ with Glib;
 with Gdk.Event;
 with Gdk.Window;
 
+with Komnenos.Configuration;
+
 with Komnenos.Colours.Cairo_Colours;
 with Komnenos.UI.Cairo_UI;
 
 package body Komnenos.UI.Gtk_UI.Canvas is
-
-   Min_Width         : constant := 30;
-   Min_Height        : constant := 30;
-   Margin_Across     : constant := 4;
-   Margin_Down       : constant := 3;
 
    function Draw_Area_Draw_Handler
      (Widget : access Gtk.Widget.Gtk_Widget_Record'Class;
@@ -153,9 +150,8 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       use Glib;
       Cr           : constant Cairo.Cairo_Context :=
                        Cairo.Create (Canvas.Surface);
-      Line_Width   : constant Positive := 2;
-      Arrow_Length : constant Positive := 6;
-      Arrow_Width  : constant Positive := 3;
+      Config       : constant Komnenos.Configuration.Diagram_Config :=
+                       Komnenos.Configuration.Get_Diagram_Config;
       Xs           : array (Line'Range) of Gdouble;
       Ys           : array (Line'Range) of Gdouble;
 
@@ -171,7 +167,7 @@ package body Komnenos.UI.Gtk_UI.Canvas is
 
       Komnenos.Colours.Cairo_Colours.Set_Source_Rgb (Cr, Colour);
 
-      Cairo.Set_Line_Width (Cr, Glib.Gdouble (Line_Width));
+      Cairo.Set_Line_Width (Cr, Glib.Gdouble (Config.Connector_Width));
       Cairo.Set_Line_Cap (Cr, Cairo.Cairo_Line_Cap_Butt);
       Cairo.Set_Line_Join (Cr, Cairo.Cairo_Line_Join_Round);
 
@@ -210,9 +206,9 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       if Arrow then
          declare
             L  : constant Gdouble :=
-                   Gdouble (Arrow_Length);
+                   Gdouble (Config.Arrow_Length);
             W  : constant Gdouble :=
-                   Gdouble (Arrow_Width);
+                   Gdouble (Config.Arrow_Width);
             X  : constant Gdouble := Xs (Xs'Last);
             Y  : constant Gdouble := Ys (Ys'Last);
             PX : constant Gdouble := Xs (Xs'Last - 1);
@@ -261,8 +257,11 @@ package body Komnenos.UI.Gtk_UI.Canvas is
    is
       Context : constant Cairo.Cairo_Context :=
                   Cairo.Create (Canvas.Surface);
+      Config    : constant Komnenos.Configuration.Diagram_Config :=
+                    Komnenos.Configuration.Get_Diagram_Config;
    begin
-      Cairo.Set_Line_Width (Context, 3.0);
+      Cairo.Set_Line_Width
+        (Context, Glib.Gdouble (Config.Node_Border_Width));
 
       Cairo.Set_Line_Cap (Context, Cairo.Cairo_Line_Cap_Butt);
       Cairo.Set_Line_Join (Context, Cairo.Cairo_Line_Join_Round);
@@ -331,10 +330,11 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       Extents   : aliased Cairo.Cairo_Text_Extents;
       Context   : constant Cairo.Cairo_Context :=
                     Cairo.Create (Canvas.Surface);
-      C_Text    : Interfaces.C.Strings.Chars_Ptr :=
+      C_Text    : Interfaces.C.Strings.chars_ptr :=
                     Interfaces.C.Strings.New_String (Text);
       Rectangle : Layout_Rectangle;
-
+      Config    : constant Komnenos.Configuration.Diagram_Config :=
+                    Komnenos.Configuration.Get_Diagram_Config;
    begin
       Komnenos.UI.Cairo_UI.Set_Font (Context, Font);
       Cairo.Text_Extents (Context, C_Text, Extents'Access);
@@ -343,8 +343,9 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       declare
          W_Min : constant Pixel_Length :=
                    Pixel_Length'Max
-                     (Pixel_Length (Extents.Width) + 2 * Margin_Across,
-                      Min_Width);
+                     (Pixel_Length (Extents.Width)
+                      + 2 * Config.Node_Across_Margin,
+                      Config.Min_Node_Width);
          D     : constant Pixel_Length :=
                    (if W_Min < Rectangle.Width then 0
                     else W_Min - Rectangle.Width);
@@ -358,8 +359,9 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       declare
          H_Min : constant Pixel_Length :=
                    Pixel_Length'Max
-                     (Pixel_Length (Extents.Height) + 2 * Margin_Down,
-                      Min_Height);
+                     (Pixel_Length (Extents.Height)
+                      + 2 * Config.Node_Down_Margin,
+                      Config.Min_Node_Height);
          D     : constant Pixel_Length :=
                    (if H_Min < Rectangle.Height then 0
                     else H_Min - Rectangle.Height);
@@ -369,6 +371,8 @@ package body Komnenos.UI.Gtk_UI.Canvas is
             Rectangle.Height := Rectangle.Height + D;
          end if;
       end;
+
+      Interfaces.C.Strings.Free (C_Text);
 
       return Rectangle;
 
