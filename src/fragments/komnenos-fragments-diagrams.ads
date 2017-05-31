@@ -12,27 +12,27 @@ package Komnenos.Fragments.Diagrams is
 
    type Diagram_Fragment is access all Diagram_Fragment_Type'Class;
 
-   overriding procedure Put_Node
+   overriding function Put_Node
      (Diagram     : in out Diagram_Fragment_Type;
-      Key         : String;
       X, Y        : Positive;
-      Style       : Komnenos.Entities.Visuals.Node_Style;
+      Style       : Node_Style;
       Label_Text  : String;
       Label_Style : Komnenos.Styles.Komnenos_Style;
       Tool_Tip    : String;
-      Link        : access Komnenos.Entities.Root_Entity_Reference'Class);
+      Link        : access Komnenos.Entities.Root_Entity_Reference'Class)
+      return Node_Reference;
 
    overriding procedure Move_Node
-     (Diagram     : in out Diagram_Fragment_Type;
-      Key         : String;
-      X, Y        : Positive);
+     (Diagram : in out Diagram_Fragment_Type;
+      Node    : Node_Reference;
+      X, Y    : Positive);
 
    overriding procedure Connect_Nodes
      (Diagram     : in out Diagram_Fragment_Type;
-      From_Key    : String;
-      From_Edge   : Komnenos.Entities.Visuals.Node_Edge;
-      To_Key      : String;
-      To_Edge     : Komnenos.Entities.Visuals.Node_Edge);
+      From        : Node_Reference;
+      From_Edge   : Node_Edge;
+      To          : Node_Reference;
+      To_Edge     : Node_Edge);
 
    overriding procedure Invalidate
      (Fragment : not null access Diagram_Fragment_Type);
@@ -49,8 +49,8 @@ private
 
    type Node_Connection is
       record
-         From, To : Positive;
-         From_Edge, To_Edge : Komnenos.Entities.Visuals.Node_Edge;
+         From, To           : Node_Reference;
+         From_Edge, To_Edge : Node_Edge;
       end record;
 
    package Node_Connection_Lists is
@@ -58,10 +58,9 @@ private
 
    type Diagram_Node is
       record
-         Key         : Ada.Strings.Unbounded.Unbounded_String;
          X, Y        : Positive;
          Rectangle   : Layout_Rectangle;
-         Style       : Komnenos.Entities.Visuals.Node_Style;
+         Style       : Node_Style;
          Label_Text  : Ada.Strings.Unbounded.Unbounded_String;
          Label_Style : Komnenos.Styles.Komnenos_Style;
          Tool_Tip    : Ada.Strings.Unbounded.Unbounded_String;
@@ -70,7 +69,7 @@ private
       end record;
 
    package Node_Vectors is
-     new Ada.Containers.Vectors (Positive, Diagram_Node);
+     new Ada.Containers.Vectors (Node_Reference, Diagram_Node);
 
    type Diagram_Fragment_Type is
      new Root_Fragment_Type

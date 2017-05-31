@@ -1,5 +1,4 @@
 with Ada.Numerics;
-with Ada.Text_IO;
 
 with Interfaces.C.Strings;
 
@@ -349,15 +348,9 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       Cairo.Move_To (Cr, X, Y);
       Komnenos.Colours.Cairo_Colours.Set_Source_Rgb (Cr, Colour);
       for Command of Path loop
-         Ada.Text_IO.Put_Line
-           ("current:" & Integer'Image (Integer (X))
-            & Integer'Image (Integer (Y))
-            & " facing " & D'Img);
-
          R := Gdouble (Command.Length);
          case Command.Atom is
             when Move =>
-               Ada.Text_IO.Put_Line ("move:" & Natural'Image (Natural (R)));
                X := X + R * Cos (D);
                Y := Y - R * Sin (D);
                Cairo.Line_To (Cr, X, Y);
@@ -387,16 +380,6 @@ package body Komnenos.UI.Gtk_UI.Canvas is
                              and then New_D = Compass_Direction'Succ (D));
                begin
                   if Command.Length > 0 then
-                     Ada.Text_IO.Put_Line
-                       ("turn: " & New_D'Img
-                        & " r =" & Natural'Image (Natural (R))
-                        & "; Xc =" & Natural'Image (Natural (Xc))
-                        & "; Yc =" & Natural'Image (Natural (Yc))
-                        & "; A1 = "
-                        & Integer'Image (Integer (A_1 * 180.0 / Pi))
-                        & "; A2 = "
-                        & Integer'Image (Integer (A_2 * 180.0 / Pi)));
-
                      if Left_Turn then
                         Cairo.Arc_Negative
                           (Cr     => Cr,
