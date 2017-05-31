@@ -33,6 +33,12 @@ private
          Surface   : Cairo.Cairo_Surface := Cairo.Null_Surface;
       end record;
 
+   overriding function Get_Bounding_Rectangle
+     (Canvas    : Komnenos_Canvas_View_Record;
+      Font      : Komnenos.Fonts.Komnenos_Font;
+      Text      : String)
+     return Layout_Rectangle;
+
    overriding procedure Draw_Rectangle
      (Canvas            : in out Komnenos_Canvas_View_Record;
       Rectangle         : Layout_Rectangle;
@@ -43,7 +49,7 @@ private
 
    overriding procedure Draw_Text
      (Canvas    : in out Komnenos_Canvas_View_Record;
-      Rectangle : in out Layout_Rectangle;
+      Rectangle : Layout_Rectangle;
       Font      : Komnenos.Fonts.Komnenos_Font;
       Text      : String);
 

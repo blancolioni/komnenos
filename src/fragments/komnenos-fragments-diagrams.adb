@@ -179,24 +179,69 @@ package body Komnenos.Fragments.Diagrams is
       if Fragment.Canvas /= null then
          for Node of Fragment.Nodes loop
             declare
+               Text         : constant String := -Node.Label_Text;
                Default_Size : constant Pixel_Length := 8;
-               Width        : constant Pixel_Length :=
-                                Fragment.Width
-                                  / Pixel_Length (Fragment.Columns);
-               Height       : constant Pixel_Length :=
-                                Fragment.Height
-                                  / Pixel_Length (Fragment.Rows);
+               Size_Rec     : constant Layout_Rectangle :=
+                                (if -Node.Label_Text /= ""
+                                 then Fragment.Canvas.Get_Bounding_Rectangle
+                                   (Node.Label_Style.Font, Text)
+                                 else (0, 0, Default_Size, Default_Size));
             begin
-               Node.Rectangle :=
-                 (Pixel_Position (Node.X - 1) * Width + Width / 2
-                  - Default_Size / 2,
-                  Pixel_Position (Node.Y - 1) * Height + Height / 2
-                  - Default_Size / 2,
-                  Default_Size, Default_Size);
-               if Node.Style /= Internal then
-                  Render (Node, Fragment.Canvas);
-               end if;
+               Node.Rectangle := Size_Rec;
+--                   (Pixel_Position (Node.X - 1) * Width + Width / 2
+--                    - Size_Rec.Width / 2,
+--                    Pixel_Position (Node.Y - 1) * Height + Height / 2
+--                    - Size_Rec.Height / 2,
+--                    Size_Rec.Width, Size_Rec.Height);
+--                 if Node.Style /= Internal then
+--                    Render (Node, Fragment.Canvas);
+--                 end if;
             end;
+         end loop;
+
+         declare
+            Height       : constant Pixel_Length :=
+                             Fragment.Height
+                               / Pixel_Length (Fragment.Rows);
+            Col_Width    : array (1 .. Fragment.Columns) of Pixel_Length :=
+                          (others => 0);
+            Col_Left  : array (1 .. Fragment.Columns) of Pixel_Position :=
+                             (others => 0);
+            Col_Visible  : array (1 .. Fragment.Columns) of Boolean :=
+                             (others => False);
+
+         begin
+            for Node of Fragment.Nodes loop
+               Col_Width (Node.X) :=
+                 Pixel_Length'Max
+                   (Col_Width (Node.X),
+                    Node.Rectangle.Width);
+               if Node.Style /= Internal then
+                  Col_Visible (Node.X) := True;
+               end if;
+            end loop;
+
+            Col_Left (1) := 20;
+            for I in 2 .. Col_Width'Last loop
+               Col_Left (I) :=
+                 Col_Left (I - 1) + Col_Width (I - 1)
+                 + (if Col_Visible (I - 1)
+                    and then Col_Visible (I)
+                    then 50 else 25);
+            end loop;
+
+            for Node of Fragment.Nodes loop
+               Node.Rectangle.X := Col_Left (Node.X);
+               Node.Rectangle.Y :=
+                 Pixel_Position (Node.Y - 1) * Height + Height / 2
+                                   - Node.Rectangle.Height / 2;
+            end loop;
+         end;
+
+         for Node of Fragment.Nodes loop
+            if Node.Style /= Internal then
+               Render (Node, Fragment.Canvas);
+            end if;
          end loop;
 
          for Node of Fragment.Nodes loop

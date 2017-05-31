@@ -292,7 +292,7 @@ package body Komnenos.UI.Gtk_UI.Canvas is
 
    overriding procedure Draw_Text
      (Canvas    : in out Komnenos_Canvas_View_Record;
-      Rectangle : in out Layout_Rectangle;
+      Rectangle : Layout_Rectangle;
       Font      : Komnenos.Fonts.Komnenos_Font;
       Text      : String)
    is
@@ -315,6 +315,31 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       Interfaces.C.Strings.Free (C_Text);
       Cairo.Destroy (Context);
 
+   end Draw_Text;
+
+   ----------------------------
+   -- Get_Bounding_Rectangle --
+   ----------------------------
+
+   overriding function Get_Bounding_Rectangle
+     (Canvas    : Komnenos_Canvas_View_Record;
+      Font      : Komnenos.Fonts.Komnenos_Font;
+      Text      : String)
+      return Layout_Rectangle
+   is
+      use Glib;
+      Extents   : aliased Cairo.Cairo_Text_Extents;
+      Context   : constant Cairo.Cairo_Context :=
+                    Cairo.Create (Canvas.Surface);
+      C_Text    : Interfaces.C.Strings.Chars_Ptr :=
+                    Interfaces.C.Strings.New_String (Text);
+      Rectangle : Layout_Rectangle;
+
+   begin
+      Komnenos.UI.Cairo_UI.Set_Font (Context, Font);
+      Cairo.Text_Extents (Context, C_Text, Extents'Access);
+      Rectangle :=
+        (0, 0, Pixel_Length (Extents.Width), Pixel_Length (Extents.Height));
       declare
          W_Min : constant Pixel_Length :=
                    Pixel_Length'Max
@@ -345,6 +370,8 @@ package body Komnenos.UI.Gtk_UI.Canvas is
          end if;
       end;
 
-   end Draw_Text;
+      return Rectangle;
+
+   end Get_Bounding_Rectangle;
 
 end Komnenos.UI.Gtk_UI.Canvas;
