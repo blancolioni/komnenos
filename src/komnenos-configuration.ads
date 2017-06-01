@@ -33,6 +33,9 @@ package Komnenos.Configuration is
          Min_Node_Height         : Pixel_Length;
          Node_Across_Margin      : Pixel_Length;
          Node_Down_Margin        : Pixel_Length;
+         Visible_Node_Gap        : Pixel_Length;
+         Internal_Node_Gap       : Pixel_Length;
+         Layout_Row_Size         : Pixel_Length;
       end record;
 
    function Get_Diagram_Config return Diagram_Config;
