@@ -648,6 +648,10 @@ package body Komnenos.Fragments is
    is
    begin
       Fragment.Content := Komnenos.Entities.Entity_Reference (Content);
+      Fragment.Title :=
+        Ada.Strings.Unbounded.To_Unbounded_String
+          (Content.Display_Text);
+      Fragment.Set_Entity_Key (Content.Key);
    end Set_Content;
 
    ----------------
