@@ -141,7 +141,10 @@ package body Komnenos.Configuration is
          Min_Node_Width       => 30,
          Min_Node_Height      => 30,
          Node_Across_Margin   => 4,
-         Node_Down_Margin     => 3);
+         Node_Down_Margin     => 3,
+         Visible_Node_Gap     => 30,
+         Internal_Node_Gap    => 20,
+         Layout_Row_Size      => 50);
 
       if Komnenos_Config.Contains ("diagram") then
          declare
@@ -191,6 +194,16 @@ package body Komnenos.Configuration is
                          (Natural'
                             (Node_Config.Child ("minimum_size").Get (2)));
                   end if;
+                  if Node_Config.Contains ("gap") then
+                     Local_Diagram_Config.Visible_Node_Gap :=
+                       Pixel_Length (Natural'
+                                       (Node_Config.Child ("gap")
+                                        .Get ("visible", 30)));
+                     Local_Diagram_Config.Internal_Node_Gap :=
+                       Pixel_Length (Natural'
+                                       (Node_Config.Child ("gap")
+                                        .Get ("internal", 10)));
+                  end if;
                   if Node_Config.Contains ("border") then
                      Local_Diagram_Config.Node_Border_Width :=
                        Pixel_Length
@@ -205,6 +218,10 @@ package body Komnenos.Configuration is
                          (Node_Config.Child ("border").Get
                           ("colour", "blue"));
                   end if;
+
+                  Local_Diagram_Config.Layout_Row_Size :=
+                    Pixel_Length (Natural'(Node_Config.Get ("row_size", 60)));
+
                end;
             end if;
             if Config.Contains ("connector") then
