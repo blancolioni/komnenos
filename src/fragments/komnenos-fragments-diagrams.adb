@@ -60,7 +60,8 @@ package body Komnenos.Fragments.Diagrams is
       if Finish.X > Start.X then
          if Straight then
             Display.Draw_Line
-              (Line   => (Start, Finish),
+              (Layer  => Komnenos.Displays.Base,
+               Line   => (Start, Finish),
                Colour => Komnenos.Colours.Black,
                Curved => False,
                Arrow  => To.Style /= Internal);
@@ -79,7 +80,8 @@ package body Komnenos.Fragments.Diagrams is
                          Move (18));
             begin
                Display.Draw_Turtle_Path
-                 (Start_Location  => Start,
+                 (Layer           => Komnenos.Displays.Base,
+                  Start_Location  => Start,
                   Start_Direction => East,
                   Path            => Path,
                   Colour          => Komnenos.Colours.Black,
@@ -100,7 +102,8 @@ package body Komnenos.Fragments.Diagrams is
                       Move (18));
          begin
             Display.Draw_Turtle_Path
-              (Start_Location  => Start,
+              (Layer           => Komnenos.Displays.Base,
+               Start_Location  => Start,
                Start_Direction => East,
                Path            => Path,
                Colour          => Komnenos.Colours.Black,
@@ -321,7 +324,8 @@ package body Komnenos.Fragments.Diagrams is
 
       if Label /= "" then
          Display.Draw_Text
-           (Rectangle => Node.Rectangle,
+           (Layer     => Komnenos.Displays.Base,
+            Rectangle => Node.Rectangle,
             Font      => Node.Label_Style.Font,
             Text      => -Node.Label_Text);
       end if;
@@ -337,7 +341,8 @@ package body Komnenos.Fragments.Diagrams is
                                when Internal     => 0);
       begin
          Display.Draw_Rectangle
-           (Rectangle         => Node.Rectangle,
+           (Layer             => Komnenos.Displays.Base,
+            Rectangle         => Node.Rectangle,
             Border_Colour     => Komnenos.Colours.Black,
             Background_Colour => Komnenos.Colours.White,
             Filled            => False,

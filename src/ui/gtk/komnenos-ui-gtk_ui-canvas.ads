@@ -24,13 +24,17 @@ package Komnenos.UI.Gtk_UI.Canvas is
 
 private
 
+   type Layer_Array is
+     array (Komnenos.Displays.Canvas_Layer) of Cairo.Cairo_Surface;
+
    type Komnenos_Canvas_View_Record is
      new Gtk.Drawing_Area.Gtk_Drawing_Area_Record
      and Komnenos.Displays.Canvas_Display with
       record
          Fragment  : Komnenos.Fragments.Fragment_Type;
          Draw_Area : Gtk.Drawing_Area.Gtk_Drawing_Area;
-         Surface   : Cairo.Cairo_Surface := Cairo.Null_Surface;
+         Layers    : Layer_Array :=
+                       (others => Cairo.Null_Surface);
       end record;
 
    overriding function Get_Bounding_Rectangle
@@ -41,6 +45,7 @@ private
 
    overriding procedure Draw_Rectangle
      (Canvas            : in out Komnenos_Canvas_View_Record;
+      Layer             : Komnenos.Displays.Canvas_Layer;
       Rectangle         : Layout_Rectangle;
       Border_Colour     : Komnenos.Colours.Komnenos_Colour;
       Background_Colour : Komnenos.Colours.Komnenos_Colour;
@@ -49,12 +54,14 @@ private
 
    overriding procedure Draw_Text
      (Canvas    : in out Komnenos_Canvas_View_Record;
+      Layer     : Komnenos.Displays.Canvas_Layer;
       Rectangle : Layout_Rectangle;
       Font      : Komnenos.Fonts.Komnenos_Font;
       Text      : String);
 
    overriding procedure Draw_Line
      (Canvas    : in out Komnenos_Canvas_View_Record;
+      Layer     : Komnenos.Displays.Canvas_Layer;
       Line      : Layout_Line;
       Colour    : Komnenos.Colours.Komnenos_Colour;
       Curved    : Boolean;
@@ -62,6 +69,7 @@ private
 
    overriding procedure Draw_Turtle_Path
      (Canvas          : in out Komnenos_Canvas_View_Record;
+      Layer           : Komnenos.Displays.Canvas_Layer;
       Start_Location  : Layout_Point;
       Start_Direction : Komnenos.Displays.Compass_Direction;
       Path            : Komnenos.Displays.Turtle_Path;
