@@ -105,16 +105,20 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       Canvas : constant Komnenos_Canvas_View :=
                  Komnenos_Canvas_View (Widget);
    begin
-      if Canvas.Surface /= Cairo.Null_Surface then
-         Cairo.Surface_Destroy (Canvas.Surface);
+      if Canvas.Layers (Komnenos.Displays.Base) /= Cairo.Null_Surface then
+         for Surface of Canvas.Layers loop
+            Cairo.Surface_Destroy (Surface);
+         end loop;
       end if;
 
-      Canvas.Surface :=
-        Gdk.Window.Create_Similar_Surface
-          (Self    => Widget.Get_Window,
-           Content => Cairo.Cairo_Content_Color_Alpha,
-           Width   => Event.Width,
-           Height  => Event.Height);
+      for Surface of Canvas.Layers loop
+         Surface :=
+           Gdk.Window.Create_Similar_Surface
+             (Self    => Widget.Get_Window,
+              Content => Cairo.Cairo_Content_Color_Alpha,
+              Width   => Event.Width,
+              Height  => Event.Height);
+      end loop;
 
       Canvas.Fragment.Invalidate;
 
@@ -131,10 +135,11 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       return Boolean
    is
    begin
-      Cairo.Set_Source_Surface
-        (Cr, Komnenos_Canvas_View_Record (Widget.all).Surface,
-         0.0, 0.0);
-      Cairo.Paint (Cr);
+      for Surface of Komnenos_Canvas_View_Record (Widget.all).Layers loop
+         Cairo.Set_Source_Surface
+           (Cr, Surface, 0.0, 0.0);
+         Cairo.Paint (Cr);
+      end loop;
       return True;
    end Draw_Area_Draw_Handler;
 
@@ -144,6 +149,7 @@ package body Komnenos.UI.Gtk_UI.Canvas is
 
    overriding procedure Draw_Line
      (Canvas    : in out Komnenos_Canvas_View_Record;
+      Layer     : Komnenos.Displays.Canvas_Layer;
       Line      : Layout_Line;
       Colour    : Komnenos.Colours.Komnenos_Colour;
       Curved    : Boolean;
@@ -151,7 +157,7 @@ package body Komnenos.UI.Gtk_UI.Canvas is
    is
       use Glib;
       Cr           : constant Cairo.Cairo_Context :=
-                       Cairo.Create (Canvas.Surface);
+                       Cairo.Create (Canvas.Layers (Layer));
       Config       : constant Komnenos.Configuration.Diagram_Config :=
                        Komnenos.Configuration.Get_Diagram_Config;
       Xs           : array (Line'Range) of Gdouble;
@@ -160,9 +166,9 @@ package body Komnenos.UI.Gtk_UI.Canvas is
    begin
 
       if Curved and then Line'Length > 4 then
-         Draw_Line (Canvas, Line (Line'First .. Line'First + 3),
+         Draw_Line (Canvas, Layer, Line (Line'First .. Line'First + 3),
                     Colour, Curved, False);
-         Draw_Line (Canvas, Line (Line'First + 3 .. Line'Last),
+         Draw_Line (Canvas, Layer, Line (Line'First + 3 .. Line'Last),
                     Colour, Curved, Arrow);
          return;
       end if;
@@ -251,6 +257,7 @@ package body Komnenos.UI.Gtk_UI.Canvas is
 
    overriding procedure Draw_Rectangle
      (Canvas            : in out Komnenos_Canvas_View_Record;
+      Layer             : Komnenos.Displays.Canvas_Layer;
       Rectangle         : Layout_Rectangle;
       Border_Colour     : Komnenos.Colours.Komnenos_Colour;
       Background_Colour : Komnenos.Colours.Komnenos_Colour;
@@ -258,7 +265,7 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       Corner_Radius     : Pixel_Length)
    is
       Context : constant Cairo.Cairo_Context :=
-                  Cairo.Create (Canvas.Surface);
+                  Cairo.Create (Canvas.Layers (Layer));
       Config    : constant Komnenos.Configuration.Diagram_Config :=
                     Komnenos.Configuration.Get_Diagram_Config;
    begin
@@ -293,6 +300,7 @@ package body Komnenos.UI.Gtk_UI.Canvas is
 
    overriding procedure Draw_Text
      (Canvas    : in out Komnenos_Canvas_View_Record;
+      Layer     : Komnenos.Displays.Canvas_Layer;
       Rectangle : Layout_Rectangle;
       Font      : Komnenos.Fonts.Komnenos_Font;
       Text      : String)
@@ -300,7 +308,7 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       use Glib;
       Extents : aliased Cairo.Cairo_Text_Extents;
       Context : constant Cairo.Cairo_Context :=
-                  Cairo.Create (Canvas.Surface);
+                  Cairo.Create (Canvas.Layers (Layer));
       C_Text  : Interfaces.C.Strings.chars_ptr :=
                   Interfaces.C.Strings.New_String (Text);
    begin
@@ -324,6 +332,7 @@ package body Komnenos.UI.Gtk_UI.Canvas is
 
    overriding procedure Draw_Turtle_Path
      (Canvas          : in out Komnenos_Canvas_View_Record;
+      Layer           : Komnenos.Displays.Canvas_Layer;
       Start_Location  : Layout_Point;
       Start_Direction : Komnenos.Displays.Compass_Direction;
       Path            : Komnenos.Displays.Turtle_Path;
@@ -339,7 +348,7 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       D : Compass_Direction := Start_Direction;
       R : Gdouble;
       Cr : constant Cairo.Cairo_Context :=
-             Cairo.Create (Canvas.Surface);
+             Cairo.Create (Canvas.Layers (Layer));
       Cos : constant array (Compass_Direction) of Gdouble :=
               (1.0, 0.0, -1.0, 0.0);
       Sin : constant array (Compass_Direction) of Gdouble :=
@@ -424,7 +433,7 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       use Glib;
       Extents   : aliased Cairo.Cairo_Text_Extents;
       Context   : constant Cairo.Cairo_Context :=
-                    Cairo.Create (Canvas.Surface);
+                    Cairo.Create (Canvas.Layers (Komnenos.Displays.Base));
       C_Text    : Interfaces.C.Strings.chars_ptr :=
                     Interfaces.C.Strings.New_String (Text);
       Rectangle : Layout_Rectangle;
