@@ -1,6 +1,11 @@
+with Ada.Text_IO;
+
+with Komnenos.Configuration;
 with Komnenos.Displays;
 
 package body Komnenos.Fragments.Diagrams is
+
+   Log_Layout : constant Boolean := False;
 
    function "+" (S : String) return Ada.Strings.Unbounded.Unbounded_String
                  renames Ada.Strings.Unbounded.To_Unbounded_String;
@@ -20,6 +25,9 @@ package body Komnenos.Fragments.Diagrams is
    overriding procedure Clear (Fragment : in out Diagram_Fragment_Type)
    is null;
 
+   procedure Create_Layout
+     (Nodes : in out Node_Vectors.Vector);
+
    -------------------
    -- Connect_Nodes --
    -------------------
@@ -34,9 +42,240 @@ package body Komnenos.Fragments.Diagrams is
       use Ada.Strings.Unbounded;
    begin
       Diagram.Nodes (From).Connections.Append
-        ((From, To, From_Edge, To_Edge));
+        ((From, To, From_Edge, To_Edge, False));
+
+      if Log_Layout then
+         Ada.Text_IO.Put_Line ("connect:" & From'Img & " -->" & To'Img);
+      end if;
 
    end Connect_Nodes;
+
+   -------------------
+   -- Create_Layout --
+   -------------------
+
+   procedure Create_Layout
+     (Nodes : in out Node_Vectors.Vector)
+   is
+
+      subtype Node_Reference_Range is
+        Node_Reference range 1 .. Nodes.Last_Index;
+
+      type Node_Flag_Array is array (Node_Reference_Range) of Boolean;
+
+      type Node_Record is
+         record
+            Placed         : Boolean := False;
+            Connected_From : Node_Flag_Array  := (others => False);
+            Connects_To    : Node_Flag_Array  := (others => False);
+            Rectangle      : Layout_Rectangle := (0, 0, 0, 0);
+         end record;
+
+      Node_Info : array (Node_Reference_Range) of Node_Record
+        with Unreferenced;
+
+      type Node_Reference_Array is
+        array (Natural range 0 .. Natural (Nodes.Length)) of Node_Reference;
+
+      type Layout_Row is
+         record
+            Count : Natural := 0;
+            Nodes : Node_Reference_Array;
+         end record;
+
+      type Layout_Array is
+        array (Natural range 0 .. Natural (Nodes.Length)) of Layout_Row;
+
+      Layout : Layout_Array;
+      Row_Count : Natural := 0;
+
+      Config : constant Komnenos.Configuration.Diagram_Config :=
+                 Komnenos.Configuration.Get_Diagram_Config;
+
+      package Reference_Lists is
+        new Ada.Containers.Doubly_Linked_Lists (Node_Reference);
+
+      Placed_Cell : array (Node_Reference_Range) of Natural := (others => 0);
+      Placed_Row  : array (Node_Reference_Range) of Natural := (others => 0);
+      Previous    : array (Node_Reference_Range) of Node_Reference_Range;
+      Placed      : array (Node_Reference_Range) of Boolean :=
+                      (others => False);
+
+      --  function Connects_To (X, Y : Node_Reference) return Boolean;
+
+      function Inter_Node_Gap
+        (From, To : Node_Reference_Range)
+         return Pixel_Length
+      is (if Nodes (From).Style = Internal
+          and then Nodes (To).Style = Internal
+          then Config.Internal_Node_Gap
+          else Config.Visible_Node_Gap);
+
+   begin
+
+      pragma Unreferenced (Placed_Cell);
+      pragma Unreferenced (Placed_Row);
+
+      Nodes (1).Rectangle.X := Config.Internal_Node_Gap;
+      Nodes (1).Rectangle.Y := Config.Internal_Node_Gap;
+
+      for I in 1 .. Nodes.Last_Index loop
+         declare
+            From : constant Diagram_Node := Nodes (I);
+         begin
+            Node_Info (I).Rectangle := Nodes (I).Rectangle;
+            for Connection of From.Connections loop
+               declare
+                  To_Ref : constant Node_Reference := Connection.To;
+               begin
+                  Node_Info (I).Connects_To (To_Ref) := True;
+                  Node_Info (To_Ref).Connected_From (I) := True;
+               end;
+            end loop;
+         end;
+      end loop;
+
+      declare
+         Current_Row  : Natural := 0;
+         Queue        : Reference_Lists.List;
+      begin
+
+         Queue.Append (1);
+
+         while not Queue.Is_Empty loop
+
+            Current_Row := Current_Row + 1;
+
+            declare
+               Current_Node : Node_Reference := Queue.First_Element;
+               Next_Node    : Node_Reference := Current_Node;
+               Have_Node    : Boolean := True;
+            begin
+
+               if Log_Layout then
+                  Ada.Text_IO.Put_Line ("layout:" & Current_Node'Img);
+               end if;
+
+               Layout (Current_Row).Count := 1;
+               Layout (Current_Row).Nodes (1) := Current_Node;
+
+               Placed_Cell (Current_Node) := 1;
+               Placed_Row (Current_Node) := Current_Row;
+               Placed (Current_Node) := True;
+
+               Queue.Delete_First;
+
+               while Have_Node loop
+
+                  Current_Node := Next_Node;
+                  Have_Node := False;
+                  for Connection of Nodes (Current_Node).Connections loop
+                     if not Placed (Connection.To) then
+                        if Have_Node then
+                           Previous (Connection.To) := Current_Node;
+
+                           if Log_Layout then
+                              Ada.Text_IO.Put_Line
+                                ("queue:" & Connection.To'Img
+                                 & " after" & Current_Node'Img);
+                           end if;
+
+                           Queue.Append (Connection.To);
+                        else
+                           if Log_Layout then
+                              Ada.Text_IO.Put_Line
+                                ("next in row:" & Connection.To'Img);
+                           end if;
+
+                           declare
+                              Row : Layout_Row renames Layout (Current_Row);
+                           begin
+                              Row.Count := Row.Count + 1;
+                              Row.Nodes (Row.Count) := Connection.To;
+                              Placed_Cell (Connection.To) := Row.Count;
+                              Placed_Row (Connection.To) := Current_Row;
+                              Placed (Connection.To) := True;
+                              Connection.Straight := True;
+                              Next_Node := Connection.To;
+                              Have_Node := True;
+                           end;
+                        end if;
+                     end if;
+                  end loop;
+
+               end loop;
+
+               if Log_Layout then
+                  Ada.Text_IO.Put_Line
+                    ("finished: row" & Current_Row'Img);
+               end if;
+
+            end;
+         end loop;
+
+         Row_Count := Current_Row;
+      end;
+
+      declare
+         Y : Pixel_Length := Config.Layout_Row_Size / 2;
+      begin
+         for Row_Index in 1 .. Row_Count loop
+            declare
+               Row : Layout_Row renames Layout (Row_Index);
+               X   : Pixel_Length := Config.Internal_Node_Gap;
+            begin
+               for Col_Index in 1 .. Row.Count loop
+                  declare
+                     Ref : constant Node_Reference := Row.Nodes (Col_Index);
+                     Node : Diagram_Node renames Nodes (Ref);
+                  begin
+                     if Col_Index = 1
+                       and then Row_Index > 1
+                     then
+                        declare
+                           Prev_Ref : constant Node_Reference :=
+                                        Previous (Row.Nodes (1));
+                           Prev_Rec : constant Layout_Rectangle :=
+                                        Nodes.Element (Prev_Ref).Rectangle;
+                        begin
+
+                           if Log_Layout then
+                              Ada.Text_IO.Put_Line
+                                ("Node" & Ref'Img
+                                 & " placed after"
+                                 & Prev_Ref'Img
+                                 & " at" & Prev_Rec.X'Img
+                                 & Prev_Rec.Y'Img);
+                           end if;
+
+                           X := Prev_Rec.X + Prev_Rec.Width
+                             + Inter_Node_Gap (Prev_Ref, Ref);
+                        end;
+                     end if;
+
+                     Node.Rectangle.X := X;
+                     Node.Rectangle.Y := Y - Node.Rectangle.Height / 2;
+
+                     if Log_Layout then
+                        Ada.Text_IO.Put_Line
+                          ("place:" & Ref'Img & " at"
+                           & Node.Rectangle.X'Img
+                           & Node.Rectangle.Y'Img);
+                     end if;
+
+                     if Col_Index < Row.Count then
+                        X := X + Node.Rectangle.Width
+                          + Inter_Node_Gap (Ref, Row.Nodes (Col_Index + 1));
+                     end if;
+
+                  end;
+               end loop;
+            end;
+            Y := Y + Config.Layout_Row_Size;
+         end loop;
+      end;
+
+   end Create_Layout;
 
    ---------------------
    -- Draw_Connection --
@@ -57,6 +296,13 @@ package body Komnenos.Fragments.Diagrams is
 
    begin
 
+      if Log_Layout then
+         Ada.Text_IO.Put_Line
+           ("draw connection:"
+            & From.Reference'Img
+            & " -->" & To.Reference'Img);
+      end if;
+
       if Finish.X > Start.X then
          if Straight then
             Display.Draw_Line
@@ -65,6 +311,51 @@ package body Komnenos.Fragments.Diagrams is
                Colour => Komnenos.Colours.Black,
                Curved => False,
                Arrow  => To.Style /= Internal);
+         elsif Finish.Y > Start.Y then
+            declare
+               use Komnenos.Displays;
+               Path : constant Komnenos.Displays.Turtle_Path :=
+                        (Turn (South, 6),
+                         Move
+                           (Pixel_Offset'Max
+                              (Finish.Y - Start.Y - 12, 0)),
+                         Turn (East, 6),
+                         Move
+                           (Pixel_Offset'Max
+                              (Finish.X - Start.X - 12, 0)));
+            begin
+               Display.Draw_Turtle_Path
+                 (Layer           => Komnenos.Displays.Base,
+                  Start_Location  => Start,
+                  Start_Direction => East,
+                  Path            => Path,
+                  Colour          => Komnenos.Colours.Black,
+                  Arrow           => To.Style /= Internal);
+            end;
+
+         elsif Finish.Y < Start.Y then
+            declare
+               use Komnenos.Displays;
+               Path : constant Komnenos.Displays.Turtle_Path :=
+                        (Move
+                           (Pixel_Offset'Max
+                              (Finish.X - Start.X - 18, 0)),
+                         Turn (North, 6),
+                         Move
+                           (Pixel_Offset'Max
+                              (Start.Y - Finish.Y - 12, 0)),
+                         Turn (East, 6),
+                         Move (6));
+            begin
+               Display.Draw_Turtle_Path
+                 (Layer           => Komnenos.Displays.Base,
+                  Start_Location  => Start,
+                  Start_Direction => East,
+                  Path            => Path,
+                  Colour          => Komnenos.Colours.Black,
+                  Arrow           => To.Style /= Internal);
+            end;
+
          else
             declare
                use Komnenos.Displays;
@@ -121,35 +412,37 @@ package body Komnenos.Fragments.Diagrams is
    is
       use Komnenos.Entities.Visuals;
 
-      function Straight_Line (From, To : Diagram_Node) return Boolean;
+--        function Straight_Line (From, To : Diagram_Node) return Boolean
+--        is (True);
 
       -------------------
       -- Straight_Line --
       -------------------
 
-      function Straight_Line (From, To : Diagram_Node) return Boolean is
-      begin
-         if From.X >= To.X
-           or else From.Y /= To.Y
-         then
-            return False;
-         end if;
-
-         if From.X + 1 = To.X then
-            return True;
-         end if;
-
-         for Node of Fragment.Nodes loop
-            if Node.Style /= Internal
-              and then Node.Y = From.Y
-              and then Node.X in From.X + 1 .. To.X - 1
-            then
-               return False;
-            end if;
-         end loop;
-
-         return True;
-      end Straight_Line;
+--        function Straight_Line (From, To : Diagram_Node) return Boolean is
+--        begin
+--           if From.Rectangle.X >= To.Rectangle.X
+--             or else From.Rectangle.Y not in
+--               To.Rectangle.Y .. To.Rectangle.Y + To.Rectangle.Width
+--           then
+--              return False;
+--           end if;
+--
+--           if From.X + 1 = To.X then
+--              return True;
+--           end if;
+--
+--           for Node of Fragment.Nodes loop
+--              if Node.Style /= Internal
+--                and then Node.Y = From.Y
+--                and then Node.X in From.X + 1 .. To.X - 1
+--              then
+--                 return False;
+--              end if;
+--           end loop;
+--
+--           return True;
+--        end Straight_Line;
 
    begin
       if Fragment.Canvas /= null then
@@ -166,55 +459,10 @@ package body Komnenos.Fragments.Diagrams is
                                  else (0, 0, Default_Size, Default_Size));
             begin
                Node.Rectangle := Size_Rec;
---                   (Pixel_Position (Node.X - 1) * Width + Width / 2
---                    - Size_Rec.Width / 2,
---                    Pixel_Position (Node.Y - 1) * Height + Height / 2
---                    - Size_Rec.Height / 2,
---                    Size_Rec.Width, Size_Rec.Height);
---                 if Node.Style /= Internal then
---                    Render (Node, Fragment.Canvas);
---                 end if;
             end;
          end loop;
 
-         declare
-            Height       : constant Pixel_Length :=
-                             Fragment.Height
-                               / Pixel_Length (Fragment.Rows);
-            Col_Width    : array (1 .. Fragment.Columns) of Pixel_Length :=
-                          (others => 0);
-            Col_Left  : array (1 .. Fragment.Columns) of Pixel_Position :=
-                             (others => 0);
-            Col_Visible  : array (1 .. Fragment.Columns) of Boolean :=
-                             (others => False);
-
-         begin
-            for Node of Fragment.Nodes loop
-               Col_Width (Node.X) :=
-                 Pixel_Length'Max
-                   (Col_Width (Node.X),
-                    Node.Rectangle.Width);
-               if Node.Style /= Internal then
-                  Col_Visible (Node.X) := True;
-               end if;
-            end loop;
-
-            Col_Left (1) := 20;
-            for I in 2 .. Col_Width'Last loop
-               Col_Left (I) :=
-                 Col_Left (I - 1) + Col_Width (I - 1)
-                 + (if Col_Visible (I - 1)
-                    and then Col_Visible (I)
-                    then 50 else 25);
-            end loop;
-
-            for Node of Fragment.Nodes loop
-               Node.Rectangle.X := Col_Left (Node.X);
-               Node.Rectangle.Y :=
-                 Pixel_Position (Node.Y - 1) * Height + Height / 2
-                                   - Node.Rectangle.Height / 2;
-            end loop;
-         end;
+         Create_Layout (Fragment.Nodes);
 
          for Node of Fragment.Nodes loop
             if Node.Style /= Internal then
@@ -227,7 +475,7 @@ package body Komnenos.Fragments.Diagrams is
                Draw_Connection
                  (From     => Node,
                   To       => Fragment.Nodes (Conn.To),
-                  Straight => Straight_Line (Node, Fragment.Nodes (Conn.To)),
+                  Straight => Conn.Straight,
                   Display  => Fragment.Canvas);
             end loop;
          end loop;
@@ -243,13 +491,13 @@ package body Komnenos.Fragments.Diagrams is
      (Diagram : in out Diagram_Fragment_Type;
       Node    : Node_Reference;
       X, Y    : Positive)
-   is
-   begin
-      Diagram.Nodes (Node).X := X;
-      Diagram.Nodes (Node).Y := Y;
-      Diagram.Columns := Natural'Max (Diagram.Columns, X);
-      Diagram.Rows := Natural'Max (Diagram.Rows, Y);
-   end Move_Node;
+   is null;
+--     begin
+--        Diagram.Nodes (Node).X := X;
+--        Diagram.Nodes (Node).Y := Y;
+--        Diagram.Columns := Natural'Max (Diagram.Columns, X);
+--        Diagram.Rows := Natural'Max (Diagram.Rows, Y);
+--     end Move_Node;
 
    -----------------
    -- New_Diagram --
@@ -294,8 +542,7 @@ package body Komnenos.Fragments.Diagrams is
       return Node_Reference
    is
       Node : constant Diagram_Node := Diagram_Node'
-        (X           => X,
-         Y           => Y,
+        (Reference   => Diagram.Nodes.Last_Index + 1,
          Rectangle   => (0, 0, 1, 1),
          Style       => Style,
          Label_Text  => +Label_Text,
@@ -307,6 +554,16 @@ package body Komnenos.Fragments.Diagrams is
       Diagram.Nodes.Append (Node);
       Diagram.Columns := Natural'Max (Diagram.Columns, X);
       Diagram.Rows := Natural'Max (Diagram.Rows, Y);
+
+      if Log_Layout then
+         Ada.Text_IO.Put_Line
+           ("put_node:" & Node_Reference'Image (Diagram.Nodes.Last_Index)
+            & ": "
+            & Style'Img
+            & ": "
+            & (if Label_Text = "" then "(no label)" else Label_Text));
+      end if;
+
       return Diagram.Nodes.Last_Index;
    end Put_Node;
 
