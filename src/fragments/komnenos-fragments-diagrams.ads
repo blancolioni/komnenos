@@ -51,6 +51,7 @@ private
       record
          From, To           : Node_Reference;
          From_Edge, To_Edge : Node_Edge;
+         Straight           : Boolean;
       end record;
 
    package Node_Connection_Lists is
@@ -58,7 +59,7 @@ private
 
    type Diagram_Node is
       record
-         X, Y        : Positive;
+         Reference   : Node_Reference;
          Rectangle   : Layout_Rectangle;
          Style       : Node_Style;
          Label_Text  : Ada.Strings.Unbounded.Unbounded_String;
