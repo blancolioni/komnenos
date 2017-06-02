@@ -36,6 +36,7 @@ package Komnenos.Configuration is
          Visible_Node_Gap        : Pixel_Length;
          Internal_Node_Gap       : Pixel_Length;
          Layout_Row_Size         : Pixel_Length;
+         Debug_Layout            : Boolean;
       end record;
 
    function Get_Diagram_Config return Diagram_Config;
