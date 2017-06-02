@@ -365,8 +365,7 @@ package body Komnenos.Fragments.Diagrams is
                          Move
                            (Pixel_Offset'Max
                               (Start.Y - Finish.Y - 12, 0)),
-                         Turn (East, 6),
-                         Move (6));
+                         Turn (East, 6));
             begin
                Display.Draw_Turtle_Path
                  (Layer           => Komnenos.Displays.Base,
