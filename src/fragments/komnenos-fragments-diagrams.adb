@@ -188,6 +188,20 @@ package body Komnenos.Fragments.Diagrams is
                            end if;
 
                            declare
+                              Existing : Reference_Lists.Cursor :=
+                                           Queue.Find (Current_Node);
+                           begin
+                              if Reference_Lists.Has_Element (Existing) then
+                                 if Config.Debug_Layout then
+                                    Ada.Text_IO.Put_Line
+                                      ("canceled queued node:"
+                                       & Connection.To'Img);
+                                 end if;
+                                 Queue.Delete (Existing);
+                              end if;
+                           end;
+
+                           declare
                               Row : Layout_Row renames Layout (Current_Row);
                            begin
                               Row.Count := Row.Count + 1;
