@@ -18,7 +18,13 @@ private with Komnenos.Commands.Bindings;
 
 package Komnenos.Fragments is
 
-   type Text_Editor_Display is interface;
+   type Fragment_Display is interface;
+
+   procedure On_Fragment_Resized
+     (Display : in out Fragment_Display)
+   is abstract;
+
+   type Text_Editor_Display is interface and Fragment_Display;
 
    procedure Insert_At_Cursor
      (Editor : in out Text_Editor_Display;
@@ -259,6 +265,7 @@ private
          Key_Sequence      : Komnenos.Keys.Sequences.Key_Sequence;
          Bindings          : Komnenos.Commands.Bindings.Binding_Table;
          Lines             : Line_Vectors.Vector;
+         Display           : access Fragment_Display'Class;
          Canvas            : access Komnenos.Displays.Canvas_Display'Class;
          Needs_Render      : Boolean := False;
       end record;
@@ -297,7 +304,7 @@ private
      new Root_Fragment_Type
      and Komnenos.Entities.Text_Entity_Visual with
       record
-         Display : access Text_Editor_Display'Class;
+         Text_Display : access Text_Editor_Display'Class;
       end record;
 
    overriding procedure Invalidate

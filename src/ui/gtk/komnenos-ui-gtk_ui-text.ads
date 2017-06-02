@@ -56,6 +56,10 @@ private
          Tool_Tip               : Ada.Strings.Unbounded.Unbounded_String;
       end record;
 
+   overriding procedure On_Fragment_Resized
+     (Text_View : in out Komnenos_Text_View_Record)
+   is null;
+
    overriding procedure Insert_At_Cursor
      (Text_View : in out Komnenos_Text_View_Record;
       Text      : in     String);

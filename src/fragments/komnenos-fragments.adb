@@ -9,6 +9,10 @@ package body Komnenos.Fragments is
    type Null_Text_Display is
      new Text_Editor_Display with null record;
 
+   overriding procedure On_Fragment_Resized
+     (Null_Display : in out Null_Text_Display)
+   is null;
+
    overriding procedure Insert_At_Cursor
      (Null_Display : in out Null_Text_Display;
       Text         : in     String)
@@ -81,7 +85,7 @@ package body Komnenos.Fragments is
    overriding procedure Clear (Fragment : in out Text_Fragment_Type) is
    begin
       Fragment.Lines.Clear;
-      Fragment.Display.Set_Content ("");
+      Fragment.Text_Display.Set_Content ("");
       Fragment.Lines.Append (new Line_Info);
    end Clear;
 
@@ -94,7 +98,7 @@ package body Komnenos.Fragments is
       Movement  : Text_Movement)
    is
    begin
-      Fragment.Display.Delete_From_Cursor (Movement);
+      Fragment.Text_Display.Delete_From_Cursor (Movement);
    end Delete_From_Cursor;
 
    --------------
@@ -369,7 +373,7 @@ package body Komnenos.Fragments is
       Text     : String)
    is
    begin
-      Fragment.Display.Insert_At_Cursor (Text);
+      Fragment.Text_Display.Insert_At_Cursor (Text);
    end Insert_At_Cursor;
 
    ----------------
@@ -380,8 +384,8 @@ package body Komnenos.Fragments is
      (Fragment : not null access Text_Fragment_Type)
    is
    begin
-      Fragment.Display.Render_Fragment (Fragment);
-      Fragment.Display.Set_Cursor (Fragment.Point);
+      Fragment.Text_Display.Render_Fragment (Fragment);
+      Fragment.Text_Display.Set_Cursor (Fragment.Point);
    end Invalidate;
 
    -------------
@@ -635,6 +639,7 @@ package body Komnenos.Fragments is
       Canvas   : access Komnenos.Displays.Canvas_Display'Class)
    is
    begin
+      Fragment.Display := Fragment_Display'Class (Canvas.all)'Access;
       Fragment.Canvas := Canvas;
    end Set_Canvas;
 
@@ -714,6 +719,9 @@ package body Komnenos.Fragments is
    begin
       Fragment.Layout_Rec.Width := Width;
       Fragment.Layout_Rec.Height := Height;
+      if Fragment.Display /= null then
+         Fragment.Display.On_Fragment_Resized;
+      end if;
    end Set_Size;
 
    ----------------------

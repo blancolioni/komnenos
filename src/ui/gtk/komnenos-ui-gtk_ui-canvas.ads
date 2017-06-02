@@ -14,6 +14,7 @@ package Komnenos.UI.Gtk_UI.Canvas is
    type Komnenos_Canvas_View_Record is
      new Gtk.Widget.Gtk_Widget_Record
      and Komnenos.Displays.Canvas_Display
+     and Komnenos.Fragments.Fragment_Display
    with private;
 
    type Komnenos_Canvas_View is access all Komnenos_Canvas_View_Record'Class;
@@ -29,13 +30,17 @@ private
 
    type Komnenos_Canvas_View_Record is
      new Gtk.Drawing_Area.Gtk_Drawing_Area_Record
-     and Komnenos.Displays.Canvas_Display with
+     and Komnenos.Displays.Canvas_Display
+     and Komnenos.Fragments.Fragment_Display with
       record
          Fragment  : Komnenos.Fragments.Fragment_Type;
          Draw_Area : Gtk.Drawing_Area.Gtk_Drawing_Area;
          Layers    : Layer_Array :=
                        (others => Cairo.Null_Surface);
       end record;
+
+   overriding procedure On_Fragment_Resized
+     (Canvas : in out Komnenos_Canvas_View_Record);
 
    overriding function Get_Bounding_Rectangle
      (Canvas    : Komnenos_Canvas_View_Record;

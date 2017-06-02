@@ -23,8 +23,9 @@ package body Komnenos.Fragments.Diagrams is
    overriding procedure Clear (Fragment : in out Diagram_Fragment_Type)
    is null;
 
-   procedure Create_Layout
-     (Nodes : in out Node_Vectors.Vector);
+   function Create_Layout
+     (Nodes : in out Node_Vectors.Vector)
+      return Layout_Rectangle;
 
    -------------------
    -- Connect_Nodes --
@@ -37,7 +38,6 @@ package body Komnenos.Fragments.Diagrams is
       To          : Node_Reference;
       To_Edge     : Node_Edge)
    is
-      use Ada.Strings.Unbounded;
    begin
       Diagram.Nodes (From).Connections.Append
         ((From, To, From_Edge, To_Edge, False));
@@ -52,8 +52,9 @@ package body Komnenos.Fragments.Diagrams is
    -- Create_Layout --
    -------------------
 
-   procedure Create_Layout
+   function Create_Layout
      (Nodes : in out Node_Vectors.Vector)
+      return Layout_Rectangle
    is
 
       subtype Node_Reference_Range is
@@ -232,6 +233,7 @@ package body Komnenos.Fragments.Diagrams is
 
       declare
          Y : Pixel_Length := Config.Layout_Row_Size;
+         Width : Pixel_Length := 0;
       begin
          for Row_Index in 1 .. Row_Count loop
             declare
@@ -273,10 +275,16 @@ package body Komnenos.Fragments.Diagrams is
 
                      if Config.Debug_Layout then
                         Ada.Text_IO.Put_Line
-                          ("place:" & Ref'Img & " at"
+                          ("place:" & Ref'Img & " in row"
+                           & Node.Row'Img
+                           & " at"
                            & Node.Rectangle.X'Img
                            & Node.Rectangle.Y'Img);
                      end if;
+
+                     Width := Pixel_Length'Max
+                       (Width,
+                        X + Node.Rectangle.Width + Config.Internal_Node_Gap);
 
                      if Col_Index < Row.Count then
                         X := X + Node.Rectangle.Width
@@ -288,6 +296,9 @@ package body Komnenos.Fragments.Diagrams is
             end;
             Y := Y + Config.Layout_Row_Size;
          end loop;
+
+         return (0, 0, Width, Y);
+
       end;
 
    end Create_Layout;
@@ -374,7 +385,7 @@ package body Komnenos.Fragments.Diagrams is
                   Start_Direction => East,
                   Path            => Path,
                   Width           => Config.Connector_Width,
-                  Colour          => Komnenos.Colours.Black,
+                  Colour          => Komnenos.Colours.From_String ("purple"),
                   Arrow           => To.Style /= Internal);
             end;
 
@@ -419,7 +430,7 @@ package body Komnenos.Fragments.Diagrams is
                Start_Direction => East,
                Path            => Path,
                Width           => Config.Connector_Width,
-               Colour          => Komnenos.Colours.Black,
+               Colour          => Komnenos.Colours.From_String ("red"),
                Arrow           => To.Style /= Internal);
          end;
       end if;
@@ -451,7 +462,16 @@ package body Komnenos.Fragments.Diagrams is
             end;
          end loop;
 
-         Create_Layout (Fragment.Nodes);
+         declare
+            Layout : constant Layout_Rectangle :=
+                       Create_Layout (Fragment.Nodes);
+         begin
+            if Layout.Width /= Fragment.Width
+              or else Layout.Height /= Fragment.Height
+            then
+               Fragment.Set_Size (Layout.Width, Layout.Height);
+            end if;
+         end;
 
          for Node of Fragment.Nodes loop
             if Node.Style /= Internal then
