@@ -44,9 +44,26 @@ package body Komnenos.Keys.Gtk_Keys is
       return Modify (Result,
                      Shift   => Shift,
                      Control => (State and Gdk.Types.Control_Mask) /= 0,
-                     Mod1    => (State and Gdk.Types.Mod1_Mask) /= 0,
-                     Mod2    => (State and Gdk.Types.Mod2_Mask) /= 0);
+                     Alt     => (State and Gdk.Types.Mod1_Mask) /= 0,
+                     Meta    => (State and Gdk.Types.Mod2_Mask) /= 0);
 
    end To_Komnenos_Key;
+
+   -------------------------------
+   -- To_Komnenos_Modifier_Keys --
+   -------------------------------
+
+   function To_Komnenos_Modifier_Keys
+     (State : Gdk.Types.Gdk_Modifier_Type)
+      return Modifier_Keys
+   is
+      use type Gdk.Types.Gdk_Modifier_Type;
+   begin
+      return Modifier
+        (Shift   => (State and Gdk.Types.Shift_Mask) /= 0,
+         Control => (State and Gdk.Types.Control_Mask) /= 0,
+         Alt     => (State and Gdk.Types.Mod1_Mask) /= 0,
+         Meta    => (State and Gdk.Types.Mod2_Mask) /= 0);
+   end To_Komnenos_Modifier_Keys;
 
 end Komnenos.Keys.Gtk_Keys;

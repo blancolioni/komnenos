@@ -7,4 +7,8 @@ package Komnenos.Keys.Gtk_Keys is
       State : Gdk.Types.Gdk_Modifier_Type)
       return Komnenos_Key;
 
+   function To_Komnenos_Modifier_Keys
+     (State : Gdk.Types.Gdk_Modifier_Type)
+      return Modifier_Keys;
+
 end Komnenos.Keys.Gtk_Keys;
