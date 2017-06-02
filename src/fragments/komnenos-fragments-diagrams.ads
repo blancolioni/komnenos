@@ -67,6 +67,7 @@ private
          Tool_Tip    : Ada.Strings.Unbounded.Unbounded_String;
          Link        : Komnenos.Entities.Entity_Reference;
          Connections : Node_Connection_Lists.List;
+         Row         : Positive;
       end record;
 
    package Node_Vectors is
