@@ -5,8 +5,6 @@ with Komnenos.Displays;
 
 package body Komnenos.Fragments.Diagrams is
 
-   Log_Layout : constant Boolean := False;
-
    function "+" (S : String) return Ada.Strings.Unbounded.Unbounded_String
                  renames Ada.Strings.Unbounded.To_Unbounded_String;
 
@@ -44,7 +42,7 @@ package body Komnenos.Fragments.Diagrams is
       Diagram.Nodes (From).Connections.Append
         ((From, To, From_Edge, To_Edge, False));
 
-      if Log_Layout then
+      if Komnenos.Configuration.Get_Diagram_Config.Debug_Layout then
          Ada.Text_IO.Put_Line ("connect:" & From'Img & " -->" & To'Img);
       end if;
 
@@ -152,7 +150,7 @@ package body Komnenos.Fragments.Diagrams is
                Have_Node    : Boolean := True;
             begin
 
-               if Log_Layout then
+               if Config.Debug_Layout then
                   Ada.Text_IO.Put_Line ("layout:" & Current_Node'Img);
                end if;
 
@@ -176,7 +174,7 @@ package body Komnenos.Fragments.Diagrams is
                         if Have_Node then
                            Previous (Connection.To) := Current_Node;
 
-                           if Log_Layout then
+                           if Config.Debug_Layout then
                               Ada.Text_IO.Put_Line
                                 ("queue:" & Connection.To'Img
                                  & " after" & Current_Node'Img);
@@ -184,7 +182,7 @@ package body Komnenos.Fragments.Diagrams is
 
                            Queue.Append (Connection.To);
                         else
-                           if Log_Layout then
+                           if Config.Debug_Layout then
                               Ada.Text_IO.Put_Line
                                 ("next in row:" & Connection.To'Img);
                            end if;
@@ -221,7 +219,7 @@ package body Komnenos.Fragments.Diagrams is
 
                end loop;
 
-               if Log_Layout then
+               if Config.Debug_Layout then
                   Ada.Text_IO.Put_Line
                     ("finished: row" & Current_Row'Img);
                end if;
@@ -255,7 +253,7 @@ package body Komnenos.Fragments.Diagrams is
                                         Nodes.Element (Prev_Ref).Rectangle;
                         begin
 
-                           if Log_Layout then
+                           if Config.Debug_Layout then
                               Ada.Text_IO.Put_Line
                                 ("Node" & Ref'Img
                                  & " placed after"
@@ -272,7 +270,7 @@ package body Komnenos.Fragments.Diagrams is
                      Node.Rectangle.X := X;
                      Node.Rectangle.Y := Y - Node.Rectangle.Height / 2;
 
-                     if Log_Layout then
+                     if Config.Debug_Layout then
                         Ada.Text_IO.Put_Line
                           ("place:" & Ref'Img & " at"
                            & Node.Rectangle.X'Img
@@ -303,6 +301,8 @@ package body Komnenos.Fragments.Diagrams is
       Display  : not null access Komnenos.Displays.Canvas_Display'Class)
    is
       use Komnenos.Entities.Visuals;
+      Config : constant Komnenos.Configuration.Diagram_Config :=
+                 Komnenos.Configuration.Get_Diagram_Config;
       Start : constant Layout_Point :=
                 (From.Rectangle.X + From.Rectangle.Width - 1,
                  From.Rectangle.Y + From.Rectangle.Height / 2);
@@ -312,7 +312,7 @@ package body Komnenos.Fragments.Diagrams is
 
    begin
 
-      if Log_Layout then
+      if Config.Debug_Layout then
          Ada.Text_IO.Put_Line
            ("draw connection:"
             & From.Reference'Img
@@ -577,7 +577,7 @@ package body Komnenos.Fragments.Diagrams is
       Diagram.Columns := Natural'Max (Diagram.Columns, X);
       Diagram.Rows := Natural'Max (Diagram.Rows, Y);
 
-      if Log_Layout then
+      if Komnenos.Configuration.Get_Diagram_Config.Debug_Layout then
          Ada.Text_IO.Put_Line
            ("put_node:" & Node_Reference'Image (Diagram.Nodes.Last_Index)
             & ": "
