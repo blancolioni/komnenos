@@ -357,7 +357,7 @@ package body Komnenos.Fragments.Diagrams is
                Path : constant Komnenos.Displays.Turtle_Path :=
                         (Move
                            (Pixel_Offset'Max
-                              (Finish.X - Start.X - 18, 0)),
+                              (Finish.X - Start.X - 12, 0)),
                          Turn (North, 6),
                          Move
                            (Pixel_Offset'Max
@@ -383,11 +383,10 @@ package body Komnenos.Fragments.Diagrams is
                          Move (15),
                          Turn (East, 6),
                          Move (Pixel_Offset'Max
-                           (Finish.X - Start.X - 42, 0)),
+                           (Finish.X - Start.X - 24, 0)),
                          Turn (South, 6),
                          Move (15),
-                         Turn (East, 6),
-                         Move (18));
+                         Turn (East, 6));
             begin
                Display.Draw_Turtle_Path
                  (Layer           => Komnenos.Displays.Base,
@@ -409,8 +408,7 @@ package body Komnenos.Fragments.Diagrams is
                       Move (Start.X - Finish.X),
                       Turn (North, 6),
                       Move (15),
-                      Turn (East, 6),
-                      Move (18));
+                      Turn (East, 6));
          begin
             Display.Draw_Turtle_Path
               (Layer           => Komnenos.Displays.Base,
