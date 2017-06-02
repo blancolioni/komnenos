@@ -316,7 +316,10 @@ package body Komnenos.Fragments.Diagrams is
          Ada.Text_IO.Put_Line
            ("draw connection:"
             & From.Reference'Img
-            & " -->" & To.Reference'Img);
+            & ":" & Start.X'Img & Start.Y'Img
+            & " -->"
+            & To.Reference'Img
+            & ":" & Finish.X'Img & Finish.Y'Img);
       end if;
 
       if Finish.X > Start.X then
@@ -430,39 +433,6 @@ package body Komnenos.Fragments.Diagrams is
      (Fragment : not null access Diagram_Fragment_Type)
    is
       use Komnenos.Entities.Visuals;
-
---        function Straight_Line (From, To : Diagram_Node) return Boolean
---        is (True);
-
-      -------------------
-      -- Straight_Line --
-      -------------------
-
---        function Straight_Line (From, To : Diagram_Node) return Boolean is
---        begin
---           if From.Rectangle.X >= To.Rectangle.X
---             or else From.Rectangle.Y not in
---               To.Rectangle.Y .. To.Rectangle.Y + To.Rectangle.Width
---           then
---              return False;
---           end if;
---
---           if From.X + 1 = To.X then
---              return True;
---           end if;
---
---           for Node of Fragment.Nodes loop
---              if Node.Style /= Internal
---                and then Node.Y = From.Y
---                and then Node.X in From.X + 1 .. To.X - 1
---              then
---                 return False;
---              end if;
---           end loop;
---
---           return True;
---        end Straight_Line;
-
    begin
       if Fragment.Canvas /= null then
          for Node of Fragment.Nodes loop
