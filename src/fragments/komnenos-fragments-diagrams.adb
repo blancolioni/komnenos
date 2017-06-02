@@ -105,7 +105,7 @@ package body Komnenos.Fragments.Diagrams is
         (From, To : Node_Reference_Range)
          return Pixel_Length
       is (if Nodes (From).Style = Internal
-          and then Nodes (To).Style = Internal
+          or else Nodes (To).Style = Internal
           then Config.Internal_Node_Gap
           else Config.Visible_Node_Gap);
 
