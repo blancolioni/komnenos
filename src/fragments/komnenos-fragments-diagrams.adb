@@ -189,7 +189,7 @@ package body Komnenos.Fragments.Diagrams is
 
                            declare
                               Existing : Reference_Lists.Cursor :=
-                                           Queue.Find (Current_Node);
+                                           Queue.Find (Connection.To);
                            begin
                               if Reference_Lists.Has_Element (Existing) then
                                  if Config.Debug_Layout then
