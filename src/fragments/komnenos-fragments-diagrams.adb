@@ -267,6 +267,7 @@ package body Komnenos.Fragments.Diagrams is
                         end;
                      end if;
 
+                     Node.Row := Row_Index;
                      Node.Rectangle.X := X;
                      Node.Rectangle.Y := Y - Node.Rectangle.Height / 2;
 
