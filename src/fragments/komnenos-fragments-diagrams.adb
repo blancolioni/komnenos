@@ -163,6 +163,8 @@ package body Komnenos.Fragments.Diagrams is
                Placed_Row (Current_Node) := Current_Row;
                Placed (Current_Node) := True;
 
+               Nodes (Current_Node).Row := Current_Row;
+
                Queue.Delete_First;
 
                while Have_Node loop
@@ -326,7 +328,7 @@ package body Komnenos.Fragments.Diagrams is
                Colour => Komnenos.Colours.Black,
                Curved => False,
                Arrow  => To.Style /= Internal);
-         elsif Finish.Y > Start.Y then
+         elsif To.Row > From.Row then
             declare
                use Komnenos.Displays;
                Path : constant Komnenos.Displays.Turtle_Path :=
@@ -349,7 +351,7 @@ package body Komnenos.Fragments.Diagrams is
                   Arrow           => To.Style /= Internal);
             end;
 
-         elsif Finish.Y < Start.Y then
+         elsif To.Row < From.Row then
             declare
                use Komnenos.Displays;
                Path : constant Komnenos.Displays.Turtle_Path :=
@@ -568,7 +570,8 @@ package body Komnenos.Fragments.Diagrams is
          Label_Style => Label_Style,
          Tool_Tip    => +Tool_Tip,
          Link        => Komnenos.Entities.Entity_Reference (Link),
-         Connections => Node_Connection_Lists.Empty_List);
+         Connections => Node_Connection_Lists.Empty_List,
+         Row         => 1);
    begin
       Diagram.Nodes.Append (Node);
       Diagram.Columns := Natural'Max (Diagram.Columns, X);
