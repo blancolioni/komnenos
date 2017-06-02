@@ -37,6 +37,11 @@ package Komnenos.Fragments.Diagrams is
    overriding procedure Invalidate
      (Fragment : not null access Diagram_Fragment_Type);
 
+   overriding procedure On_Click
+     (Fragment : not null access Diagram_Fragment_Type;
+      X, Y     : Pixel_Position;
+      Modifier : Komnenos.Keys.Modifier_Keys);
+
    function New_Diagram
      return Diagram_Fragment;
 
@@ -46,6 +51,14 @@ package Komnenos.Fragments.Diagrams is
      return Diagram_Fragment;
 
 private
+
+   function To_String_With_Default
+     (S : Ada.Strings.Unbounded.Unbounded_String;
+      Default : String)
+      return String
+   is (if Ada.Strings.Unbounded."="
+       (S, Ada.Strings.Unbounded.Null_Unbounded_String)
+       then Default else Ada.Strings.Unbounded.To_String (S));
 
    type Node_Connection is
       record
@@ -69,6 +82,14 @@ private
          Connections : Node_Connection_Lists.List;
          Row         : Positive;
       end record;
+
+   function Image (Node : Diagram_Node) return String
+   is (Node_Reference'Image (Node.Reference)
+       & ": "
+       & Node.Style'Img
+       & ": "
+       & (To_String_With_Default
+          (Node.Label_Text, "(no label)")));
 
    package Node_Vectors is
      new Ada.Containers.Vectors (Node_Reference, Diagram_Node);
