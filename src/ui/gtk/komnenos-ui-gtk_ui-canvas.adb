@@ -9,6 +9,8 @@ with Gdk.Window;
 
 with Komnenos.Configuration;
 
+with Komnenos.Keys.Gtk_Keys;
+
 with Komnenos.Colours.Cairo_Colours;
 with Komnenos.UI.Cairo_UI;
 
@@ -22,6 +24,11 @@ package body Komnenos.UI.Gtk_UI.Canvas is
    function Draw_Area_Configure_Handler
      (Widget : access Gtk.Widget.Gtk_Widget_Record'Class;
       Event : Gdk.Event.Gdk_Event_Configure)
+      return Boolean;
+
+   function Draw_Area_Click_Handler
+     (Widget : access Gtk.Widget.Gtk_Widget_Record'Class;
+      Event  : Gdk.Event.Gdk_Event_Button)
       return Boolean;
 
    ------------------------
@@ -76,6 +83,8 @@ package body Komnenos.UI.Gtk_UI.Canvas is
         (Draw_Area_Configure_Handler'Access);
       Result.Draw_Area.On_Draw
         (Draw_Area_Draw_Handler'Access);
+      Result.Draw_Area.On_Button_Release_Event
+        (Draw_Area_Click_Handler'Access);
 
 --        Result.Text.On_Key_Press_Event
 --          (Text_View_Key_Press'Access,
@@ -91,6 +100,23 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       return Result;
 
    end Create_Canvas_View;
+
+   -----------------------------
+   -- Draw_Area_Click_Handler --
+   -----------------------------
+
+   function Draw_Area_Click_Handler
+     (Widget : access Gtk.Widget.Gtk_Widget_Record'Class;
+      Event  : Gdk.Event.Gdk_Event_Button)
+      return Boolean
+   is
+   begin
+      Komnenos_Canvas_View (Widget).Fragment.On_Click
+        (Pixel_Position (Event.X), Pixel_Position (Event.Y),
+         Komnenos.Keys.Gtk_Keys.To_Komnenos_Modifier_Keys
+           (Event.State));
+      return True;
+   end Draw_Area_Click_Handler;
 
    ---------------------------------
    -- Draw_Area_Configure_Handler --
@@ -360,8 +386,18 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       Cairo.Set_Line_Width (Cr, Gdouble (Width));
       Cairo.Move_To (Cr, X, Y);
       Komnenos.Colours.Cairo_Colours.Set_Source_Rgb (Cr, Colour);
+--        Ada.Text_IO.Put_Line ("start path:" & Integer'Image (Integer (X))
+--                                & Integer'Image (Integer (Y)));
+
       for Command of Path loop
          R := Gdouble (Command.Length);
+--           Ada.Text_IO.Put_Line
+--             ("command:"
+--              & Command.Atom'Img
+--              & Command.Length'Img
+--              & (if Command.Atom = Turn
+--                then " " & Command.Direction'Img else ""));
+
          case Command.Atom is
             when Move =>
                X := X + R * Cos (D);
@@ -418,6 +454,8 @@ package body Komnenos.UI.Gtk_UI.Canvas is
                   D := New_D;
                end;
          end case;
+--           Ada.Text_IO.Put_Line ("location:" & Integer'Image (Integer (X))
+--                                 & Integer'Image (Integer (Y)));
       end loop;
 
       Cairo.Stroke (Cr);
