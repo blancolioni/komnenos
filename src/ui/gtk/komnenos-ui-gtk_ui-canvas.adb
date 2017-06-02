@@ -486,4 +486,17 @@ package body Komnenos.UI.Gtk_UI.Canvas is
 
    end Get_Bounding_Rectangle;
 
+   -------------------------
+   -- On_Fragment_Resized --
+   -------------------------
+
+   overriding procedure On_Fragment_Resized
+     (Canvas : in out Komnenos_Canvas_View_Record)
+   is
+   begin
+      Canvas.Draw_Area.Set_Size_Request
+        (Width  => Glib.Gint (Canvas.Fragment.Width),
+         Height => Glib.Gint (Canvas.Fragment.Height));
+   end On_Fragment_Resized;
+
 end Komnenos.UI.Gtk_UI.Canvas;
