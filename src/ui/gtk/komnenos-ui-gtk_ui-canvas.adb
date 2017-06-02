@@ -367,9 +367,9 @@ package body Komnenos.UI.Gtk_UI.Canvas is
                declare
                   New_D : constant Compass_Direction := Command.Direction;
                   Xc    : constant Gdouble :=
-                            X + R * Cos (D) + R * Cos (New_D);
+                            X + R * Cos (New_D);
                   Yc    : constant Gdouble :=
-                            Y - R * Sin (D) - R * Sin (New_D);
+                            Y - R * Sin (New_D);
                   A_1   : constant Gdouble :=
                             (case New_D is
                                 when East   => Pi,
