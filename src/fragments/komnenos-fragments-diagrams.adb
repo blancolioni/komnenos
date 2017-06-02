@@ -2,6 +2,7 @@ with Ada.Text_IO;
 
 with Komnenos.Configuration;
 with Komnenos.Displays;
+with Komnenos.UI;
 
 package body Komnenos.Fragments.Diagrams is
 
@@ -385,7 +386,7 @@ package body Komnenos.Fragments.Diagrams is
                   Start_Direction => East,
                   Path            => Path,
                   Width           => Config.Connector_Width,
-                  Colour          => Komnenos.Colours.From_String ("purple"),
+                  Colour          => Komnenos.Colours.Black,
                   Arrow           => To.Style /= Internal);
             end;
 
@@ -430,7 +431,7 @@ package body Komnenos.Fragments.Diagrams is
                Start_Direction => East,
                Path            => Path,
                Width           => Config.Connector_Width,
-               Colour          => Komnenos.Colours.From_String ("red"),
+               Colour          => Komnenos.Colours.Black,
                Arrow           => To.Style /= Internal);
          end;
       end if;
@@ -535,6 +536,35 @@ package body Komnenos.Fragments.Diagrams is
          Diagram.Layout_Rec.Height := 200;
       end return;
    end New_Diagram;
+
+   --------------
+   -- On_Click --
+   --------------
+
+   overriding procedure On_Click
+     (Fragment : not null access Diagram_Fragment_Type;
+      X, Y     : Pixel_Position;
+      Modifier : Komnenos.Keys.Modifier_Keys)
+   is
+      use Komnenos.Entities;
+      Follow_Link : constant Boolean :=
+                      Komnenos.Keys.Control (Modifier);
+   begin
+      for Node of Fragment.Nodes loop
+         if Contains (Node.Rectangle, X, Y) then
+            Ada.Text_IO.Put_Line
+              ("click: " & Image (Node));
+            if Follow_Link
+              and then Node.Link /= null
+            then
+               Node.Link.Select_Entity
+                 (Komnenos.UI.Current_UI, Fragment,  null,
+                  Node.Rectangle.Y + Node.Rectangle.Height / 2);
+            end if;
+            exit;
+         end if;
+      end loop;
+   end On_Click;
 
    --------------
    -- Put_Node --
