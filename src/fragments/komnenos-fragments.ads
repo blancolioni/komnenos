@@ -146,6 +146,12 @@ package Komnenos.Fragments is
      (Fragment : in out Root_Fragment_Type'Class;
       Canvas   : access Komnenos.Displays.Canvas_Display'Class);
 
+   procedure On_Click
+     (Fragment : not null access Root_Fragment_Type;
+      X, Y     : Pixel_Position;
+      Modifier : Komnenos.Keys.Modifier_Keys)
+   is null;
+
    type Fragment_Type is access all Root_Fragment_Type'Class;
 
    type Text_Fragment_Type is
