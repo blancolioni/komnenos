@@ -36,6 +36,7 @@ package Komnenos.Displays is
      (Canvas    : in out Canvas_Display;
       Layer     : Canvas_Layer;
       Line      : Layout_Line;
+      Width     : Pixel_Length;
       Colour    : Komnenos.Colours.Komnenos_Colour;
       Curved    : Boolean;
       Arrow     : Boolean)
@@ -65,6 +66,7 @@ package Komnenos.Displays is
       Start_Location  : Layout_Point;
       Start_Direction : Compass_Direction;
       Path            : Turtle_Path;
+      Width           : Pixel_Length;
       Colour          : Komnenos.Colours.Komnenos_Colour;
       Arrow           : Boolean)
    is abstract;
