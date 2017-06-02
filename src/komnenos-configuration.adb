@@ -144,13 +144,15 @@ package body Komnenos.Configuration is
          Node_Down_Margin     => 3,
          Visible_Node_Gap     => 30,
          Internal_Node_Gap    => 20,
-         Layout_Row_Size      => 50);
+         Layout_Row_Size      => 50,
+         Debug_Layout         => False);
 
       if Komnenos_Config.Contains ("diagram") then
          declare
             Config : constant Tropos.Configuration :=
                        Komnenos_Config.Child ("diagram");
          begin
+            Local_Diagram_Config.Debug_Layout := Config.Get ("debug_layout");
             if Config.Contains ("label_font") then
                declare
                   Font_Config : constant Tropos.Configuration :=
