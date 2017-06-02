@@ -37,11 +37,29 @@ package Komnenos is
    subtype Pixel_Offset is Pixel_Position;
    subtype Pixel_Length is Pixel_Position range 0 .. Pixel_Position'Last;
 
+   type Layout_Point is
+      record
+         X, Y : Pixel_Position;
+      end record;
+
    type Layout_Rectangle is
       record
          X, Y          : Pixel_Position;
          Width, Height : Pixel_Length;
       end record;
+
+   function Contains
+     (Rectangle : Layout_Rectangle;
+      X, Y      : Pixel_Position)
+      return Boolean
+   is (X in Rectangle.X .. Rectangle.X + Rectangle.Width
+       and then Y in Rectangle.Y .. Rectangle.Y + Rectangle.Height);
+
+   function Contains
+     (Rectangle : Layout_Rectangle;
+      Point     : Layout_Point)
+      return Boolean
+   is (Contains (Rectangle, Point.X, Point.Y));
 
    function To_Config
      (Rectangle : Layout_Rectangle)
@@ -50,11 +68,6 @@ package Komnenos is
    function From_Config
      (Config : Tropos.Configuration)
       return Layout_Rectangle;
-
-   type Layout_Point is
-      record
-         X, Y : Pixel_Position;
-      end record;
 
    type Layout_Line is array (Positive range <>) of Layout_Point;
 
