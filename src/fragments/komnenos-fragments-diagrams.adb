@@ -231,7 +231,7 @@ package body Komnenos.Fragments.Diagrams is
       end;
 
       declare
-         Y : Pixel_Length := Config.Layout_Row_Size / 2;
+         Y : Pixel_Length := Config.Layout_Row_Size;
       begin
          for Row_Index in 1 .. Row_Count loop
             declare
