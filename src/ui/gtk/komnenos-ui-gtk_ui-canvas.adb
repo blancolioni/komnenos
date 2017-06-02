@@ -151,6 +151,7 @@ package body Komnenos.UI.Gtk_UI.Canvas is
      (Canvas    : in out Komnenos_Canvas_View_Record;
       Layer     : Komnenos.Displays.Canvas_Layer;
       Line      : Layout_Line;
+      Width     : Pixel_Length;
       Colour    : Komnenos.Colours.Komnenos_Colour;
       Curved    : Boolean;
       Arrow     : Boolean)
@@ -167,12 +168,13 @@ package body Komnenos.UI.Gtk_UI.Canvas is
 
       if Curved and then Line'Length > 4 then
          Draw_Line (Canvas, Layer, Line (Line'First .. Line'First + 3),
-                    Colour, Curved, False);
+                    Width, Colour, Curved, False);
          Draw_Line (Canvas, Layer, Line (Line'First + 3 .. Line'Last),
-                    Colour, Curved, Arrow);
+                    Width, Colour, Curved, Arrow);
          return;
       end if;
 
+      Cairo.Set_Line_Width (Cr, Gdouble (Width));
       Komnenos.Colours.Cairo_Colours.Set_Source_Rgb (Cr, Colour);
 
       Cairo.Set_Line_Width (Cr, Glib.Gdouble (Config.Connector_Width));
@@ -336,6 +338,7 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       Start_Location  : Layout_Point;
       Start_Direction : Komnenos.Displays.Compass_Direction;
       Path            : Komnenos.Displays.Turtle_Path;
+      Width           : Pixel_Length;
       Colour          : Komnenos.Colours.Komnenos_Colour;
       Arrow           : Boolean)
    is
@@ -354,6 +357,7 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       Sin : constant array (Compass_Direction) of Gdouble :=
               (0.0, 1.0, 0.0, -1.0);
    begin
+      Cairo.Set_Line_Width (Cr, Gdouble (Width));
       Cairo.Move_To (Cr, X, Y);
       Komnenos.Colours.Cairo_Colours.Set_Source_Rgb (Cr, Colour);
       for Command of Path loop

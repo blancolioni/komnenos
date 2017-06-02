@@ -63,6 +63,7 @@ private
      (Canvas    : in out Komnenos_Canvas_View_Record;
       Layer     : Komnenos.Displays.Canvas_Layer;
       Line      : Layout_Line;
+      Width     : Pixel_Length;
       Colour    : Komnenos.Colours.Komnenos_Colour;
       Curved    : Boolean;
       Arrow     : Boolean);
@@ -73,6 +74,7 @@ private
       Start_Location  : Layout_Point;
       Start_Direction : Komnenos.Displays.Compass_Direction;
       Path            : Komnenos.Displays.Turtle_Path;
+      Width           : Pixel_Length;
       Colour          : Komnenos.Colours.Komnenos_Colour;
       Arrow           : Boolean);
 

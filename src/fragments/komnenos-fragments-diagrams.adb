@@ -322,6 +322,7 @@ package body Komnenos.Fragments.Diagrams is
             Display.Draw_Line
               (Layer  => Komnenos.Displays.Base,
                Line   => (Start, Finish),
+               Width  => Config.Connector_Width,
                Colour => Komnenos.Colours.Black,
                Curved => False,
                Arrow  => To.Style /= Internal);
@@ -343,6 +344,7 @@ package body Komnenos.Fragments.Diagrams is
                   Start_Location  => Start,
                   Start_Direction => East,
                   Path            => Path,
+                  Width           => Config.Connector_Width,
                   Colour          => Komnenos.Colours.Black,
                   Arrow           => To.Style /= Internal);
             end;
@@ -366,6 +368,7 @@ package body Komnenos.Fragments.Diagrams is
                   Start_Location  => Start,
                   Start_Direction => East,
                   Path            => Path,
+                  Width           => Config.Connector_Width,
                   Colour          => Komnenos.Colours.Black,
                   Arrow           => To.Style /= Internal);
             end;
@@ -389,6 +392,7 @@ package body Komnenos.Fragments.Diagrams is
                   Start_Location  => Start,
                   Start_Direction => East,
                   Path            => Path,
+                  Width           => Config.Connector_Width,
                   Colour          => Komnenos.Colours.Black,
                   Arrow           => To.Style /= Internal);
             end;
@@ -411,6 +415,7 @@ package body Komnenos.Fragments.Diagrams is
                Start_Location  => Start,
                Start_Direction => East,
                Path            => Path,
+               Width           => Config.Connector_Width,
                Colour          => Komnenos.Colours.Black,
                Arrow           => To.Style /= Internal);
          end;
