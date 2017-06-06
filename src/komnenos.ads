@@ -76,6 +76,9 @@ package Komnenos is
 
    type Node_Edge is (Left, Top, Right, Bottom);
 
+   type Node_Visibility is
+     (Always_Visible, Show_On_Hover, Show_On_Selected, Never_Visible);
+
    type Node_Reference is new Positive;
 
 end Komnenos;

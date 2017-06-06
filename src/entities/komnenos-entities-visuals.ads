@@ -13,7 +13,24 @@ package Komnenos.Entities.Visuals is
       return Node_Reference
    is abstract
      with Pre'Class =>
-       not (Komnenos.Styles."=" (Label_Style, null));
+       Label_Text = ""
+         or else not (Komnenos.Styles."=" (Label_Style, null));
+
+   function Put_Sub_Node
+     (Visual      : in out Diagram_Visual;
+      Parent      : Node_Reference;
+      Anchor      : Node_Edge;
+      Visibility  : Node_Visibility;
+      Style       : Node_Style;
+      Label_Text  : String;
+      Label_Style : Komnenos.Styles.Komnenos_Style;
+      Tool_Tip    : String;
+      Link        : access Komnenos.Entities.Root_Entity_Reference'Class)
+      return Node_Reference
+      is abstract
+     with Pre'Class =>
+       Label_Text = ""
+       or else not (Komnenos.Styles."=" (Label_Style, null));
 
    procedure Move_Node
      (Visual   : in out Diagram_Visual;
