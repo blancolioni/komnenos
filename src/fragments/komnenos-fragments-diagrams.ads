@@ -22,6 +22,18 @@ package Komnenos.Fragments.Diagrams is
       Link        : access Komnenos.Entities.Root_Entity_Reference'Class)
       return Node_Reference;
 
+   overriding function Put_Sub_Node
+     (Diagram     : in out Diagram_Fragment_Type;
+      Parent      : Node_Reference;
+      Anchor      : Node_Edge;
+      Visibility  : Node_Visibility;
+      Style       : Node_Style;
+      Label_Text  : String;
+      Label_Style : Komnenos.Styles.Komnenos_Style;
+      Tool_Tip    : String;
+      Link        : access Komnenos.Entities.Root_Entity_Reference'Class)
+      return Node_Reference;
+
    overriding procedure Move_Node
      (Diagram : in out Diagram_Fragment_Type;
       Node    : Node_Reference;
@@ -48,12 +60,12 @@ package Komnenos.Fragments.Diagrams is
    function New_Diagram
      (Entity : not null access
         Komnenos.Entities.Root_Entity_Reference'Class)
-     return Diagram_Fragment;
+      return Diagram_Fragment;
 
 private
 
    function To_String_With_Default
-     (S : Ada.Strings.Unbounded.Unbounded_String;
+     (S       : Ada.Strings.Unbounded.Unbounded_String;
       Default : String)
       return String
    is (if Ada.Strings.Unbounded."="
@@ -72,15 +84,19 @@ private
 
    type Diagram_Node is
       record
-         Reference   : Node_Reference;
-         Rectangle   : Layout_Rectangle;
-         Style       : Node_Style;
-         Label_Text  : Ada.Strings.Unbounded.Unbounded_String;
-         Label_Style : Komnenos.Styles.Komnenos_Style;
-         Tool_Tip    : Ada.Strings.Unbounded.Unbounded_String;
-         Link        : Komnenos.Entities.Entity_Reference;
-         Connections : Node_Connection_Lists.List;
-         Row         : Positive;
+         Reference        : Node_Reference;
+         Parent_Reference : Node_Reference;
+         Has_Parent       : Boolean;
+         Rectangle        : Layout_Rectangle;
+         Anchor           : Node_Edge;
+         Visibility       : Node_Visibility;
+         Style            : Node_Style;
+         Label_Text       : Ada.Strings.Unbounded.Unbounded_String;
+         Label_Style      : Komnenos.Styles.Komnenos_Style;
+         Tool_Tip         : Ada.Strings.Unbounded.Unbounded_String;
+         Link             : Komnenos.Entities.Entity_Reference;
+         Connections      : Node_Connection_Lists.List;
+         Row              : Positive;
       end record;
 
    function Image (Node : Diagram_Node) return String

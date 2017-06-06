@@ -86,7 +86,7 @@ package body Komnenos.Fragments.Diagrams is
       type Layout_Array is
         array (Natural range 0 .. Natural (Nodes.Length)) of Layout_Row;
 
-      Layout : Layout_Array;
+      Layout    : Layout_Array;
       Row_Count : Natural := 0;
 
       Config : constant Komnenos.Configuration.Diagram_Config :=
@@ -233,7 +233,7 @@ package body Komnenos.Fragments.Diagrams is
       end;
 
       declare
-         Y : Pixel_Length := Config.Layout_Row_Size;
+         Y     : Pixel_Length := Config.Layout_Row_Size;
          Width : Pixel_Length := 0;
       begin
          for Row_Index in 1 .. Row_Count loop
@@ -243,7 +243,7 @@ package body Komnenos.Fragments.Diagrams is
             begin
                for Col_Index in 1 .. Row.Count loop
                   declare
-                     Ref : constant Node_Reference := Row.Nodes (Col_Index);
+                     Ref  : constant Node_Reference := Row.Nodes (Col_Index);
                      Node : Diagram_Node renames Nodes (Ref);
                   begin
                      if Col_Index = 1
@@ -316,9 +316,9 @@ package body Komnenos.Fragments.Diagrams is
       use Komnenos.Entities.Visuals;
       Config : constant Komnenos.Configuration.Diagram_Config :=
                  Komnenos.Configuration.Get_Diagram_Config;
-      Start : constant Layout_Point :=
-                (From.Rectangle.X + From.Rectangle.Width - 1,
-                 From.Rectangle.Y + From.Rectangle.Height / 2);
+      Start  : constant Layout_Point :=
+                 (From.Rectangle.X + From.Rectangle.Width - 1,
+                  From.Rectangle.Y + From.Rectangle.Height / 2);
       Finish : constant Layout_Point :=
                  (To.Rectangle.X,
                   To.Rectangle.Y + To.Rectangle.Height / 2);
@@ -502,12 +502,12 @@ package body Komnenos.Fragments.Diagrams is
       Node    : Node_Reference;
       X, Y    : Positive)
    is null;
---     begin
---        Diagram.Nodes (Node).X := X;
---        Diagram.Nodes (Node).Y := Y;
---        Diagram.Columns := Natural'Max (Diagram.Columns, X);
---        Diagram.Rows := Natural'Max (Diagram.Rows, Y);
---     end Move_Node;
+   --     begin
+   --        Diagram.Nodes (Node).X := X;
+   --        Diagram.Nodes (Node).Y := Y;
+   --        Diagram.Columns := Natural'Max (Diagram.Columns, X);
+   --        Diagram.Rows := Natural'Max (Diagram.Rows, Y);
+   --     end Move_Node;
 
    -----------------
    -- New_Diagram --
@@ -581,17 +581,22 @@ package body Komnenos.Fragments.Diagrams is
       return Node_Reference
    is
       Node : constant Diagram_Node := Diagram_Node'
-        (Reference   => Diagram.Nodes.Last_Index + 1,
-         Rectangle   => (0, 0, 1, 1),
-         Style       => Style,
-         Label_Text  => +Label_Text,
-         Label_Style => Label_Style,
-         Tool_Tip    => +Tool_Tip,
-         Link        => Komnenos.Entities.Entity_Reference (Link),
-         Connections => Node_Connection_Lists.Empty_List,
-         Row         => 1);
+        (Reference        => Diagram.Nodes.Last_Index + 1,
+         Parent_Reference => Diagram.Nodes.Last_Index + 1,
+         Has_Parent       => False,
+         Rectangle        => (0, 0, 1, 1),
+         Visibility       => Always_Visible,
+         Anchor           => Left,
+         Style            => Style,
+         Label_Text       => +Label_Text,
+         Label_Style      => Label_Style,
+         Tool_Tip         => +Tool_Tip,
+         Link             => Komnenos.Entities.Entity_Reference (Link),
+         Connections      => Node_Connection_Lists.Empty_List,
+         Row              => 1);
    begin
       Diagram.Nodes.Append (Node);
+
       Diagram.Columns := Natural'Max (Diagram.Columns, X);
       Diagram.Rows := Natural'Max (Diagram.Rows, Y);
 
@@ -606,6 +611,53 @@ package body Komnenos.Fragments.Diagrams is
 
       return Diagram.Nodes.Last_Index;
    end Put_Node;
+
+   ------------------
+   -- Put_Sub_Node --
+   ------------------
+
+   overriding function Put_Sub_Node
+     (Diagram     : in out Diagram_Fragment_Type;
+      Parent      : Node_Reference;
+      Anchor      : Node_Edge;
+      Visibility  : Node_Visibility;
+      Style       : Node_Style;
+      Label_Text  : String;
+      Label_Style : Komnenos.Styles.Komnenos_Style;
+      Tool_Tip    : String;
+      Link        : access Komnenos.Entities.Root_Entity_Reference'Class)
+      return Node_Reference
+   is
+      Node : constant Diagram_Node := Diagram_Node'
+        (Reference        => Diagram.Nodes.Last_Index + 1,
+         Parent_Reference => Parent,
+         Has_Parent       => True,
+         Rectangle        => (0, 0, 1, 1),
+         Visibility       => Visibility,
+         Anchor           => Anchor,
+         Style            => Style,
+         Label_Text       => +Label_Text,
+         Label_Style      => Label_Style,
+         Tool_Tip         => +Tool_Tip,
+         Link             => Komnenos.Entities.Entity_Reference (Link),
+         Connections      => Node_Connection_Lists.Empty_List,
+         Row              => 1);
+   begin
+      Diagram.Nodes.Append (Node);
+
+      if Komnenos.Configuration.Get_Diagram_Config.Debug_Layout then
+         Ada.Text_IO.Put_Line
+           ("put_sub_node:"
+            & Node_Reference'Image (Diagram.Nodes.Last_Index)
+            & Node_Reference'Image (Node.Parent_Reference)
+            & ": "
+            & Style'Img
+            & ": "
+            & (if Label_Text = "" then "(no label)" else Label_Text));
+      end if;
+
+      return Diagram.Nodes.Last_Index;
+   end Put_Sub_Node;
 
    ------------
    -- Render --
@@ -630,10 +682,10 @@ package body Komnenos.Fragments.Diagrams is
       declare
          Corner_Radius : constant Pixel_Length :=
                            (case Node.Style is
-                               when Box         => 0,
-                               when Rounded_Box =>
+                               when Box          => 0,
+                               when Rounded_Box  =>
                                   Node.Rectangle.Height / 3,
-                               when Circle =>
+                               when Circle       =>
                                   Node.Rectangle.Height / 2,
                                when Internal     => 0);
       begin
