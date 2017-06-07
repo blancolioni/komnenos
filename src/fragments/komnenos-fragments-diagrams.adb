@@ -323,35 +323,61 @@ package body Komnenos.Fragments.Diagrams is
          begin
             for Edge in Node_Edge loop
                declare
-                  DX : constant Pixel_Offset :=
-                         (if Edge = Left then -1 elsif Edge = Right then 1
-                          else 0);
-                  DY : constant Pixel_Offset :=
-                         (if Edge = Top then -1 elsif Edge = Bottom then 1
-                          else 0);
-                  X  : Pixel_Position :=
-                         Node.Rectangle.X +
-                           (if Edge = Right then Node.Rectangle.Width else 0);
-                  Y  : Pixel_Position :=
-                         Node.Rectangle.Y +
-                           (if Edge = Bottom
-                            then Node.Rectangle.Height else 0);
+                  Vertical_Edge : constant Boolean :=
+                                    Edge in Left | Right;
+                  X, Y          : Pixel_Position;
+                  Total_Width   : Pixel_Length := 0;
+                  Total_Height  : Pixel_Length := 0;
                begin
+                  for Sub_Node_Rec of Node.Sub_Nodes (Edge) loop
+                     declare
+                        Rec : constant Layout_Rectangle :=
+                                Nodes (Sub_Node_Rec.Sub_Node).Rectangle;
+                     begin
+                        if Vertical_Edge then
+                           Total_Height := Total_Height + Rec.Height + 2;
+                           Total_Width :=
+                             Pixel_Length'Max (Total_Width, Rec.Width);
+                        else
+                           Total_Width := Total_Width + Rec.Width + 2;
+                           Total_Height :=
+                             Pixel_Length'Max (Total_Height, Rec.Height);
+                        end if;
+                     end;
+                  end loop;
+
+                  case Edge is
+                     when Left =>
+                        X := Node.Rectangle.X - Total_Width - 2;
+                     when Right =>
+                        X := Node.Rectangle.X + Node.Rectangle.Width + 2;
+                     when Top =>
+                        Y := Node.Rectangle.Y - Total_Height - 2;
+                     when Bottom =>
+                        Y := Node.Rectangle.Y + Node.Rectangle.Height + 2;
+                  end case;
+
+                  if Vertical_Edge then
+                     Y := Node.Rectangle.Y + Node.Rectangle.Height / 2
+                       - Total_Height / 2;
+                  else
+                     X := Node.Rectangle.X + Node.Rectangle.Width / 2
+                       - Total_Width / 2;
+                  end if;
+
                   for Sub_Node_Rec of Node.Sub_Nodes (Edge) loop
                      declare
                         Sub_Node : Diagram_Node renames
                                      Nodes (Sub_Node_Rec.Sub_Node);
-                        Width    : constant Pixel_Offset :=
-                                     Sub_Node.Rectangle.Width;
-                        Height   : constant Pixel_Offset :=
-                                     Sub_Node.Rectangle.Height;
                      begin
-                        Sub_Node.Rectangle.X := X -
-                          (if DX < 0 then Width else 0);
-                        Sub_Node.Rectangle.Y := Y -
-                          (if DY < 0 then Height else 0);
-                        X := X + DX * Width;
-                        Y := Y + DY * Height;
+                        Sub_Node.Rectangle.X := X;
+                        Sub_Node.Rectangle.Y := Y;
+
+                        if Vertical_Edge then
+                           Y := Y + Sub_Node.Rectangle.Height + 2;
+                        else
+                           X := X + Sub_Node.Rectangle.Width + 2;
+                        end if;
                      end;
                   end loop;
                end;
