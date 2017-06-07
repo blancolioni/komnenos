@@ -95,9 +95,9 @@ package Komnenos.Fragments is
      (Fragment : Root_Fragment_Type) return Pixel_Length
    is (Fragment.Rectangle.Height);
 
---     procedure Set_Text_Display
---       (Fragment : in out Root_Fragment_Type;
---        Display  : access Text_Editor_Display'Class);
+   procedure Set_Text_Display
+     (Fragment : in out Root_Fragment_Type;
+      Display  : access Text_Editor_Display'Class);
 
    procedure Execute
      (Fragment : in out Root_Fragment_Type'Class;
@@ -171,6 +171,10 @@ package Komnenos.Fragments is
       Link     : access Komnenos.Entities.Root_Entity_Reference'Class);
 
    overriding procedure New_Line (Fragment : in out Text_Fragment_Type);
+
+   overriding procedure Set_Text_Display
+     (Fragment : in out Text_Fragment_Type;
+      Display  : access Text_Editor_Display'Class);
 
    procedure On_Cursor_Move
      (Fragment     : in out Text_Fragment_Type;
