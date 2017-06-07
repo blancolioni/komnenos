@@ -102,6 +102,7 @@ package body Komnenos.Entities is
 
    procedure Create
      (Item         : in out Root_Entity_Reference'Class;
+      Key          : String;
       Identifier   : in String;
       Class_Name   : in String;
       Path         : in String;
@@ -109,6 +110,10 @@ package body Komnenos.Entities is
       Description  : in String)
    is
    begin
+
+      Item.Key :=
+        Ada.Strings.Unbounded.To_Unbounded_String (Key);
+
       Item.Identifier :=
         Ada.Strings.Unbounded.To_Unbounded_String (Identifier);
 
@@ -372,18 +377,6 @@ package body Komnenos.Entities is
          end loop;
       end if;
    end Iterate;
-
-   ---------
-   -- Key --
-   ---------
-
-   function Key
-     (Item : Root_Entity_Reference)
-      return String
-   is
-   begin
-      return Ada.Strings.Unbounded.To_String (Item.Key);
-   end Key;
 
    -----------------------------
    -- Location_Reference_Type --
