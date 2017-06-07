@@ -28,6 +28,9 @@ package body Komnenos.Fragments.Diagrams is
      (Nodes : in out Node_Vectors.Vector)
       return Layout_Rectangle;
 
+   procedure Create_Sub_Node_Layout
+     (Nodes : in out Node_Vectors.Vector);
+
    -------------------
    -- Connect_Nodes --
    -------------------
@@ -298,11 +301,64 @@ package body Komnenos.Fragments.Diagrams is
             Y := Y + Config.Layout_Row_Size;
          end loop;
 
+         Create_Sub_Node_Layout (Nodes);
+
          return (0, 0, Width, Y);
 
       end;
 
    end Create_Layout;
+
+   ----------------------------
+   -- Create_Sub_Node_Layout --
+   ----------------------------
+
+   procedure Create_Sub_Node_Layout
+     (Nodes : in out Node_Vectors.Vector)
+   is
+   begin
+      for Node_Index in 1 .. Nodes.Last_Index loop
+         declare
+            Node : constant Diagram_Node := Nodes (Node_Index);
+         begin
+            for Edge in Node_Edge loop
+               declare
+                  DX : constant Pixel_Offset :=
+                         (if Edge = Left then -1 elsif Edge = Right then 1
+                          else 0);
+                  DY : constant Pixel_Offset :=
+                         (if Edge = Top then -1 elsif Edge = Bottom then 1
+                          else 0);
+                  X  : Pixel_Position :=
+                         Node.Rectangle.X +
+                           (if Edge = Right then Node.Rectangle.Width else 0);
+                  Y  : Pixel_Position :=
+                         Node.Rectangle.Y +
+                           (if Edge = Bottom
+                            then Node.Rectangle.Height else 0);
+               begin
+                  for Sub_Node_Rec of Node.Sub_Nodes (Edge) loop
+                     declare
+                        Sub_Node : Diagram_Node renames
+                                     Nodes (Sub_Node_Rec.Sub_Node);
+                        Width    : constant Pixel_Offset :=
+                                     Sub_Node.Rectangle.Width;
+                        Height   : constant Pixel_Offset :=
+                                     Sub_Node.Rectangle.Height;
+                     begin
+                        Sub_Node.Rectangle.X := X -
+                          (if DX < 0 then Width else 0);
+                        Sub_Node.Rectangle.Y := Y -
+                          (if DY < 0 then Height else 0);
+                        X := X + DX * Width;
+                        Y := Y + DY * Height;
+                     end;
+                  end loop;
+               end;
+            end loop;
+         end;
+      end loop;
+   end Create_Sub_Node_Layout;
 
    ---------------------
    -- Draw_Connection --
@@ -593,6 +649,7 @@ package body Komnenos.Fragments.Diagrams is
          Tool_Tip         => +Tool_Tip,
          Link             => Komnenos.Entities.Entity_Reference (Link),
          Connections      => Node_Connection_Lists.Empty_List,
+         Sub_Nodes        => (others => <>),
          Row              => 1);
    begin
       Diagram.Nodes.Append (Node);
@@ -606,7 +663,8 @@ package body Komnenos.Fragments.Diagrams is
             & ": "
             & Style'Img
             & ": "
-            & (if Label_Text = "" then "(no label)" else Label_Text));
+            & (if Label_Text = "" then "(no label)" else Label_Text)
+            & (if Link = null then "" else " --> " & Link.Name));
       end if;
 
       return Diagram.Nodes.Last_Index;
@@ -641,9 +699,13 @@ package body Komnenos.Fragments.Diagrams is
          Tool_Tip         => +Tool_Tip,
          Link             => Komnenos.Entities.Entity_Reference (Link),
          Connections      => Node_Connection_Lists.Empty_List,
+         Sub_Nodes        => (others => <>),
          Row              => 1);
    begin
       Diagram.Nodes.Append (Node);
+      Diagram.Nodes (Parent).Sub_Nodes (Anchor).Append
+        ((Sub_Node => Diagram.Nodes.Last_Index,
+          Edge     => Anchor));
 
       if Komnenos.Configuration.Get_Diagram_Config.Debug_Layout then
          Ada.Text_IO.Put_Line
