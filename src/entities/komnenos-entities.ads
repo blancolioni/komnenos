@@ -97,7 +97,7 @@ package Komnenos.Entities is
       return String;
 
    function Key
-     (Item : Root_Entity_Reference)
+     (Item : Root_Entity_Reference'Class)
       return String;
 
    function Path
@@ -171,6 +171,7 @@ package Komnenos.Entities is
 
    procedure Create
      (Item         : in out Root_Entity_Reference'Class;
+      Key          : String;
       Identifier   : String;
       Class_Name   : String;
       Path         : String;
@@ -433,11 +434,11 @@ private
    type Root_Entity_Reference is
      abstract new Aqua.Objects.Root_Object_Type with
       record
+         Key            : Ada.Strings.Unbounded.Unbounded_String;
          Identifier     : Ada.Strings.Unbounded.Unbounded_String;
          Class          : Ada.Strings.Unbounded.Unbounded_String;
          Display_Text   : Ada.Strings.Unbounded.Unbounded_String;
          Description    : Ada.Strings.Unbounded.Unbounded_String;
-         Key            : Ada.Strings.Unbounded.Unbounded_String;
          Path           : Ada.Strings.Unbounded.Unbounded_String;
          References     : Reference_Vectors.Vector;
          Table          : Entity_Table_Access;
@@ -453,6 +454,11 @@ private
      (Item           : Root_Entity_Reference;
       Recursive_Show : access
         function (Value : Aqua.Word) return String) return String;
+
+   function Key
+     (Item : Root_Entity_Reference'Class)
+      return String
+   is (Ada.Strings.Unbounded.To_String (Item.Key));
 
    function Path
      (Item : Root_Entity_Reference)
