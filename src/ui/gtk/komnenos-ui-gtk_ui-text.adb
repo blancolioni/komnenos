@@ -163,6 +163,7 @@ package body Komnenos.UI.Gtk_UI.Text is
    begin
       Gtk.Text_View.Initialize (Result);
       Result.Fragment := Fragment;
+      Result.Fragment.Set_Text_Display (Result);
       --  Gtk.Text_View.Gtk_New (Result.Text);
       Result.Text := Gtk.Text_View.Gtk_Text_View (Result);
 
@@ -203,7 +204,6 @@ package body Komnenos.UI.Gtk_UI.Text is
       end;
 
       Result.Text.On_Configure_Event (Text_View_Configure'Access, Result);
-      Result.Render_Fragment (Fragment);
 
       declare
          use Gdk.Event;
@@ -251,6 +251,8 @@ package body Komnenos.UI.Gtk_UI.Text is
          Result.Buffer.Get_Start_Iter (Start_Iter);
          Result.Buffer.Place_Cursor (Start_Iter);
       end;
+
+      Result.Render_Fragment (Fragment);
 
       return Result;
 

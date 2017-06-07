@@ -38,8 +38,7 @@ package body Komnenos.Fragments is
       Fragment     : not null access Fragments.Root_Fragment_Type'Class)
    is null;
 
-   Local_Null_Text_Display : aliased Null_Text_Display
-     with Unreferenced;
+   Local_Null_Text_Display : aliased Null_Text_Display;
 
    function New_Text_Fragment
      return access Komnenos.Session_Objects.Session_Object_Interface'Class;
@@ -509,6 +508,7 @@ package body Komnenos.Fragments is
       Result.Title :=
         Ada.Strings.Unbounded.To_Unbounded_String
           (Entity.Display_Text);
+      Result.Text_Display := Local_Null_Text_Display'Access;
       return new Text_Fragment_Type'(Result);
    end New_Text_Fragment;
 
@@ -728,17 +728,31 @@ package body Komnenos.Fragments is
    -- Set_Text_Display --
    ----------------------
 
---     procedure Set_Text_Display
---       (Fragment : in out Root_Fragment_Type;
---        Display  : access Text_Editor_Display'Class)
---     is
---     begin
---        if Display = null then
---           Fragment.Display := Local_Null_Text_Display'Access;
---        else
---           Fragment.Display := Display;
---        end if;
---     end Set_Text_Display;
+   procedure Set_Text_Display
+     (Fragment : in out Root_Fragment_Type;
+      Display  : access Text_Editor_Display'Class)
+   is
+   begin
+      if Display = null then
+         Fragment.Display := Local_Null_Text_Display'Access;
+      else
+         Fragment.Display := Display;
+      end if;
+   end Set_Text_Display;
+
+   ----------------------
+   -- Set_Text_Display --
+   ----------------------
+
+   overriding procedure Set_Text_Display
+     (Fragment : in out Text_Fragment_Type;
+      Display  : access Text_Editor_Display'Class)
+   is
+   begin
+      Root_Fragment_Type (Fragment).Set_Text_Display (Display);
+      Fragment.Text_Display :=
+        (if Display = null then Local_Null_Text_Display'Access else Display);
+   end Set_Text_Display;
 
    -------------------
    -- Text_Contents --
