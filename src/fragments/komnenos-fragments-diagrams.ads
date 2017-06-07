@@ -82,6 +82,17 @@ private
    package Node_Connection_Lists is
      new Ada.Containers.Doubly_Linked_Lists (Node_Connection);
 
+   type Sub_Node_Record is
+      record
+         Sub_Node : Node_Reference;
+         Edge     : Node_Edge;
+      end record;
+
+   package Sub_Node_Lists is
+     new Ada.Containers.Doubly_Linked_Lists (Sub_Node_Record);
+
+   type Sub_Node_Array is array (Node_Edge) of Sub_Node_Lists.List;
+
    type Diagram_Node is
       record
          Reference        : Node_Reference;
@@ -96,6 +107,7 @@ private
          Tool_Tip         : Ada.Strings.Unbounded.Unbounded_String;
          Link             : Komnenos.Entities.Entity_Reference;
          Connections      : Node_Connection_Lists.List;
+         Sub_Nodes        : Sub_Node_Array;
          Row              : Positive;
       end record;
 
