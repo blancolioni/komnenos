@@ -1,5 +1,6 @@
 with Ada.Characters.Latin_1;
 with Ada.Directories;
+with Ada.Text_IO;
 
 with Komnenos.Commands.Cursor_Movement;
 with Komnenos.Themes;
@@ -501,7 +502,7 @@ package body Komnenos.Fragments is
       Result.Border_Colour     := Komnenos.Colours.From_String ("#660066");
       Result.Set_Content (Entity);
       Result.Set_Position (100, 100);
-      Result.Set_Entity_Key (Entity.Name);
+      Result.Set_Entity_Key (Entity.Key);
       Result.Path :=
         Ada.Strings.Unbounded.To_Unbounded_String
           (Entity.Path);
@@ -509,6 +510,9 @@ package body Komnenos.Fragments is
         Ada.Strings.Unbounded.To_Unbounded_String
           (Entity.Display_Text);
       Result.Text_Display := Local_Null_Text_Display'Access;
+      Ada.Text_IO.Put_Line
+        ("New text fragment: " & Entity.Key);
+
       return new Text_Fragment_Type'(Result);
    end New_Text_Fragment;
 
