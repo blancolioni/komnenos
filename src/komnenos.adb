@@ -34,4 +34,31 @@ package body Komnenos is
       return Config;
    end To_Config;
 
+   -----------
+   -- Union --
+   -----------
+
+   function Union
+     (Left, Right : Layout_Rectangle)
+      return Layout_Rectangle
+   is
+   begin
+      return Result : Layout_Rectangle := Left do
+         if Result.X > Right.X then
+            Result.Width := Result.Width + Result.X - Right.X;
+            Result.X := Right.X;
+         end if;
+         if Result.Y > Right.Y then
+            Result.Height := Result.Height + Result.Y - Right.Y;
+            Result.Y := Right.Y;
+         end if;
+         if Result.X + Result.Width < Right.X + Right.Width then
+            Result.Width := Right.X + Right.Width - Result.X;
+         end if;
+         if Result.Y + Result.Height < Right.Y + Right.Height then
+            Result.Height := Right.Y + Right.Height - Result.Y;
+         end if;
+      end return;
+   end Union;
+
 end Komnenos;
