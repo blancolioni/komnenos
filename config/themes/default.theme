@@ -10,6 +10,15 @@ classes =
     default =
     {
     }
+        small = 
+        {
+          font_size = 8
+        }
+        
+        italic =
+        {
+           italic = yes
+        }
     reserved_identifier =
     {
       --  bold = true
