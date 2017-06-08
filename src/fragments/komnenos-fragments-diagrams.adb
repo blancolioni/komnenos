@@ -29,7 +29,8 @@ package body Komnenos.Fragments.Diagrams is
       return Layout_Rectangle;
 
    procedure Create_Sub_Node_Layout
-     (Nodes : in out Node_Vectors.Vector);
+     (Nodes : in out Node_Vectors.Vector;
+      Area  : in out Layout_Rectangle);
 
    -------------------
    -- Connect_Nodes --
@@ -301,9 +302,27 @@ package body Komnenos.Fragments.Diagrams is
             Y := Y + Config.Layout_Row_Size;
          end loop;
 
-         Create_Sub_Node_Layout (Nodes);
+         declare
+            Area : Layout_Rectangle := (0, 0, Width, Y);
+         begin
+            Create_Sub_Node_Layout (Nodes, Area);
 
-         return (0, 0, Width, Y);
+            if Area.X < 0 or else Area.Y < 0 then
+               declare
+                  DX : constant Pixel_Offset := -Area.X;
+                  DY : constant Pixel_Offset := -Area.Y;
+               begin
+                  for Node of Nodes loop
+                     Node.Rectangle.X := Node.Rectangle.X + DX;
+                     Node.Rectangle.Y := Node.Rectangle.Y + DY;
+                  end loop;
+                  Area.X := 0;
+                  Area.Y := 0;
+               end;
+            end if;
+
+            return Area;
+         end;
 
       end;
 
@@ -314,7 +333,8 @@ package body Komnenos.Fragments.Diagrams is
    ----------------------------
 
    procedure Create_Sub_Node_Layout
-     (Nodes : in out Node_Vectors.Vector)
+     (Nodes : in out Node_Vectors.Vector;
+      Area  : in out Layout_Rectangle)
    is
    begin
       for Node_Index in 1 .. Nodes.Last_Index loop
@@ -372,6 +392,8 @@ package body Komnenos.Fragments.Diagrams is
                      begin
                         Sub_Node.Rectangle.X := X;
                         Sub_Node.Rectangle.Y := Y;
+
+                        Area := Union (Area, Sub_Node.Rectangle);
 
                         if Vertical_Edge then
                            Y := Y + Sub_Node.Rectangle.Height + 2;
