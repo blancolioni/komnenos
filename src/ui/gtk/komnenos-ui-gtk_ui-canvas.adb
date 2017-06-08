@@ -537,4 +537,15 @@ package body Komnenos.UI.Gtk_UI.Canvas is
          Height => Glib.Gint (Canvas.Fragment.Height));
    end On_Fragment_Resized;
 
+   -------------
+   -- Refresh --
+   -------------
+
+   overriding procedure Refresh
+     (Canvas : in out Komnenos_Canvas_View_Record)
+   is
+   begin
+      Canvas.Draw_Area.Queue_Draw;
+   end Refresh;
+
 end Komnenos.UI.Gtk_UI.Canvas;

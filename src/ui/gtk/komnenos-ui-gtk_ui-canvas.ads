@@ -39,6 +39,9 @@ private
                        (others => Cairo.Null_Surface);
       end record;
 
+   overriding procedure Refresh
+     (Canvas : in out Komnenos_Canvas_View_Record);
+
    overriding procedure On_Fragment_Resized
      (Canvas : in out Komnenos_Canvas_View_Record);
 
