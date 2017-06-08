@@ -579,7 +579,13 @@ package body Komnenos.Fragments.Diagrams is
          end;
 
          for Node of Fragment.Nodes loop
-            if Node.Style /= Internal then
+            if Node.Style /= Internal
+              and then (Node.Visibility = Always_Visible
+                        or else (Node.Visibility = Show_On_Parent_Selected
+                                 and then Node.Has_Parent
+                                 and then Fragment.Nodes
+                                   (Node.Parent_Reference).Selected))
+            then
                Render (Node, Fragment.Canvas);
             end if;
          end loop;
@@ -631,7 +637,7 @@ package body Komnenos.Fragments.Diagrams is
    function New_Diagram
      (Entity : not null access
         Komnenos.Entities.Root_Entity_Reference'Class)
-      return Diagram_Fragment
+                  return Diagram_Fragment
    is
    begin
       return Diagram : constant Diagram_Fragment := New_Diagram do
@@ -653,11 +659,14 @@ package body Komnenos.Fragments.Diagrams is
       use Komnenos.Entities;
       Follow_Link : constant Boolean :=
                       Komnenos.Keys.Control (Modifier);
+      Changed     : Boolean := False;
    begin
       for Node of Fragment.Nodes loop
          if Contains (Node.Rectangle, X, Y) then
-            Ada.Text_IO.Put_Line
-              ("click: " & Image (Node));
+            if not Node.Selected then
+               Node.Selected := True;
+               Changed := True;
+            end if;
             if Follow_Link
               and then Node.Link /= null
             then
@@ -665,9 +674,17 @@ package body Komnenos.Fragments.Diagrams is
                  (Komnenos.UI.Current_UI, Fragment,  null,
                   Node.Rectangle.Y + Node.Rectangle.Height / 2);
             end if;
-            exit;
+         elsif Node.Selected then
+            Node.Selected := False;
+            Changed := True;
          end if;
       end loop;
+
+      if Changed then
+         Fragment.Invalidate;
+         Fragment.Canvas.Refresh;
+      end if;
+
    end On_Click;
 
    --------------
@@ -682,12 +699,13 @@ package body Komnenos.Fragments.Diagrams is
       Label_Style : Komnenos.Styles.Komnenos_Style;
       Tool_Tip    : String;
       Link        : access Komnenos.Entities.Root_Entity_Reference'Class)
-      return Node_Reference
+                  return Node_Reference
    is
       Node : constant Diagram_Node := Diagram_Node'
         (Reference        => Diagram.Nodes.Last_Index + 1,
          Parent_Reference => Diagram.Nodes.Last_Index + 1,
          Has_Parent       => False,
+         Selected         => False,
          Rectangle        => (0, 0, 1, 1),
          Visibility       => Always_Visible,
          Anchor           => Left,
@@ -732,12 +750,13 @@ package body Komnenos.Fragments.Diagrams is
       Label_Style : Komnenos.Styles.Komnenos_Style;
       Tool_Tip    : String;
       Link        : access Komnenos.Entities.Root_Entity_Reference'Class)
-      return Node_Reference
+                  return Node_Reference
    is
       Node : constant Diagram_Node := Diagram_Node'
         (Reference        => Diagram.Nodes.Last_Index + 1,
          Parent_Reference => Parent,
          Has_Parent       => True,
+         Selected         => False,
          Rectangle        => (0, 0, 1, 1),
          Visibility       => Visibility,
          Anchor           => Anchor,
@@ -802,7 +821,10 @@ package body Komnenos.Fragments.Diagrams is
          Display.Draw_Rectangle
            (Layer             => Komnenos.Displays.Base,
             Rectangle         => Node.Rectangle,
-            Border_Colour     => Komnenos.Colours.Black,
+            Border_Colour     =>
+              (if Node.Selected
+               then Komnenos.Colours.From_String ("#D4AF37")
+               else Komnenos.Colours.Black),
             Background_Colour => Komnenos.Colours.White,
             Filled            => False,
             Corner_Radius     => Corner_Radius);

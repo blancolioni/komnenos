@@ -98,6 +98,7 @@ private
          Reference        : Node_Reference;
          Parent_Reference : Node_Reference;
          Has_Parent       : Boolean;
+         Selected         : Boolean;
          Rectangle        : Layout_Rectangle;
          Anchor           : Node_Edge;
          Visibility       : Node_Visibility;
