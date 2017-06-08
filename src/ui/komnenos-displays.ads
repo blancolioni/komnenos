@@ -42,6 +42,8 @@ package Komnenos.Displays is
       Arrow     : Boolean)
    is abstract;
 
+   procedure Refresh (Canvas : in out Canvas_Display) is abstract;
+
    type Compass_Direction is (East, North, West, South);
    type Turtle_Atom is (Move, Turn);
 
