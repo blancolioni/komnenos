@@ -86,4 +86,7 @@ private
       Colour          : Komnenos.Colours.Komnenos_Colour;
       Arrow           : Boolean);
 
+   procedure Clear
+     (Canvas : in out Komnenos_Canvas_View_Record'Class);
+
 end Komnenos.UI.Gtk_UI.Canvas;

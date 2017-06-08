@@ -31,6 +31,26 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       Event  : Gdk.Event.Gdk_Event_Button)
       return Boolean;
 
+   -----------
+   -- Clear --
+   -----------
+
+   procedure Clear
+     (Canvas : in out Komnenos_Canvas_View_Record'Class)
+   is
+   begin
+      for Surface of Canvas.Layers loop
+         declare
+            Cr : constant Cairo.Cairo_Context :=
+                   Cairo.Create (Surface);
+         begin
+            Cairo.Set_Operator (Cr, Cairo.Cairo_Operator_Clear);
+            Cairo.Paint (Cr);
+            Cairo.Destroy (Cr);
+         end;
+      end loop;
+   end Clear;
+
    ------------------------
    -- Create_Canvas_View --
    ------------------------
@@ -545,6 +565,8 @@ package body Komnenos.UI.Gtk_UI.Canvas is
      (Canvas : in out Komnenos_Canvas_View_Record)
    is
    begin
+      Canvas.Clear;
+      Canvas.Fragment.Invalidate;
       Canvas.Draw_Area.Queue_Draw;
    end Refresh;
 
