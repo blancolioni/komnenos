@@ -61,6 +61,10 @@ package Komnenos is
       return Boolean
    is (Contains (Rectangle, Point.X, Point.Y));
 
+   function Union
+     (Left, Right : Layout_Rectangle)
+      return Layout_Rectangle;
+
    function To_Config
      (Rectangle : Layout_Rectangle)
       return Tropos.Configuration;
@@ -77,7 +81,8 @@ package Komnenos is
    type Node_Edge is (Left, Top, Right, Bottom);
 
    type Node_Visibility is
-     (Always_Visible, Show_On_Hover, Show_On_Selected, Never_Visible);
+     (Always_Visible, Show_On_Hover, Show_On_Selected,
+      Show_On_Parent_Selected, Never_Visible);
 
    type Node_Reference is new Positive;
 
