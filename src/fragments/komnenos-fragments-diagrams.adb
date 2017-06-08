@@ -681,7 +681,6 @@ package body Komnenos.Fragments.Diagrams is
       end loop;
 
       if Changed then
-         Fragment.Invalidate;
          Fragment.Canvas.Refresh;
       end if;
 
