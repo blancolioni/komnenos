@@ -1,5 +1,7 @@
 with Cairo;
 
+with Css;
+
 with Komnenos.Fonts;
 
 package Komnenos.UI.Cairo_UI is
@@ -18,5 +20,10 @@ package Komnenos.UI.Cairo_UI is
    procedure Set_Font
      (Context : Cairo.Cairo_Context;
       Font    : Komnenos.Fonts.Komnenos_Font);
+
+   procedure Set_Css_Style
+     (Context : Cairo.Cairo_Context;
+      Element : Css.Css_Element_Interface'Class)
+   is null;
 
 end Komnenos.UI.Cairo_UI;
