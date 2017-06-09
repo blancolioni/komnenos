@@ -1,3 +1,5 @@
+private with Css;
+
 with Tropos;
 
 with Komnenos.Entities;
@@ -44,6 +46,10 @@ package Komnenos.UI is
    procedure Start
      (UI     : in out Root_Komnenos_UI)
    is abstract;
+
+   procedure Load_Style_Sheet
+     (UI   : in out Root_Komnenos_UI'Class;
+      Path : String);
 
    overriding procedure Add_Entity
      (UI     : in out Root_Komnenos_UI;

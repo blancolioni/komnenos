@@ -5,6 +5,8 @@ private with Ada.Strings.Unbounded;
 
 with Tropos;
 
+with Css;
+
 with Komnenos.Colours;
 with Komnenos.Keys.Sequences;
 with Komnenos.Styles;
@@ -49,6 +51,7 @@ package Komnenos.Fragments is
    type Root_Fragment_Type is
      abstract new Komnenos.Entities.Entity_Visual
      and Komnenos.Session_Objects.Session_Object_Interface
+     and Css.Css_Element_Interface
    with private;
 
    procedure Render_Fragment
@@ -60,6 +63,75 @@ package Komnenos.Fragments is
      (Fragment : Root_Fragment_Type)
       return String
    is ("fragment");
+
+   overriding procedure Create_Style
+     (Fragment : in out Root_Fragment_Type;
+      Name     : String);
+
+   overriding procedure Set_Style
+     (Fragment : in out Root_Fragment_Type;
+      Name     : String;
+      State    : String;
+      Value    : Css.Css_Element_Value);
+
+   overriding function Style
+     (Fragment : Root_Fragment_Type;
+      Name     : String)
+      return Css.Css_Element_Value;
+
+   overriding function Get_Layout_Position
+     (Fragment : Root_Fragment_Type)
+      return Css.Layout_Position;
+
+   overriding procedure Set_Layout_Position
+     (Fragment : in out Root_Fragment_Type;
+      Position : Css.Layout_Position);
+
+   overriding function Get_Layout_Size
+     (Fragment : Root_Fragment_Type)
+      return Css.Layout_Size;
+
+   overriding procedure Set_Layout_Size
+     (Fragment : in out Root_Fragment_Type;
+      Size     : Css.Layout_Size);
+
+   overriding function Id
+     (Fragment : Root_Fragment_Type)
+      return String;
+
+   overriding function Classes
+     (Fragment : Root_Fragment_Type)
+      return String;
+
+   overriding function Minimum_Size
+     (Fragment   : Root_Fragment_Type;
+      Constraint : Css.Layout_Size)
+      return Css.Layout_Size;
+
+   overriding function Required_Parent_Tag
+     (Fragment : Root_Fragment_Type)
+      return String;
+
+   overriding function Parent_Element
+     (Fragment : Root_Fragment_Type)
+      return access Css.Css_Element_Interface'Class;
+
+   overriding function Child_Elements
+     (Fragment : Root_Fragment_Type)
+      return Css.Array_Of_Elements;
+
+   overriding function Contents_Layout_Size
+     (Fragment : Root_Fragment_Type)
+      return Css.Layout_Size;
+
+   overriding procedure Set_Contents_Layout_Size
+     (Fragment : in out Root_Fragment_Type;
+      Size     : Css.Layout_Size);
+
+   overriding function Default_Style_Value
+     (Fragment : Root_Fragment_Type;
+      Name     : String)
+      return Css.Css_Element_Value;
 
    function File_Name
      (Fragment : Root_Fragment_Type'Class)
@@ -257,17 +329,22 @@ private
 
    type Root_Fragment_Type is
      abstract new Ada.Finalization.Controlled
+     and Css.Css_Element_Interface
      and Komnenos.Entities.Entity_Visual
      and Komnenos.Session_Objects.Session_Object_Interface with
       record
          Content           : Komnenos.Entities.Entity_Reference;
+         Styles            : Css.Css_Style_Map;
          Point             : Text_Position := 0;
          Commands          : Komnenos.Commands.Manager.Command_Manager;
          Default_Style     : Komnenos.Styles.Komnenos_Style;
          Layout_Rec        : Layout_Rectangle;
+         Css_Position      : Css.Layout_Position;
+         Css_Size          : Css.Layout_Size;
          Path              : Ada.Strings.Unbounded.Unbounded_String;
          Title             : Ada.Strings.Unbounded.Unbounded_String;
          Key               : Ada.Strings.Unbounded.Unbounded_String;
+         Classes           : Ada.Strings.Unbounded.Unbounded_String;
          Editable          : Boolean;
          Background_Colour : Komnenos.Colours.Komnenos_Colour;
          Foreground_Colour : Komnenos.Colours.Komnenos_Colour;
@@ -279,6 +356,15 @@ private
          Canvas            : access Komnenos.Displays.Canvas_Display'Class;
          Needs_Render      : Boolean := False;
       end record;
+
+   function Needs_Render
+     (Fragment : Root_Fragment_Type)
+      return Boolean;
+
+   function Get_Style_Info
+     (Fragment : Root_Fragment_Type'Class;
+      Offset   : Positive)
+      return Style_Info;
 
    overriding procedure Initialize (Fragment : in out Root_Fragment_Type);
    overriding procedure Finalize (Fragment : in out Root_Fragment_Type);
@@ -301,14 +387,69 @@ private
       return access Komnenos.Entities.Root_Entity_Reference'Class
    is (Fragment.Content);
 
-   function Needs_Render
-     (Fragment : Root_Fragment_Type)
-      return Boolean;
+   overriding function Style
+     (Fragment : Root_Fragment_Type;
+      Name     : String)
+      return Css.Css_Element_Value
+   is (Fragment.Styles.Style (Name));
 
-   function Get_Style_Info
-     (Fragment : Root_Fragment_Type'Class;
-      Offset   : Positive)
-      return Style_Info;
+   overriding function Get_Layout_Position
+     (Fragment : Root_Fragment_Type)
+      return Css.Layout_Position
+   is (Float (Fragment.Rectangle.X), Float (Fragment.Rectangle.Y));
+
+   overriding function Get_Layout_Size
+     (Fragment : Root_Fragment_Type)
+      return Css.Layout_Size
+   is (True, True,
+       Float (Fragment.Rectangle.Width), Float (Fragment.Rectangle.Height));
+
+   overriding function Id
+     (Fragment : Root_Fragment_Type)
+      return String
+   is (Ada.Strings.Unbounded.To_String (Fragment.Key));
+
+   overriding function Classes
+     (Fragment : Root_Fragment_Type)
+      return String
+   is (Ada.Strings.Unbounded.To_String (Fragment.Classes));
+
+   overriding function Minimum_Size
+     (Fragment : Root_Fragment_Type;
+      Constraint : Css.Layout_Size)
+      return Css.Layout_Size
+   is (Root_Fragment_Type'Class (Fragment).Get_Layout_Size);
+
+   overriding function Required_Parent_Tag
+     (Fragment : Root_Fragment_Type)
+      return String
+   is ("");
+
+   overriding function Parent_Element
+     (Fragment : Root_Fragment_Type)
+      return access Css.Css_Element_Interface'Class
+   is (null);
+
+   overriding function Child_Elements
+     (Fragment : Root_Fragment_Type)
+      return Css.Array_Of_Elements
+   is (Css.No_Elements);
+
+   overriding function Contents_Layout_Size
+     (Fragment : Root_Fragment_Type)
+      return Css.Layout_Size
+   is (Root_Fragment_Type'Class (Fragment).Get_Layout_Size);
+
+   overriding procedure Set_Contents_Layout_Size
+     (Fragment : in out Root_Fragment_Type;
+      Size     : Css.Layout_Size)
+   is null;
+
+   overriding function Default_Style_Value
+     (Fragment : Root_Fragment_Type;
+      Name     : String)
+      return Css.Css_Element_Value
+   is (Css.Null_Element_Value);
 
    type Text_Fragment_Type is
      new Root_Fragment_Type
@@ -316,6 +457,11 @@ private
       record
          Text_Display : access Text_Editor_Display'Class;
       end record;
+
+   overriding function Tag
+     (Fragment : Text_Fragment_Type)
+      return String
+   is ("text-fragment");
 
    overriding procedure Invalidate
      (Fragment : not null access Text_Fragment_Type);

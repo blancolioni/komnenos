@@ -89,6 +89,18 @@ package body Komnenos.Fragments is
       Fragment.Lines.Append (new Line_Info);
    end Clear;
 
+   ------------------
+   -- Create_Style --
+   ------------------
+
+   overriding procedure Create_Style
+     (Fragment : in out Root_Fragment_Type;
+      Name     : String)
+   is
+   begin
+      Fragment.Styles.Create_Style (Name);
+   end Create_Style;
+
    ------------------------
    -- Delete_From_Cursor --
    ------------------------
@@ -698,6 +710,39 @@ package body Komnenos.Fragments is
       Fragment.Key := Ada.Strings.Unbounded.To_Unbounded_String (Key);
    end Set_Entity_Key;
 
+   -------------------------
+   -- Set_Layout_Position --
+   -------------------------
+
+   overriding procedure Set_Layout_Position
+     (Fragment : in out Root_Fragment_Type;
+      Position : Css.Layout_Position)
+   is
+   begin
+      Fragment.Set_Position
+        (Pixel_Position (Position.X), Pixel_Position (Position.Y));
+   end Set_Layout_Position;
+
+   ---------------------
+   -- Set_Layout_Size --
+   ---------------------
+
+   overriding procedure Set_Layout_Size
+     (Fragment : in out Root_Fragment_Type;
+      Size     : Css.Layout_Size)
+   is
+      Rec : Layout_Rectangle := Fragment.Rectangle;
+   begin
+      if Size.Constrained_Width then
+         Rec.Width := Pixel_Length (Size.Width);
+      end if;
+      if Size.Constrained_Height then
+         Rec.Height := Pixel_Length (Size.Height);
+      end if;
+
+      Fragment.Set_Size (Rec.Width, Rec.Height);
+   end Set_Layout_Size;
+
    ------------------
    -- Set_Position --
    ------------------
@@ -727,6 +772,20 @@ package body Komnenos.Fragments is
          Fragment.Display.On_Fragment_Resized;
       end if;
    end Set_Size;
+
+   ---------------
+   -- Set_Style --
+   ---------------
+
+   overriding procedure Set_Style
+     (Fragment : in out Root_Fragment_Type;
+      Name     : String;
+      State    : String;
+      Value    : Css.Css_Element_Value)
+   is
+   begin
+      Fragment.Styles.Set_Style (Name, State, Value);
+   end Set_Style;
 
    ----------------------
    -- Set_Text_Display --

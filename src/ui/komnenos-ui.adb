@@ -1,3 +1,5 @@
+with Css.Parser;
+
 with Komnenos.UI.Gtk_UI;
 
 package body Komnenos.UI is
@@ -146,6 +148,19 @@ package body Komnenos.UI is
    begin
       UI.Entities.Iterate (Filter, Process, Top_Level_Only);
    end Iterate;
+
+   ----------------------
+   -- Load_Style_Sheet --
+   ----------------------
+
+   procedure Load_Style_Sheet
+     (UI   : in out Root_Komnenos_UI'Class;
+      Path : String)
+   is
+      pragma Unreferenced (UI);
+   begin
+      Css.Parser.Load_Css_File (Path);
+   end Load_Style_Sheet;
 
    -------------------
    -- Program_Store --
