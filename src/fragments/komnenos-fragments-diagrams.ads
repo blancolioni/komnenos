@@ -26,6 +26,7 @@ package Komnenos.Fragments.Diagrams is
      (Diagram     : in out Diagram_Fragment_Type;
       Parent      : Node_Reference;
       Anchor      : Node_Edge;
+      Interior    : Boolean;
       Visibility  : Node_Visibility;
       Style       : Node_Style;
       Label_Text  : String;
@@ -101,6 +102,7 @@ private
          Selected         : Boolean;
          Rectangle        : Layout_Rectangle;
          Anchor           : Node_Edge;
+         Interior         : Boolean;
          Visibility       : Node_Visibility;
          Style            : Node_Style;
          Label_Text       : Ada.Strings.Unbounded.Unbounded_String;
@@ -131,6 +133,11 @@ private
          Columns     : Natural := 0;
          Nodes       : Node_Vectors.Vector;
       end record;
+
+   overriding function Tag
+     (Fragment : Diagram_Fragment_Type)
+      return String
+   is ("diagram-fragment");
 
    overriding procedure Clear (Fragment : in out Diagram_Fragment_Type);
 

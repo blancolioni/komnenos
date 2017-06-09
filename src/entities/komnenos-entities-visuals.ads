@@ -20,6 +20,7 @@ package Komnenos.Entities.Visuals is
      (Visual      : in out Diagram_Visual;
       Parent      : Node_Reference;
       Anchor      : Node_Edge;
+      Interior    : Boolean;
       Visibility  : Node_Visibility;
       Style       : Node_Style;
       Label_Text  : String;

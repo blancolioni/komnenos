@@ -708,6 +708,7 @@ package body Komnenos.Fragments.Diagrams is
          Rectangle        => (0, 0, 1, 1),
          Visibility       => Always_Visible,
          Anchor           => Left,
+         Interior         => False,
          Style            => Style,
          Label_Text       => +Label_Text,
          Label_Style      => Label_Style,
@@ -743,6 +744,7 @@ package body Komnenos.Fragments.Diagrams is
      (Diagram     : in out Diagram_Fragment_Type;
       Parent      : Node_Reference;
       Anchor      : Node_Edge;
+      Interior    : Boolean;
       Visibility  : Node_Visibility;
       Style       : Node_Style;
       Label_Text  : String;
@@ -759,6 +761,7 @@ package body Komnenos.Fragments.Diagrams is
          Rectangle        => (0, 0, 1, 1),
          Visibility       => Visibility,
          Anchor           => Anchor,
+         Interior         => Interior,
          Style            => Style,
          Label_Text       => +Label_Text,
          Label_Style      => Label_Style,
