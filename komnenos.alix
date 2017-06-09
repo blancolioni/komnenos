@@ -10,6 +10,7 @@ exec_name = komnenos-demo
 depend = { project = gtkada external = yes }
 depend = { project = aqua version = any }
 depend = { project = tropos version = any }
+depend = { project = agama version = any }
 depend = { project = lith version = any }
 depend = { project = wlib version = any }
 config_dir = config
