@@ -116,6 +116,10 @@ package Komnenos.Fragments is
      (Fragment : Root_Fragment_Type)
       return access Css.Css_Element_Interface'Class;
 
+   overriding function Child_Index
+     (Fragment : Root_Fragment_Type)
+      return Natural;
+
    overriding function Child_Elements
      (Fragment : Root_Fragment_Type)
       return Css.Array_Of_Elements;
@@ -132,6 +136,10 @@ package Komnenos.Fragments is
      (Fragment : Root_Fragment_Type;
       Name     : String)
       return Css.Css_Element_Value;
+
+   overriding function Inline_Style_Rules
+     (Fragment : Root_Fragment_Type)
+      return Css.Css_Rule;
 
    function File_Name
      (Fragment : Root_Fragment_Type'Class)
@@ -430,6 +438,11 @@ private
       return access Css.Css_Element_Interface'Class
    is (null);
 
+   overriding function Child_Index
+     (Fragment : Root_Fragment_Type)
+      return Natural
+   is (0);
+
    overriding function Child_Elements
      (Fragment : Root_Fragment_Type)
       return Css.Array_Of_Elements
@@ -450,6 +463,11 @@ private
       Name     : String)
       return Css.Css_Element_Value
    is (Css.Null_Element_Value);
+
+   overriding function Inline_Style_Rules
+     (Fragment : Root_Fragment_Type)
+      return Css.Css_Rule
+   is (null);
 
    type Text_Fragment_Type is
      new Root_Fragment_Type
