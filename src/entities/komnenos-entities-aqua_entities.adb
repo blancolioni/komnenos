@@ -3,7 +3,7 @@ with Aqua.Primitives;
 with Aqua.Words;
 
 with Komnenos.Source;
-with Komnenos.Entities.Source;
+--  with Komnenos.Entities.Source;
 
 package body Komnenos.Entities.Aqua_Entities is
 
@@ -11,10 +11,10 @@ package body Komnenos.Entities.Aqua_Entities is
 
    procedure Create_Aqua_Primitives;
 
-   function Handle_Define
-     (Context : in out Aqua.Execution.Execution_Interface'Class;
-      Arguments : Aqua.Array_Of_Words)
-      return Aqua.Word;
+--     function Handle_Define
+--       (Context : in out Aqua.Execution.Execution_Interface'Class;
+--        Arguments : Aqua.Array_Of_Words)
+--        return Aqua.Word;
 
    function Handle_Cross_Reference
      (Context : in out Aqua.Execution.Execution_Interface'Class;
@@ -45,10 +45,10 @@ package body Komnenos.Entities.Aqua_Entities is
 
    procedure Create_Aqua_Primitives is
    begin
-      Aqua.Primitives.New_Primitive_Function
-        (Name           => "komnenos__define",
-         Argument_Count => 4,
-         Handler        => Handle_Define'Access);
+--        Aqua.Primitives.New_Primitive_Function
+--          (Name           => "komnenos__define",
+--           Argument_Count => 4,
+--           Handler        => Handle_Define'Access);
       Aqua.Primitives.New_Primitive_Function
         (Name           => "komnenos__cross_reference",
          Argument_Count => 4,
@@ -82,13 +82,13 @@ package body Komnenos.Entities.Aqua_Entities is
       use Aqua;
       Object_Primitive_Name : constant String :=
                                 "komnenos__" & Name;
-      Object_Primitive      : constant Subroutine_Reference :=
+      Object_Primitive      : constant Primitive_Reference :=
                                 Aqua.Primitives.Get_Primitive
                                   (Object_Primitive_Name);
       Result                : Word;
    begin
       if Object_Primitive /= 0 then
-         Result := Aqua.Words.To_Subroutine_Word (Object_Primitive);
+         Result := Aqua.Words.To_Primitive_Word (Object_Primitive);
       else
          Result := Aqua.Objects.Root_Object_Type (Object).Get_Property (Name);
       end if;
@@ -144,51 +144,52 @@ package body Komnenos.Entities.Aqua_Entities is
    -- Handle_Define --
    -------------------
 
-   function Handle_Define
-     (Context   : in out Aqua.Execution.Execution_Interface'Class;
-      Arguments : Aqua.Array_Of_Words)
-      return Aqua.Word
-   is
-      Aqua_Object : constant Komnenos_Aqua_Object :=
-                      Komnenos_Aqua_Object
-                        (Context.To_External_Object (Arguments (1)));
-   begin
-
-      if Aqua_Object.Table = null then
-         return 0;
-      end if;
-
-      declare
-         use type Aqua.Word;
-         Parent_Arg  : constant Aqua.Word := Arguments (2);
-         Child_Arg   : constant Aqua.Word := Arguments (3);
-         Parent      : constant Komnenos.Source.Source_Tree :=
-                         Komnenos.Source.Get (Context, Parent_Arg);
-         Child : constant String  :=
-                   (if Aqua.Is_External_Reference (Child_Arg)
-                    then Komnenos.Source.Get (Context, Child_Arg).Text
-                    else Context.To_String (Child_Arg));
-         Class   : constant String :=
-                         Context.To_String (Arguments (4));
-         Top_Level   : constant Boolean :=
-                         Arguments'Length < 5
-                           or else Arguments (5) /= 0;
-         Entity  : constant Komnenos.Entities.Entity_Reference :=
-                     Komnenos.Entities.Source.Create_Source_Entity
-                       (Table            => Aqua_Object.Table,
-                        Name             => Child,
-                        File_Name        => Parent.Source_File_Name,
-                        Class            => Class,
-                        Line             => Parent.Source_Line,
-                        Column           => Parent.Source_Column,
-                        Top_Level        => Top_Level,
-                        Compilation_Unit => Parent.Source_Root,
-                        Entity_Spec      => Parent,
-                        Entity_Body      => null);
-      begin
-         return Context.To_Word (Entity);
-      end;
-   end Handle_Define;
+--     function Handle_Define
+--       (Context   : in out Aqua.Execution.Execution_Interface'Class;
+--        Arguments : Aqua.Array_Of_Words)
+--        return Aqua.Word
+--     is
+--        Aqua_Object : constant Komnenos_Aqua_Object :=
+--                        Komnenos_Aqua_Object
+--                          (Context.To_External_Object (Arguments (1)));
+--     begin
+--
+--        if Aqua_Object.Table = null then
+--           return 0;
+--        end if;
+--
+--        declare
+--           use type Aqua.Word;
+--           Parent_Arg  : constant Aqua.Word := Arguments (2);
+--           Child_Arg   : constant Aqua.Word := Arguments (3);
+--           Parent      : constant Komnenos.Source.Source_Tree :=
+--                           Komnenos.Source.Get (Context, Parent_Arg);
+--           Child : constant String  :=
+--                     (if Aqua.Is_External_Reference (Child_Arg)
+--                      then Komnenos.Source.Get (Context, Child_Arg).Text
+--                      else Context.To_String (Child_Arg));
+--           Entity : constant Komnenos.Entities.Entity_Reference :=
+--                      Komnenos.Entities.Entity_Reference
+--                        (Context.To_External_Object (Arguments (4)));
+--           Top_Level   : constant Boolean :=
+--                           Arguments'Length < 5
+--                             or else Arguments (5) /= 0;
+--           Entity  : constant Komnenos.Entities.Entity_Reference :=
+--                       Komnenos.Entities.Source.Create_Source_Entity
+--                         (Table            => Aqua_Object.Table,
+--                          Name             => Child,
+--                          File_Name        => Parent.Source_File_Name,
+--                          Class            => Class,
+--                          Line             => Parent.Source_Line,
+--                          Column           => Parent.Source_Column,
+--                          Top_Level        => Top_Level,
+--                          Compilation_Unit => Parent.Source_Root,
+--                          Entity_Spec      => Parent,
+--                          Entity_Body      => null);
+--        begin
+--           return Context.To_Word (Entity);
+--        end;
+--     end Handle_Define;
 
    -----------------------
    -- Handle_Get_Entity --
