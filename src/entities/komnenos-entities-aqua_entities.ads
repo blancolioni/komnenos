@@ -29,6 +29,10 @@ package Komnenos.Entities.Aqua_Entities is
       return String
    is ("[UI]");
 
+   function Table
+     (Object : Root_Aqua_Object'Class)
+     return access Entity_Table_Interface'Class;
+
 --     procedure Define
 --       (Object       : in out Root_Aqua_Object'Class;
 --        Declaration  : Source_Tree;
@@ -49,5 +53,10 @@ private
       record
          Table : access Entity_Table_Interface'Class;
       end record;
+
+   function Table
+     (Object : Root_Aqua_Object'Class)
+      return access Entity_Table_Interface'Class
+   is (Object.Table);
 
 end Komnenos.Entities.Aqua_Entities;
