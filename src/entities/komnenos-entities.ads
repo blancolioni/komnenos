@@ -173,6 +173,7 @@ package Komnenos.Entities is
      (Item         : in out Root_Entity_Reference'Class;
       Key          : String;
       Identifier   : String;
+      Full_Name    : String;
       Class_Name   : String;
       Path         : String;
       Display_Text : String;
@@ -436,6 +437,7 @@ private
       record
          Key            : Ada.Strings.Unbounded.Unbounded_String;
          Identifier     : Ada.Strings.Unbounded.Unbounded_String;
+         Full_Name      : Ada.Strings.Unbounded.Unbounded_String;
          Class          : Ada.Strings.Unbounded.Unbounded_String;
          Display_Text   : Ada.Strings.Unbounded.Unbounded_String;
          Description    : Ada.Strings.Unbounded.Unbounded_String;
@@ -502,13 +504,14 @@ private
 
    type Entity_Table is new Entity_Table_Interface with
       record
-         File_Map    : File_Name_Maps.Map;
-         File_Vector : File_Name_Vectors.Vector;
-         Table       : Entity_Vectors.Vector;
-         Map         : Entity_Maps.Map;
-         Name_Map    : Entity_Name_Maps.Map;
-         X_Ref       : Cross_Reference_Maps.Map;
-         Store       : access Program_Store_Interface'Class;
+         File_Map      : File_Name_Maps.Map;
+         File_Vector   : File_Name_Vectors.Vector;
+         Table         : Entity_Vectors.Vector;
+         Map           : Entity_Maps.Map;
+         Name_Map      : Entity_Name_Maps.Map;
+         Full_Name_Map : Entity_Maps.Map;
+         X_Ref         : Cross_Reference_Maps.Map;
+         Store         : access Program_Store_Interface'Class;
       end record;
 
    overriding function Program_Store

@@ -67,7 +67,9 @@ package body Komnenos.Entities is
       Key   : String;
       Item  : Entity_Reference)
    is
-      Name : constant String := Item.Name;
+      Name      : constant String := Item.Name;
+      Full_Name : constant String :=
+                    Ada.Strings.Unbounded.To_String (Item.Full_Name);
    begin
       Item.Key := Ada.Strings.Unbounded.To_Unbounded_String (Key);
       Table.Table.Append (Item);
@@ -82,6 +84,11 @@ package body Komnenos.Entities is
             Table.Name_Map.Insert (Name, List);
          end;
       end if;
+
+      if not Table.Full_Name_Map.Contains (Full_Name) then
+         Table.Full_Name_Map.Insert (Full_Name, Item);
+      end if;
+
    end Add_Entity;
 
    -----------
@@ -104,6 +111,7 @@ package body Komnenos.Entities is
      (Item         : in out Root_Entity_Reference'Class;
       Key          : String;
       Identifier   : in String;
+      Full_Name    : String;
       Class_Name   : in String;
       Path         : in String;
       Display_Text : in String;
@@ -116,6 +124,9 @@ package body Komnenos.Entities is
 
       Item.Identifier :=
         Ada.Strings.Unbounded.To_Unbounded_String (Identifier);
+
+      Item.Full_Name :=
+        Ada.Strings.Unbounded.To_Unbounded_String (Full_Name);
 
       Item.Class :=
         Ada.Strings.Unbounded.To_Unbounded_String (Class_Name);
