@@ -35,7 +35,11 @@ package body Komnenos.Entities.Aqua_Entities is
    is
    begin
       Local_Aqua_Object := new Root_Aqua_Object;
-      Local_Aqua_Object.Table := Table;
+      if Table = null then
+         Local_Aqua_Object.Table := new Entity_Table;
+      else
+         Local_Aqua_Object.Table := Table;
+      end if;
       Create_Aqua_Primitives;
    end Create_Aqua_Object;
 
