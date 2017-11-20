@@ -141,6 +141,8 @@ package Komnenos.UI is
      (Config_Folder_Path : String := Komnenos.Paths.Config_Path)
       return Komnenos_UI;
 
+   function Have_UI return Boolean;
+
    function Current_UI return Komnenos_UI;
 
 private
@@ -156,5 +158,7 @@ private
          Entities    : Komnenos.Entities.Entity_Table;
          Store       : access Komnenos.Entities.Program_Store_Interface'Class;
       end record;
+
+   function Have_UI return Boolean is (Current_UI /= null);
 
 end Komnenos.UI;
