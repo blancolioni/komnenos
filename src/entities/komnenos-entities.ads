@@ -187,6 +187,8 @@ package Komnenos.Entities is
 
    type Entity_Table_Interface is interface;
 
+   type Entity_Table_Access is access all Entity_Table_Interface'Class;
+
    procedure Select_Entity
      (Entity : not null access Root_Entity_Reference;
       Table  : access Entity_Table_Interface'Class;
@@ -338,7 +340,8 @@ package Komnenos.Entities is
      (Reference : Reference_Record)
       return String;
 
-   type Entity_Table is new Entity_Table_Interface with private;
+   type Entity_Table is
+     new Entity_Table_Interface with private;
 
    overriding procedure Add_Entity
      (Table        : in out Entity_Table;
@@ -429,8 +432,6 @@ private
    package Entity_Vectors is
      new Ada.Containers.Vectors
        (Positive, Entity_Reference);
-
-   type Entity_Table_Access is access all Entity_Table_Interface'Class;
 
    type Root_Entity_Reference is
      abstract new Aqua.Objects.Root_Object_Type with

@@ -141,6 +141,11 @@ package Komnenos.Fragments is
      (Fragment : Root_Fragment_Type)
       return Css.Css_Rule;
 
+   overriding function Is_Table
+     (Fragment : Root_Fragment_Type)
+      return Boolean
+   is (False);
+
    function File_Name
      (Fragment : Root_Fragment_Type'Class)
       return String;
