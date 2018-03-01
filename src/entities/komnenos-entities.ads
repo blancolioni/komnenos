@@ -7,6 +7,8 @@ private with Ada.Strings.Fixed.Equal_Case_Insensitive;
 private with Ada.Strings.Fixed.Hash_Case_Insensitive;
 private with Ada.Strings.Unbounded;
 
+private with WL.String_Maps;
+
 with Komnenos.Styles;
 
 --  with Komnenos.Commands;
@@ -14,6 +16,7 @@ with Komnenos.Session_Objects;
 with Komnenos.Source;
 
 with Aqua.Objects;
+with Aqua.Values;
 
 package Komnenos.Entities is
 
@@ -28,6 +31,16 @@ package Komnenos.Entities is
 
    type Root_Entity_Reference is
      abstract new Aqua.Objects.Root_Object_Type with private;
+
+   overriding function Get_Property
+     (Entity   : in out Root_Entity_Reference;
+      Name     : in String)
+      return Aqua.Values.Property_Value;
+
+   overriding function Has_Property
+     (Entity   : Root_Entity_Reference;
+      Name     : in String)
+      return Boolean;
 
    procedure Set_Content
      (Visual : in out Entity_Visual;
@@ -170,14 +183,14 @@ package Komnenos.Entities is
 --        is abstract;
 
    procedure Create
-     (Item         : in out Root_Entity_Reference'Class;
-      Key          : String;
-      Identifier   : String;
-      Full_Name    : String;
-      Class_Name   : String;
-      Path         : String;
-      Display_Text : String;
-      Description  : String);
+     (Item             : in out Root_Entity_Reference'Class;
+      Key              : String;
+      Identifier       : String;
+      Full_Name        : String;
+      Class_Name       : String;
+      Path             : String;
+      Display_Text     : String;
+      Description      : String);
 
 --     procedure Execute_Command
 --       (Item    : not null access Root_Entity_Reference;
@@ -420,11 +433,7 @@ private
         Element_Type => Reference_Record);
 
    package File_Name_Maps is
-     new Ada.Containers.Indefinite_Hashed_Maps
-       (Key_Type        => String,
-        Element_Type    => File_Id,
-        Hash            => Ada.Strings.Fixed.Hash_Case_Insensitive,
-        Equivalent_Keys => Ada.Strings.Fixed.Equal_Case_Insensitive);
+     new WL.String_Maps (File_Id);
 
    package File_Name_Vectors is
      new Ada.Containers.Indefinite_Vectors (File_Id, String);
@@ -433,22 +442,47 @@ private
      new Ada.Containers.Vectors
        (Positive, Entity_Reference);
 
+   package String_Property_Maps is
+     new WL.String_Maps (String);
+
    type Root_Entity_Reference is
      abstract new Aqua.Objects.Root_Object_Type with
       record
-         Key            : Ada.Strings.Unbounded.Unbounded_String;
-         Identifier     : Ada.Strings.Unbounded.Unbounded_String;
-         Full_Name      : Ada.Strings.Unbounded.Unbounded_String;
-         Class          : Ada.Strings.Unbounded.Unbounded_String;
-         Display_Text   : Ada.Strings.Unbounded.Unbounded_String;
-         Description    : Ada.Strings.Unbounded.Unbounded_String;
-         Path           : Ada.Strings.Unbounded.Unbounded_String;
+         String_Props   : String_Property_Maps.Map;
+--           Key            : Ada.Strings.Unbounded.Unbounded_String;
+--           Identifier     : Ada.Strings.Unbounded.Unbounded_String;
+--           Full_Name      : Ada.Strings.Unbounded.Unbounded_String;
+--           Class          : Ada.Strings.Unbounded.Unbounded_String;
+--           Display_Text   : Ada.Strings.Unbounded.Unbounded_String;
+--           Description    : Ada.Strings.Unbounded.Unbounded_String;
+--           Path           : Ada.Strings.Unbounded.Unbounded_String;
          References     : Reference_Vectors.Vector;
          Table          : Entity_Table_Access;
       end record;
 
+   Name_Property         : constant String := "name";
+   Key_Property          : constant String := "key";
+   Identifier_Property   : constant String := "identifier";
+   Full_Name_Property    : constant String := "full_name";
+   Class_Property        : constant String := "class";
+   Display_Text_Property : constant String := "display_text";
+   Description_Property  : constant String := "description";
+   Path_Property         : constant String := "path";
+
+   function Get_String_Property
+     (Item : Root_Entity_Reference'Class;
+      Name : String)
+      return String
+   is (Item.String_Props.Element (Name));
+
+   procedure Set
+     (Item  : in out Root_Entity_Reference'Class;
+      Name  : String;
+      Value : String);
+
    overriding function Name
-     (Item : Root_Entity_Reference) return String;
+     (Item : Root_Entity_Reference) return String
+   is (Item.Get_String_Property (Name_Property));
 
    overriding function Text
      (Item : Root_Entity_Reference) return String;
@@ -461,30 +495,41 @@ private
    function Key
      (Item : Root_Entity_Reference'Class)
       return String
-   is (Ada.Strings.Unbounded.To_String (Item.Key));
+   is (Item.Get_String_Property (Key_Property));
+
+   function Identifier
+     (Item : Root_Entity_Reference'Class)
+      return String
+   is (Item.Get_String_Property (Identifier_Property));
+
+   function Description
+     (Item : Root_Entity_Reference)
+      return String
+   is (Item.Get_String_Property (Description_Property));
+
+   function Display_Text
+     (Item : Root_Entity_Reference)
+      return String
+   is (Item.Get_String_Property (Display_Text_Property));
 
    function Path
      (Item : Root_Entity_Reference)
       return String
-   is (Ada.Strings.Unbounded.To_String (Item.Path));
+   is (Item.Get_String_Property (Path_Property));
+
+   function Class
+     (Item : Root_Entity_Reference'Class)
+      return String
+   is (Item.Get_String_Property (Class_Property));
 
    package Entity_Maps is
-     new Ada.Containers.Indefinite_Hashed_Maps
-       (Key_Type        => String,
-        Element_Type    => Entity_Reference,
-        Hash            => Ada.Strings.Fixed.Hash_Case_Insensitive,
-        Equivalent_Keys => Ada.Strings.Fixed.Equal_Case_Insensitive);
+     new WL.String_Maps (Entity_Reference);
 
    package List_Of_Entities is
      new Ada.Containers.Doubly_Linked_Lists (Entity_Reference);
 
    package Entity_Name_Maps is
-     new Ada.Containers.Indefinite_Hashed_Maps
-       (Key_Type        => String,
-        Element_Type    => List_Of_Entities.List,
-        Hash            => Ada.Strings.Fixed.Hash_Case_Insensitive,
-        Equivalent_Keys => Ada.Strings.Fixed.Equal_Case_Insensitive,
-        "="             => List_Of_Entities."=");
+     new WL.String_Maps (List_Of_Entities.List, List_Of_Entities."=");
 
    type Cross_Reference_Record is
       record

@@ -10,7 +10,7 @@ package Komnenos.Entities.Aqua_Entities is
    overriding function Get_Property
      (Object : in out Root_Aqua_Object;
       Name   : in String)
-      return Aqua.Word;
+      return Aqua.Values.Property_Value;
 
    overriding function Name
      (Object : Root_Aqua_Object)

@@ -1,6 +1,6 @@
 with Ada.Characters.Handling;
 with Ada.Strings.Fixed;
-with Ada.Strings.Unbounded.Less_Case_Insensitive;
+with Ada.Strings.Fixed.Less_Case_Insensitive;
 
 package body Komnenos.Entities is
 
@@ -12,7 +12,7 @@ package body Komnenos.Entities is
    function Display_Text_Less_Than
      (Left, Right : Entity_Reference)
       return Boolean
-   is (Ada.Strings.Unbounded.Less_Case_Insensitive
+   is (Ada.Strings.Fixed.Less_Case_Insensitive
        (Left.Display_Text, Right.Display_Text));
 
    package Entity_Sorting is
@@ -69,9 +69,9 @@ package body Komnenos.Entities is
    is
       Name      : constant String := Item.Name;
       Full_Name : constant String :=
-                    Ada.Strings.Unbounded.To_String (Item.Full_Name);
+                    Item.Get_String_Property (Full_Name_Property);
    begin
-      Item.Key := Ada.Strings.Unbounded.To_Unbounded_String (Key);
+      Item.String_Props (Key_Property) := Key;
       Table.Table.Append (Item);
       Table.Map.Insert (Key, Item);
       if Table.Name_Map.Contains (Name) then
@@ -91,61 +91,39 @@ package body Komnenos.Entities is
 
    end Add_Entity;
 
-   -----------
-   -- Class --
-   -----------
-
-   function Class
-     (Item : Root_Entity_Reference'Class)
-      return String
-   is
-   begin
-      return Ada.Strings.Unbounded.To_String (Item.Class);
-   end Class;
-
    ------------
    -- Create --
    ------------
 
    procedure Create
-     (Item         : in out Root_Entity_Reference'Class;
-      Key          : String;
-      Identifier   : in String;
-      Full_Name    : String;
-      Class_Name   : in String;
-      Path         : in String;
-      Display_Text : in String;
-      Description  : in String)
+     (Item             : in out Root_Entity_Reference'Class;
+      Key              : String;
+      Identifier       : String;
+      Full_Name        : String;
+      Class_Name       : String;
+      Path             : String;
+      Display_Text     : String;
+      Description      : String)
    is
    begin
 
-      Item.Key :=
-        Ada.Strings.Unbounded.To_Unbounded_String (Key);
+      Item.Set (Key_Property, Key);
+      Item.Set (Identifier_Property, Identifier);
+      Item.Set (Name_Property, Identifier);
+      Item.Set (Full_Name_Property, Full_Name);
+      Item.Set (Class_Property, Class_Name);
+      Item.Set (Path_Property, Path);
 
-      Item.Identifier :=
-        Ada.Strings.Unbounded.To_Unbounded_String (Identifier);
-
-      Item.Full_Name :=
-        Ada.Strings.Unbounded.To_Unbounded_String (Full_Name);
-
-      Item.Class :=
-        Ada.Strings.Unbounded.To_Unbounded_String (Class_Name);
-
-      Item.Path :=
-        Ada.Strings.Unbounded.To_Unbounded_String (Path);
-
-      if Display_Text /= "" then
-         Item.Display_Text :=
-           Ada.Strings.Unbounded.To_Unbounded_String (Display_Text);
+      if Display_Text = "" then
+         Item.Set (Display_Text_Property, Identifier);
       else
-         Item.Display_Text := Item.Identifier;
+         Item.Set (Display_Text_Property, Display_Text);
       end if;
 
-      if Description /= "" then
-         Item.Description :=
-           Ada.Strings.Unbounded.To_Unbounded_String (Description);
+      if Description = "" then
+         Item.Set (Description_Property, Identifier);
       else
-         Item.Description := Item.Identifier;
+         Item.Set (Description_Property, Description);
       end if;
 
    end Create;
@@ -187,30 +165,6 @@ package body Komnenos.Entities is
          end;
       end if;
    end Cross_References;
-
-   -----------------
-   -- Description --
-   -----------------
-
-   function Description
-     (Item : Root_Entity_Reference)
-      return String
-   is
-   begin
-      return Ada.Strings.Unbounded.To_String (Item.Description);
-   end Description;
-
-   ------------------
-   -- Display_Text --
-   ------------------
-
-   function Display_Text
-     (Item : Root_Entity_Reference)
-      return String
-   is
-   begin
-      return Ada.Strings.Unbounded.To_String (Item.Display_Text);
-   end Display_Text;
 
    ---------------------
    -- Execute_Command --
@@ -312,6 +266,24 @@ package body Komnenos.Entities is
         & Integer'Image (-Integer (Column));
    end Get_Key;
 
+   ------------------
+   -- Get_Property --
+   ------------------
+
+   overriding function Get_Property
+     (Entity   : in out Root_Entity_Reference;
+      Name     : in String)
+      return Aqua.Values.Property_Value
+   is
+   begin
+      if Entity.String_Props.Contains (Name) then
+         return Aqua.Values.To_String_Value
+           (Entity.String_Props.Element (Name));
+      else
+         return Aqua.Objects.Root_Object_Type (Entity).Get_Property (Name);
+      end if;
+   end Get_Property;
+
    -------------------
    -- Get_Reference --
    -------------------
@@ -336,17 +308,15 @@ package body Komnenos.Entities is
       return Reference.Referrer;
    end Get_Referrer;
 
-   ----------------
-   -- Identifier --
-   ----------------
+   ------------------
+   -- Has_Property --
+   ------------------
 
-   function Identifier
-     (Item : Root_Entity_Reference'Class)
-      return String
-   is
-   begin
-      return Ada.Strings.Unbounded.To_String (Item.Identifier);
-   end Identifier;
+   overriding function Has_Property
+     (Entity   : Root_Entity_Reference;
+      Name     : in String)
+      return Boolean
+   is (False);
 
    -------------
    -- Iterate --
@@ -374,8 +344,7 @@ package body Komnenos.Entities is
                declare
                   Match_Text : constant String :=
                                  Ada.Characters.Handling.To_Lower
-                                   (Ada.Strings.Unbounded.To_String
-                                      (Entity.Identifier));
+                                   (Entity.Identifier);
                begin
                   if Ada.Strings.Fixed.Index
                     (Match_Text, Filter_Text)
@@ -400,17 +369,6 @@ package body Komnenos.Entities is
    begin
       return Ada.Strings.Unbounded.To_String (Reference.Ref_Type);
    end Location_Reference_Type;
-
-   ----------
-   -- Name --
-   ----------
-
-   overriding function Name
-     (Item : Root_Entity_Reference) return String
-   is
-   begin
-      return Ada.Strings.Unbounded.To_String (Item.Identifier);
-   end Name;
 
    --------------
    -- Put_Line --
@@ -460,6 +418,23 @@ package body Komnenos.Entities is
       return Result;
    end References;
 
+   ---------
+   -- Set --
+   ---------
+
+   procedure Set
+     (Item  : in out Root_Entity_Reference'Class;
+      Name  : String;
+      Value : String)
+   is
+   begin
+      if Item.String_Props.Contains (Name) then
+         Item.String_Props.Replace (Name, Value);
+      else
+         Item.String_Props.Insert (Name, Value);
+      end if;
+   end Set;
+
    -----------------------
    -- Set_Program_Store --
    -----------------------
@@ -496,7 +471,7 @@ package body Komnenos.Entities is
    is
       pragma Unreferenced (Recursive_Show);
    begin
-      return Ada.Strings.Unbounded.To_String (Item.Description);
+      return Item.Description;
    end Show;
 
    ----------
@@ -518,7 +493,7 @@ package body Komnenos.Entities is
      (Item : Root_Entity_Reference) return String
    is
    begin
-      return Ada.Strings.Unbounded.To_String (Item.Display_Text);
+      return Item.Display_Text;
    end Text;
 
    ---------------

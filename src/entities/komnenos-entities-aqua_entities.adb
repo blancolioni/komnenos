@@ -55,7 +55,7 @@ package body Komnenos.Entities.Aqua_Entities is
 --           Handler        => Handle_Define'Access);
       Aqua.Primitives.New_Primitive_Function
         (Name           => "komnenos__cross_reference",
-         Argument_Count => 4,
+         Argument_Count => 5,
          Handler        => Handle_Cross_Reference'Access);
       Aqua.Primitives.New_Primitive_Function
         (Name           => "komnenos__get_entity",
@@ -81,7 +81,7 @@ package body Komnenos.Entities.Aqua_Entities is
    overriding function Get_Property
      (Object : in out Root_Aqua_Object;
       Name   : in String)
-      return Aqua.Word
+      return Aqua.Values.Property_Value
    is
       use Aqua;
       Object_Primitive_Name : constant String :=
@@ -89,12 +89,15 @@ package body Komnenos.Entities.Aqua_Entities is
       Object_Primitive      : constant Primitive_Reference :=
                                 Aqua.Primitives.Get_Primitive
                                   (Object_Primitive_Name);
-      Result                : Word;
+      Result                : Aqua.Values.Property_Value;
    begin
       if Object_Primitive /= 0 then
-         Result := Aqua.Words.To_Primitive_Word (Object_Primitive);
+         Result :=
+           Aqua.Values.To_Word_Value
+             (Aqua.Words.To_Primitive_Word (Object_Primitive));
       else
-         Result := Aqua.Objects.Root_Object_Type (Object).Get_Property (Name);
+         Result :=
+           Aqua.Objects.Root_Object_Type (Object).Get_Property (Name);
       end if;
       return Result;
    end Get_Property;
@@ -130,7 +133,9 @@ package body Komnenos.Entities.Aqua_Entities is
          Referrer_Ext : constant access Aqua.External_Object_Interface'Class :=
                          Context.To_External_Object (Arguments (4));
          Referrer     : constant Entity_Reference :=
-                         Entity_Reference (Referrer_Ext);
+                          Entity_Reference (Referrer_Ext);
+         Ref_Type : constant String :=
+                      Context.To_String (Arguments (5));
       begin
          Aqua_Object.Table.Add_Cross_Reference
            (Item      => Ref,
@@ -138,7 +143,7 @@ package body Komnenos.Entities.Aqua_Entities is
             File_Name => Source.Source_File_Name,
             Line      => Source.Source_Line,
             Column    => Source.Source_Column,
-            Ref_Type  => "reference");
+            Ref_Type  => Ref_Type);
       end;
 
       return 1;

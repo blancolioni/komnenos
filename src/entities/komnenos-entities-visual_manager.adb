@@ -1,8 +1,6 @@
 with Ada.Containers.Doubly_Linked_Lists;
-with Ada.Containers.Hashed_Maps;
 
-with Ada.Strings.Unbounded.Equal_Case_Insensitive;
-with Ada.Strings.Unbounded.Hash_Case_Insensitive;
+with WL.String_Maps;
 
 package body Komnenos.Entities.Visual_Manager is
 
@@ -10,12 +8,7 @@ package body Komnenos.Entities.Visual_Manager is
      new Ada.Containers.Doubly_Linked_Lists (Entity_Visual_Access);
 
    package Entity_Visual_Maps is
-     new Ada.Containers.Hashed_Maps
-       (Key_Type        => Ada.Strings.Unbounded.Unbounded_String,
-        Element_Type    => List_Of_Visuals.List,
-        Hash            => Ada.Strings.Unbounded.Hash_Case_Insensitive,
-        Equivalent_Keys => Ada.Strings.Unbounded.Equal_Case_Insensitive,
-        "="             => List_Of_Visuals."=");
+     new WL.String_Maps (List_Of_Visuals.List, List_Of_Visuals."=");
 
    Bound_Entity_Map : Entity_Visual_Maps.Map;
 
@@ -118,7 +111,7 @@ package body Komnenos.Entities.Visual_Manager is
    begin
       if not Bound_Entity_Map.Contains (Entity.Key) then
          raise Constraint_Error with
-           "entity " & Ada.Strings.Unbounded.To_String (Entity.Key)
+           "entity " & Entity.Key
            & " has no visuals";
       else
          declare
