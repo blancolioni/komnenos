@@ -471,7 +471,7 @@ package body Komnenos.Entities is
    is
       pragma Unreferenced (Recursive_Show);
    begin
-      return Item.Description;
+      return "[entity:" & Item.Display_Text & "]";
    end Show;
 
    ----------
