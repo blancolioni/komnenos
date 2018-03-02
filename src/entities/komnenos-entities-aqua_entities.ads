@@ -17,6 +17,11 @@ package Komnenos.Entities.Aqua_Entities is
       return String
    is ("[UI]");
 
+   overriding function Class_Name
+     (Object : Root_Aqua_Object)
+      return String
+   is ("[komnenos-UI]");
+
    overriding function Text
      (Object : Root_Aqua_Object)
       return String
