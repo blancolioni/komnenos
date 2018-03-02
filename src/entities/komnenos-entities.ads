@@ -15,6 +15,7 @@ with Komnenos.Styles;
 with Komnenos.Session_Objects;
 with Komnenos.Source;
 
+with Aqua.Execution;
 with Aqua.Objects;
 with Aqua.Values;
 
@@ -413,6 +414,11 @@ package Komnenos.Entities is
      (Table     : Entity_Table;
       Reference : Reference_Record)
       return String;
+
+   function To_Entity
+     (Context : in out Aqua.Execution.Execution_Interface'Class;
+      Value   : Aqua.Word)
+      return Entity_Reference;
 
 private
 

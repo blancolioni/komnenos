@@ -497,6 +497,19 @@ package body Komnenos.Entities is
    end Text;
 
    ---------------
+   -- To_Entity --
+   ---------------
+
+   function To_Entity
+     (Context : in out Aqua.Execution.Execution_Interface'Class;
+      Value   : Aqua.Word)
+      return Entity_Reference
+   is
+   begin
+      return Context.To_Class_Instance ("komnenos__entity", Value);
+   end To_Entity;
+
+   ---------------
    -- To_String --
    ---------------
 
