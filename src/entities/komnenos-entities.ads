@@ -201,6 +201,9 @@ package Komnenos.Entities is
 
    type Entity_Table_Interface is interface;
 
+   function Table_Name (Table : Entity_Table_Interface) return String
+                        is abstract;
+
    type Entity_Table_Access is access all Entity_Table_Interface'Class;
 
    procedure Select_Entity
@@ -218,6 +221,8 @@ package Komnenos.Entities is
 
    type Program_Store_Interface is interface
      and Komnenos.Session_Objects.Session_Object_Interface;
+
+   type Program_Store_Access is access all Program_Store_Interface'Class;
 
    procedure Load
      (Store : not null access Program_Store_Interface)
@@ -237,10 +242,10 @@ package Komnenos.Entities is
       return access Program_Store_Interface'Class
       is abstract;
 
-   procedure Set_Program_Store
-     (Table : in out Entity_Table_Interface;
-      Store : access Program_Store_Interface'Class)
-   is null;
+   function New_Table
+     (Name  : String;
+      Store : not null access Program_Store_Interface'Class)
+      return Entity_Table_Access;
 
    type Array_Of_Entities is array (Positive range <>) of Entity_Reference;
 
@@ -556,6 +561,7 @@ private
 
    type Entity_Table is new Entity_Table_Interface with
       record
+         Name          : Ada.Strings.Unbounded.Unbounded_String;
          File_Map      : File_Name_Maps.Map;
          File_Vector   : File_Name_Vectors.Vector;
          Table         : Entity_Vectors.Vector;
@@ -566,13 +572,14 @@ private
          Store         : access Program_Store_Interface'Class;
       end record;
 
+   overriding function Table_Name
+     (Table : Entity_Table)
+      return String
+   is (Ada.Strings.Unbounded.To_String (Table.Name));
+
    overriding function Program_Store
      (Table : Entity_Table)
       return access Program_Store_Interface'Class
    is (Table.Store);
-
-   overriding procedure Set_Program_Store
-     (Table : in out Entity_Table;
-      Store : access Program_Store_Interface'Class);
 
 end Komnenos.Entities;

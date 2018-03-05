@@ -2,7 +2,7 @@ with Ada.Text_IO;
 
 with Komnenos.Configuration;
 with Komnenos.Displays;
-with Komnenos.UI;
+with Komnenos.Entities.Tables;
 
 package body Komnenos.Fragments.Diagrams is
 
@@ -671,7 +671,7 @@ package body Komnenos.Fragments.Diagrams is
               and then Node.Link /= null
             then
                Node.Link.Select_Entity
-                 (Komnenos.UI.Current_UI, Fragment,  null,
+                 (Komnenos.Entities.Tables.Table ("/"), Fragment,  null,
                   Node.Rectangle.Y + Node.Rectangle.Height / 2);
             end if;
          elsif Node.Selected then

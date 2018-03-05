@@ -11,8 +11,7 @@ with Komnenos.Paths;
 package Komnenos.UI is
 
    type Root_Komnenos_UI is
-     abstract new Komnenos.Entities.Entity_Table_Interface
-     and Komnenos.Session_Objects.Session_Object_Interface
+     abstract new Komnenos.Session_Objects.Session_Object_Interface
    with private;
 
    overriding function Config_Name (UI : Root_Komnenos_UI) return String
@@ -51,68 +50,77 @@ package Komnenos.UI is
      (UI   : in out Root_Komnenos_UI'Class;
       Path : String);
 
-   overriding procedure Add_Entity
-     (UI     : in out Root_Komnenos_UI;
-      Key    : String;
-      Entity : Komnenos.Entities.Entity_Reference);
+   function Table
+     (UI : Root_Komnenos_UI'Class;
+      Name : String)
+      return Komnenos.Entities.Entity_Table_Access;
 
-   overriding procedure Add_Cross_Reference
-     (UI           : in out Root_Komnenos_UI;
-      Item         : Komnenos.Entities.Entity_Reference;
-      Referrer     : Komnenos.Entities.Entity_Reference;
-      File_Name    : String;
-      Line         : Line_Number;
-      Column       : Column_Number;
-      Ref_Type     : String);
+   function Main_Table
+     (UI : Root_Komnenos_UI'Class)
+      return Komnenos.Entities.Entity_Table_Access;
 
-   overriding function Cross_References
-     (UI           : Root_Komnenos_UI;
-      File_Name    : String;
-      Line         : Line_Number;
-      Column       : Column_Number;
-      Enabled      : String := "")
-      return Komnenos.Entities.Array_Of_Entities;
-
-   overriding function References
-     (UI     : Root_Komnenos_UI;
-      Entity : Komnenos.Entities.Entity_Reference)
-      return Komnenos.Entities.Reference_Record_Array;
-
-   overriding function Exists
-     (UI  : Root_Komnenos_UI;
-      Key : String)
-      return Boolean;
-
-   overriding function Get
-     (UI  : Root_Komnenos_UI;
-      Key : String)
-      return Komnenos.Entities.Entity_Reference;
-
-   overriding function Find
-     (UI         : Root_Komnenos_UI;
-      Name       : String;
-      Class_Name : String)
-      return Komnenos.Entities.Entity_Reference;
-
-   overriding function Reference_File_Name
-     (UI        : Root_Komnenos_UI;
-      Reference : Komnenos.Entities.Reference_Record)
-      return String;
+--     overriding procedure Add_Entity
+--       (UI     : in out Root_Komnenos_UI;
+--        Key    : String;
+--        Entity : Komnenos.Entities.Entity_Reference);
+--
+--     overriding procedure Add_Cross_Reference
+--       (UI           : in out Root_Komnenos_UI;
+--        Item         : Komnenos.Entities.Entity_Reference;
+--        Referrer     : Komnenos.Entities.Entity_Reference;
+--        File_Name    : String;
+--        Line         : Line_Number;
+--        Column       : Column_Number;
+--        Ref_Type     : String);
+--
+--     overriding function Cross_References
+--       (UI           : Root_Komnenos_UI;
+--        File_Name    : String;
+--        Line         : Line_Number;
+--        Column       : Column_Number;
+--        Enabled      : String := "")
+--        return Komnenos.Entities.Array_Of_Entities;
+--
+--     overriding function References
+--       (UI     : Root_Komnenos_UI;
+--        Entity : Komnenos.Entities.Entity_Reference)
+--        return Komnenos.Entities.Reference_Record_Array;
+--
+--     overriding function Exists
+--       (UI  : Root_Komnenos_UI;
+--        Key : String)
+--        return Boolean;
+--
+--     overriding function Get
+--       (UI  : Root_Komnenos_UI;
+--        Key : String)
+--        return Komnenos.Entities.Entity_Reference;
+--
+--     overriding function Find
+--       (UI         : Root_Komnenos_UI;
+--        Name       : String;
+--        Class_Name : String)
+--        return Komnenos.Entities.Entity_Reference;
+--
+--     overriding function Reference_File_Name
+--       (UI        : Root_Komnenos_UI;
+--        Reference : Komnenos.Entities.Reference_Record)
+--        return String;
 
    function Active_Fragment
      (UI : Root_Komnenos_UI)
       return Komnenos.Fragments.Fragment_Type
       is abstract;
 
-   overriding procedure Sort
-     (UI     : in out Root_Komnenos_UI);
-
-   overriding procedure Iterate
-     (UI             : Root_Komnenos_UI;
-      Filter         : in String;
-      Process        : not null access
-        procedure (Item : Komnenos.Entities.Entity_Reference);
-      Top_Level_Only : Boolean := True);
+--     overriding procedure Sort
+--       (UI     : in out Root_Komnenos_UI);
+--
+--     overriding procedure Iterate
+--       (UI             : Root_Komnenos_UI;
+--        Filter         : in String;
+--        Process        : not null access
+--          procedure (Item : Komnenos.Entities.Entity_Reference);
+--        Top_Level_Only : Boolean := True);
 
 --     function Find_Entity
 --       (UI     : Root_Komnenos_UI;
@@ -121,13 +129,13 @@ package Komnenos.UI is
 --        Column : Natural)
 --        return Komnenos.Entities.Entity_Reference;
 
-   overriding function Program_Store
-     (UI             : Root_Komnenos_UI)
-      return access Komnenos.Entities.Program_Store_Interface'Class;
-
-   overriding procedure Set_Program_Store
-     (UI    : in out Root_Komnenos_UI;
-      Store : access Komnenos.Entities.Program_Store_Interface'Class);
+--     overriding function Program_Store
+--       (UI             : Root_Komnenos_UI)
+--        return access Komnenos.Entities.Program_Store_Interface'Class;
+--
+--     overriding procedure Set_Program_Store
+--       (UI    : in out Root_Komnenos_UI;
+--        Store : access Komnenos.Entities.Program_Store_Interface'Class);
 
    function Get_Visual
      (UI  : Root_Komnenos_UI;
@@ -148,14 +156,12 @@ package Komnenos.UI is
 private
 
    type Root_Komnenos_UI is
-     abstract new Komnenos.Entities.Entity_Table_Interface
-     and Komnenos.Session_Objects.Session_Object_Interface with
+     abstract new Komnenos.Session_Objects.Session_Object_Interface with
       record
          View_Left   : Pixel_Position;
          View_Top    : Pixel_Position;
          View_Height : Pixel_Length;
          View_Width  : Pixel_Length;
-         Entities    : Komnenos.Entities.Entity_Table;
          Store       : access Komnenos.Entities.Program_Store_Interface'Class;
       end record;
 

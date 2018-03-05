@@ -173,7 +173,7 @@ package body Komnenos.UI.Gtk_UI.Entity_Lists is
                  Komnenos.Entities.Get_Referrer (Reference);
    begin
       if Entity /= null then
-         Entity.Select_Entity (Current_UI, null, null, 0);
+         Entity.Select_Entity (Current_UI.Main_Table, null, null, 0);
       end if;
    end On_Context_Menu_Item_Selected;
 
@@ -200,7 +200,7 @@ package body Komnenos.UI.Gtk_UI.Entity_Lists is
                  Get_Selected_Entity
                    (Gtk.Tree_View.Gtk_Tree_View (Tree_View));
    begin
-      Entity.Select_Entity (Current_UI, null, null, 0);
+      Entity.Select_Entity (Current_UI.Main_Table, null, null, 0);
    end On_Row_Activated;
 
    --------------------
@@ -273,7 +273,7 @@ package body Komnenos.UI.Gtk_UI.Entity_Lists is
             Entity : constant Komnenos.Entities.Entity_Reference :=
                        Get_Selected_Entity (Tree_View);
             References : constant Komnenos.Entities.Reference_Record_Array :=
-                           Current_UI.References (Entity);
+                           Current_UI.Main_Table.References (Entity);
 
          begin
             Show_Context_Menu (Tree_View, Event,  Entity, References);
@@ -304,7 +304,7 @@ package body Komnenos.UI.Gtk_UI.Entity_Lists is
             Menu_Item : Gtk.Menu_Item.Gtk_Menu_Item;
          begin
             Gtk.Menu_Item.Gtk_New_With_Label
-              (Menu_Item, Current_UI.To_String (References (I)));
+              (Menu_Item, Current_UI.Main_Table.To_String (References (I)));
             Context_Menu_Reference_Callback.Connect
               (Menu_Item, Gtk.Menu_Item.Signal_Activate,
                Context_Menu_Reference_Callback.To_Marshaller
@@ -369,8 +369,8 @@ package body Komnenos.UI.Gtk_UI.Entity_Lists is
 
    begin
       Entity_Model.Clear;
-      Current_UI.Sort;
-      Current_UI.Iterate (Filter, Show'Access);
+      Current_UI.Main_Table.Sort;
+      Current_UI.Main_Table.Iterate (Filter, Show'Access);
    end Show_Entities;
 
 end Komnenos.UI.Gtk_UI.Entity_Lists;

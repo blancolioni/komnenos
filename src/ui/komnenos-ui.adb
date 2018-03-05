@@ -1,5 +1,7 @@
 with Css.Parser;
 
+with Komnenos.Entities.Tables;
+
 with Komnenos.UI.Gtk_UI;
 
 package body Komnenos.UI is
@@ -10,32 +12,32 @@ package body Komnenos.UI is
    -- Add_Cross_Reference --
    -------------------------
 
-   overriding procedure Add_Cross_Reference
-     (UI           : in out Root_Komnenos_UI;
-      Item         : Komnenos.Entities.Entity_Reference;
-      Referrer     : Komnenos.Entities.Entity_Reference;
-      File_Name    : String;
-      Line         : Line_Number;
-      Column       : Column_Number;
-      Ref_Type     : String)
-   is
-   begin
-      UI.Entities.Add_Cross_Reference
-        (Item, Referrer, File_Name, Line, Column, Ref_Type);
-   end Add_Cross_Reference;
+--     overriding procedure Add_Cross_Reference
+--       (UI           : in out Root_Komnenos_UI;
+--        Item         : Komnenos.Entities.Entity_Reference;
+--        Referrer     : Komnenos.Entities.Entity_Reference;
+--        File_Name    : String;
+--        Line         : Line_Number;
+--        Column       : Column_Number;
+--        Ref_Type     : String)
+--     is
+--     begin
+--        UI.Entities.Add_Cross_Reference
+--          (Item, Referrer, File_Name, Line, Column, Ref_Type);
+--     end Add_Cross_Reference;
 
    --------------------------
    -- Add_Entity_Reference --
    --------------------------
 
-   overriding procedure Add_Entity
-     (UI     : in out Root_Komnenos_UI;
-      Key    : String;
-      Entity : Komnenos.Entities.Entity_Reference)
-   is
-   begin
-      UI.Entities.Add_Entity (Key, Entity);
-   end Add_Entity;
+--     overriding procedure Add_Entity
+--       (UI     : in out Root_Komnenos_UI;
+--        Key    : String;
+--        Entity : Komnenos.Entities.Entity_Reference)
+--     is
+--     begin
+--        UI.Entities.Add_Entity (Key, Entity);
+--     end Add_Entity;
 
    ---------------
    -- Create_UI --
@@ -54,18 +56,18 @@ package body Komnenos.UI is
    -- Cross_References --
    ----------------------
 
-   overriding function Cross_References
-     (UI           : Root_Komnenos_UI;
-      File_Name    : String;
-      Line         : Line_Number;
-      Column       : Column_Number;
-      Enabled      : String := "")
-      return Komnenos.Entities.Array_Of_Entities
-   is
-   begin
-      return UI.Entities.Cross_References
-        (File_Name, Line, Column, Enabled);
-   end Cross_References;
+--     overriding function Cross_References
+--       (UI           : Root_Komnenos_UI;
+--        File_Name    : String;
+--        Line         : Line_Number;
+--        Column       : Column_Number;
+--        Enabled      : String := "")
+--        return Komnenos.Entities.Array_Of_Entities
+--     is
+--     begin
+--        return UI.Entities.Cross_References
+--          (File_Name, Line, Column, Enabled);
+--     end Cross_References;
 
    ----------------
    -- Current_UI --
@@ -80,28 +82,28 @@ package body Komnenos.UI is
    -- Exists --
    ------------
 
-   overriding function Exists
-     (UI  : Root_Komnenos_UI;
-      Key : String)
-      return Boolean
-   is
-   begin
-      return UI.Entities.Exists (Key);
-   end Exists;
+--     overriding function Exists
+--       (UI  : Root_Komnenos_UI;
+--        Key : String)
+--        return Boolean
+--     is
+--     begin
+--        return UI.Entities.Exists (Key);
+--     end Exists;
 
    ----------
    -- Find --
    ----------
 
-   overriding function Find
-     (UI         : Root_Komnenos_UI;
-      Name       : String;
-      Class_Name : String)
-      return Komnenos.Entities.Entity_Reference
-   is
-   begin
-      return UI.Entities.Find (Name, Class_Name);
-   end Find;
+--     overriding function Find
+--       (UI         : Root_Komnenos_UI;
+--        Name       : String;
+--        Class_Name : String)
+--        return Komnenos.Entities.Entity_Reference
+--     is
+--     begin
+--        return UI.Entities.Find (Name, Class_Name);
+--     end Find;
 
    -----------------
    -- From_Config --
@@ -125,29 +127,29 @@ package body Komnenos.UI is
    -- Get --
    ---------
 
-   overriding function Get
-     (UI  : Root_Komnenos_UI;
-      Key : String)
-      return Komnenos.Entities.Entity_Reference
-   is
-   begin
-      return UI.Entities.Get (Key);
-   end Get;
+--     overriding function Get
+--       (UI  : Root_Komnenos_UI;
+--        Key : String)
+--        return Komnenos.Entities.Entity_Reference
+--     is
+--     begin
+--        return UI.Entities.Get (Key);
+--     end Get;
 
    -------------
    -- Iterate --
    -------------
 
-   overriding procedure Iterate
-     (UI             : Root_Komnenos_UI;
-      Filter         : in String;
-      Process        : not null access
-        procedure (Item : Komnenos.Entities.Entity_Reference);
-      Top_Level_Only : Boolean := True)
-   is
-   begin
-      UI.Entities.Iterate (Filter, Process, Top_Level_Only);
-   end Iterate;
+--     overriding procedure Iterate
+--       (UI             : Root_Komnenos_UI;
+--        Filter         : in String;
+--        Process        : not null access
+--          procedure (Item : Komnenos.Entities.Entity_Reference);
+--        Top_Level_Only : Boolean := True)
+--     is
+--     begin
+--        UI.Entities.Iterate (Filter, Process, Top_Level_Only);
+--     end Iterate;
 
    ----------------------
    -- Load_Style_Sheet --
@@ -162,66 +164,85 @@ package body Komnenos.UI is
       Css.Parser.Load_Css_File (Path);
    end Load_Style_Sheet;
 
+   ----------------
+   -- Main_Table --
+   ----------------
+
+   function Main_Table
+     (UI : Root_Komnenos_UI'Class)
+      return Komnenos.Entities.Entity_Table_Access
+   is (UI.Table ("/"));
+
    -------------------
    -- Program_Store --
    -------------------
 
-   overriding function Program_Store
-     (UI             : Root_Komnenos_UI)
-      return access Komnenos.Entities.Program_Store_Interface'Class
-   is
-   begin
-      return UI.Store;
-   end Program_Store;
+--     overriding function Program_Store
+--       (UI             : Root_Komnenos_UI)
+--        return access Komnenos.Entities.Program_Store_Interface'Class
+--     is
+--     begin
+--        return UI.Store;
+--     end Program_Store;
 
    -------------------------
    -- Reference_File_Name --
    -------------------------
 
-   overriding function Reference_File_Name
-     (UI        : Root_Komnenos_UI;
-      Reference : Komnenos.Entities.Reference_Record)
-      return String
-   is
-   begin
-      return UI.Entities.Reference_File_Name (Reference);
-   end Reference_File_Name;
+--     overriding function Reference_File_Name
+--       (UI        : Root_Komnenos_UI;
+--        Reference : Komnenos.Entities.Reference_Record)
+--        return String
+--     is
+--     begin
+--        return UI.Entities.Reference_File_Name (Reference);
+--     end Reference_File_Name;
 
    ----------------
    -- References --
    ----------------
 
-   overriding function References
-     (UI     : Root_Komnenos_UI;
-      Entity : Komnenos.Entities.Entity_Reference)
-      return Komnenos.Entities.Reference_Record_Array
-   is
-   begin
-      return UI.Entities.References (Entity);
-   end References;
+--     overriding function References
+--       (UI     : Root_Komnenos_UI;
+--        Entity : Komnenos.Entities.Entity_Reference)
+--        return Komnenos.Entities.Reference_Record_Array
+--     is
+--     begin
+--        return UI.Entities.References (Entity);
+--     end References;
 
    -----------------------
    -- Set_Program_Store --
    -----------------------
 
-   overriding procedure Set_Program_Store
-     (UI    : in out Root_Komnenos_UI;
-      Store : access Komnenos.Entities.Program_Store_Interface'Class)
-   is
-   begin
-      UI.Store := Store;
-   end Set_Program_Store;
+--     overriding procedure Set_Program_Store
+--       (UI    : in out Root_Komnenos_UI;
+--        Store : access Komnenos.Entities.Program_Store_Interface'Class)
+--     is
+--     begin
+--        UI.Store := Store;
+--     end Set_Program_Store;
 
    ----------
    -- Sort --
    ----------
 
-   overriding procedure Sort
-     (UI     : in out Root_Komnenos_UI)
-   is
-   begin
-      UI.Entities.Sort;
-   end Sort;
+--     overriding procedure Sort
+--       (UI     : in out Root_Komnenos_UI)
+--     is
+--     begin
+--        UI.Entities.Sort;
+--     end Sort;
+
+   -----------
+   -- Table --
+   -----------
+
+   function Table
+     (UI   : Root_Komnenos_UI'Class;
+      Name : String)
+      return Komnenos.Entities.Entity_Table_Access
+   is (Komnenos.Entities.Tables.Table (Name));
 
    ---------------
    -- To_Config --

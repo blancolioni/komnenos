@@ -1,6 +1,7 @@
 with Ada.Characters.Handling;
 with Ada.Strings.Fixed;
 with Ada.Strings.Fixed.Less_Case_Insensitive;
+with Ada.Text_IO;
 
 package body Komnenos.Entities is
 
@@ -142,6 +143,10 @@ package body Komnenos.Entities is
    is
       Key : constant String := Get_Key (File_Name, Line, Column);
    begin
+      Ada.Text_IO.Put_Line
+        ("xref [" & Table.Table_Name & "]" & Line'Img & Column'Img
+         & ": " & Enabled & " " & Key);
+
       if Table.X_Ref.Contains (Key) then
          declare
             List : constant Cross_Reference_Lists.List :=
@@ -150,6 +155,8 @@ package body Komnenos.Entities is
             Count  : Natural := 0;
          begin
             for Element of List loop
+               Ada.Text_IO.Put_Line ("   " & Element.Entity.Class
+                                     & " " & Element.Entity.Name);
                if Enabled = "all" then
                   Count := Count + 1;
                   Result (Count) := Element.Entity;
@@ -370,6 +377,22 @@ package body Komnenos.Entities is
       return Ada.Strings.Unbounded.To_String (Reference.Ref_Type);
    end Location_Reference_Type;
 
+   ---------------
+   -- New_Table --
+   ---------------
+
+   function New_Table
+     (Name  : String;
+      Store : not null access Program_Store_Interface'Class)
+      return Entity_Table_Access
+   is
+      Rec : Entity_Table;
+   begin
+      Rec.Name := Ada.Strings.Unbounded.To_Unbounded_String (Name);
+      Rec.Store := Store;
+      return Table : constant Entity_Table_Access := new Entity_Table'(Rec);
+   end New_Table;
+
    --------------
    -- Put_Line --
    --------------
@@ -434,18 +457,6 @@ package body Komnenos.Entities is
          Item.String_Props.Insert (Name, Value);
       end if;
    end Set;
-
-   -----------------------
-   -- Set_Program_Store --
-   -----------------------
-
-   overriding procedure Set_Program_Store
-     (Table : in out Entity_Table;
-      Store : access Program_Store_Interface'Class)
-   is
-   begin
-      Table.Store := Store;
-   end Set_Program_Store;
 
    -------------------
    -- Set_Reference --

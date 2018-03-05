@@ -605,6 +605,8 @@ package body Komnenos.Fragments is
                       Reference => Komnenos.Entities.Entity_Reference (Link));
    begin
       if Link /= null then
+         Ada.Text_IO.Put_Line
+           ("at " & Text & ": link to " & Link.Class & " " & Link.Name);
          Line_Style.Styles (Hover) :=
            Komnenos.Themes.Active_Theme.Default_Link_Style;
       end if;

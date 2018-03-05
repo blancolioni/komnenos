@@ -284,14 +284,16 @@ package body Komnenos.UI.Gtk_UI is
         (Fragment : Komnenos.Fragments.Fragment_Type)
       is
          use type Komnenos.Entities.Entity_Reference;
+         Table : constant Komnenos.Entities.Entity_Table_Access :=
+                   UI.Main_Table;
          Entity : constant Komnenos.Entities.Entity_Reference :=
-                    (if UI.Entities.Exists (Fragment.Entity_Key)
-                     then UI.Entities.Get (Fragment.Entity_Key)
+                    (if Table.Exists (Fragment.Entity_Key)
+                     then Table.Get (Fragment.Entity_Key)
                      else null);
       begin
          if Entity /= null then
             Entity.Select_Entity
-              (Table  => UI,
+              (Table  => Table,
                Parent => null,
                Visual => Fragment,
                Offset => 0);
