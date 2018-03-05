@@ -301,7 +301,7 @@ package body Komnenos.UI.Gtk_UI.Text is
          begin
             Text_View.Get_Iter_Location (Iter, Location);
             Entity.Select_Entity
-              (Current_UI, Display.Fragment, null,
+              (Current_UI.Main_Table, Display.Fragment, null,
                Pixel_Position (Location.Y)
                + Pixel_Position (Location.Height) / 2);
             Display.Highlights.Append
