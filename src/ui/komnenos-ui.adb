@@ -171,7 +171,7 @@ package body Komnenos.UI is
    function Main_Table
      (UI : Root_Komnenos_UI'Class)
       return Komnenos.Entities.Entity_Table_Access
-   is (UI.Table ("/"));
+   is (Komnenos.Entities.Tables.Active_Table);
 
    -------------------
    -- Program_Store --

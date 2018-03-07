@@ -224,6 +224,10 @@ package Komnenos.Entities is
 
    type Program_Store_Access is access all Program_Store_Interface'Class;
 
+   function Program_Store_Name
+     (Store : Program_Store_Interface) return String
+      is abstract;
+
    procedure Load
      (Store : not null access Program_Store_Interface)
    is abstract;
@@ -241,6 +245,8 @@ package Komnenos.Entities is
      (Table : Entity_Table_Interface)
       return access Program_Store_Interface'Class
       is abstract;
+
+   function Null_Program_Store return Program_Store_Access;
 
    function New_Table
      (Name  : String;

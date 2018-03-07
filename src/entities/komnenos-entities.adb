@@ -5,6 +5,39 @@ with Ada.Text_IO;
 
 package body Komnenos.Entities is
 
+   type Null_Program_Store_Record is
+     new Program_Store_Interface with null record;
+
+   overriding function Config_Name
+     (Item : Null_Program_Store_Record)
+      return String
+   is ("null_program_store");
+
+   overriding function Program_Store_Name
+     (Item : Null_Program_Store_Record)
+      return String
+   is ("null_program_store");
+
+   overriding procedure To_Config
+     (Item   : Null_Program_Store_Record;
+      Config : in out Tropos.Configuration)
+   is null;
+
+   overriding procedure From_Config
+     (Item   : not null access Null_Program_Store_Record;
+      Config : Tropos.Configuration)
+   is null;
+
+   overriding procedure Load
+     (Store : not null access Null_Program_Store_Record)
+   is null;
+
+   overriding procedure Save
+     (Store : not null access Null_Program_Store_Record)
+   is null;
+
+   Local_Null_Program_Store : aliased Null_Program_Store_Record;
+
    function Get_Key (File_Name : String;
                      Line      : Line_Number;
                      Column    : Column_Number)
@@ -143,9 +176,11 @@ package body Komnenos.Entities is
    is
       Key : constant String := Get_Key (File_Name, Line, Column);
    begin
-      Ada.Text_IO.Put_Line
-        ("xref [" & Table.Table_Name & "]" & Line'Img & Column'Img
-         & ": " & Enabled & " " & Key);
+      if False then
+         Ada.Text_IO.Put_Line
+           ("xref [" & Table.Table_Name & "]" & Line'Img & Column'Img
+            & ": " & Enabled & " " & Key);
+      end if;
 
       if Table.X_Ref.Contains (Key) then
          declare
@@ -392,6 +427,15 @@ package body Komnenos.Entities is
       Rec.Store := Store;
       return Table : constant Entity_Table_Access := new Entity_Table'(Rec);
    end New_Table;
+
+   ------------------------
+   -- Null_Program_Store --
+   ------------------------
+
+   function Null_Program_Store return Program_Store_Access is
+   begin
+      return Local_Null_Program_Store'Access;
+   end Null_Program_Store;
 
    --------------
    -- Put_Line --
