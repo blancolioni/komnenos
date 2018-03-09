@@ -33,6 +33,24 @@ package Komnenos.Entities is
    type Root_Entity_Reference is
      abstract new Aqua.Objects.Root_Object_Type with private;
 
+   overriding function Name
+     (Entity   : Root_Entity_Reference)
+      return String;
+
+   overriding function Class_Name
+     (Entity   : Root_Entity_Reference)
+      return String;
+
+   overriding function Text
+     (Item : Root_Entity_Reference)
+      return String;
+
+   overriding function Show
+     (Item           : Root_Entity_Reference;
+      Recursive_Show : access
+        function (Value : Aqua.Word) return String)
+      return String;
+
    overriding function Get_Property
      (Entity   : in out Root_Entity_Reference;
       Name     : in String)
@@ -504,16 +522,8 @@ private
       Value : String);
 
    overriding function Name
-     (Item : Root_Entity_Reference) return String
-   is (Item.Get_String_Property (Name_Property));
-
-   overriding function Text
-     (Item : Root_Entity_Reference) return String;
-
-   overriding function Show
-     (Item           : Root_Entity_Reference;
-      Recursive_Show : access
-        function (Value : Aqua.Word) return String) return String;
+     (Entity : Root_Entity_Reference) return String
+   is (Entity.Get_String_Property (Name_Property));
 
    function Key
      (Item : Root_Entity_Reference'Class)

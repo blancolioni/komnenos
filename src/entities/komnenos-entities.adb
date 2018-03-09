@@ -131,6 +131,11 @@ package body Komnenos.Entities is
 
    end Add_Entity;
 
+   overriding function Class_Name
+     (Entity   : Root_Entity_Reference)
+      return String
+   is ("komnenos__entity");
+
    ------------
    -- Create --
    ------------
@@ -566,7 +571,10 @@ package body Komnenos.Entities is
       Value   : Aqua.Word)
       return Entity_Reference
    is
+      Result : constant access Aqua.External_Object_Interface'Class :=
+                 Context.To_Class_Instance ("komnenos__entity", Value);
    begin
+      Ada.Text_IO.Put_Line (Result.Class_Name & " " & Result.Name);
       return Context.To_Class_Instance ("komnenos__entity", Value);
    end To_Entity;
 
