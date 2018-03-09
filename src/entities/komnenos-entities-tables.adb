@@ -1,5 +1,3 @@
-with Ada.Text_IO;
-
 with WL.String_Maps;
 
 package body Komnenos.Entities.Tables is
@@ -46,7 +44,6 @@ package body Komnenos.Entities.Tables is
      (Table : not null access Entity_Table_Interface'Class)
    is
    begin
-      Ada.Text_IO.Put_Line ("active table: " & Table.Table_Name);
       Local_Active_Table := Entity_Table_Access (Table);
    end Set_Active_Table;
 

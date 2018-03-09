@@ -18,6 +18,12 @@ package body Komnenos.Entities is
       return String
    is ("null_program_store");
 
+   overriding function Find_File
+     (Item : Null_Program_Store_Record;
+      Name : String)
+      return String
+   is ("");
+
    overriding procedure To_Config
      (Item   : Null_Program_Store_Record;
       Config : in out Tropos.Configuration)

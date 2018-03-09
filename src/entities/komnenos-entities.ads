@@ -241,6 +241,12 @@ package Komnenos.Entities is
       Item  : not null access Komnenos.Source.Source_Tree_Interface'Class)
    is null;
 
+   function Find_File
+     (Store : Program_Store_Interface;
+      Name  : String)
+      return String
+      is abstract;
+
    function Program_Store
      (Table : Entity_Table_Interface)
       return access Program_Store_Interface'Class
