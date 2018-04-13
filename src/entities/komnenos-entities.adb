@@ -131,7 +131,7 @@ package body Komnenos.Entities is
 
    end Add_Entity;
 
-   overriding function Class_Name
+   function Class_Name
      (Entity   : Root_Entity_Reference)
       return String
    is ("komnenos__entity");
@@ -323,17 +323,16 @@ package body Komnenos.Entities is
    -- Get_Property --
    ------------------
 
-   overriding function Get_Property
+   function Get_Property
      (Entity   : in out Root_Entity_Reference;
       Name     : in String)
-      return Aqua.Values.Property_Value
+      return String
    is
    begin
       if Entity.String_Props.Contains (Name) then
-         return Aqua.Values.To_String_Value
-           (Entity.String_Props.Element (Name));
+         return Entity.String_Props.Element (Name);
       else
-         return Aqua.Objects.Root_Object_Type (Entity).Get_Property (Name);
+         return "";
       end if;
    end Get_Property;
 
@@ -365,7 +364,7 @@ package body Komnenos.Entities is
    -- Has_Property --
    ------------------
 
-   overriding function Has_Property
+   function Has_Property
      (Entity   : Root_Entity_Reference;
       Name     : in String)
       return Boolean
@@ -529,7 +528,7 @@ package body Komnenos.Entities is
    -- Show --
    ----------
 
-   overriding function Show
+   function Show
      (Item           : Root_Entity_Reference;
       Recursive_Show : access
         function (Value : Aqua.Word) return String)
@@ -555,25 +554,12 @@ package body Komnenos.Entities is
    -- Text --
    ----------
 
-   overriding function Text
+   function Text
      (Item : Root_Entity_Reference) return String
    is
    begin
       return Item.Display_Text;
    end Text;
-
-   ---------------
-   -- To_Entity --
-   ---------------
-
-   function To_Entity
-     (Context : in out Aqua.Execution.Execution_Interface'Class;
-      Value   : Aqua.Word)
-      return Entity_Reference
-   is
-   begin
-      return Context.To_Class_Instance ("komnenos__entity", Value);
-   end To_Entity;
 
    ---------------
    -- To_String --

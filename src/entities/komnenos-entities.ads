@@ -16,8 +16,6 @@ with Komnenos.Session_Objects;
 with Komnenos.Source;
 
 with Aqua.Execution;
-with Aqua.Objects;
-with Aqua.Values;
 
 package Komnenos.Entities is
 
@@ -30,33 +28,32 @@ package Komnenos.Entities is
 
    type Entity_Visual_Access is access all Entity_Visual'Class;
 
-   type Root_Entity_Reference is
-     abstract new Aqua.Objects.Root_Object_Type with private;
+   type Root_Entity_Reference is abstract tagged private;
 
-   overriding function Name
+   function Name
      (Entity   : Root_Entity_Reference)
       return String;
 
-   overriding function Class_Name
+   function Class_Name
      (Entity   : Root_Entity_Reference)
       return String;
 
-   overriding function Text
+   function Text
      (Item : Root_Entity_Reference)
       return String;
 
-   overriding function Show
+   function Show
      (Item           : Root_Entity_Reference;
       Recursive_Show : access
         function (Value : Aqua.Word) return String)
       return String;
 
-   overriding function Get_Property
+   function Get_Property
      (Entity   : in out Root_Entity_Reference;
       Name     : in String)
-      return Aqua.Values.Property_Value;
+      return String;
 
-   overriding function Has_Property
+   function Has_Property
      (Entity   : Root_Entity_Reference;
       Name     : in String)
       return Boolean;
@@ -450,11 +447,6 @@ package Komnenos.Entities is
       Reference : Reference_Record)
       return String;
 
-   function To_Entity
-     (Context : in out Aqua.Execution.Execution_Interface'Class;
-      Value   : Aqua.Word)
-      return Entity_Reference;
-
 private
 
    type File_Id is new Positive;
@@ -487,7 +479,7 @@ private
      new WL.String_Maps (String);
 
    type Root_Entity_Reference is
-     abstract new Aqua.Objects.Root_Object_Type with
+     abstract tagged
       record
          String_Props   : String_Property_Maps.Map;
 --           Key            : Ada.Strings.Unbounded.Unbounded_String;
@@ -521,7 +513,7 @@ private
       Name  : String;
       Value : String);
 
-   overriding function Name
+   function Name
      (Entity : Root_Entity_Reference) return String
    is (Entity.Get_String_Property (Name_Property));
 
