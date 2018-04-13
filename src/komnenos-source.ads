@@ -1,10 +1,6 @@
-with Aqua;
-with Aqua.Execution;
-
 package Komnenos.Source is
 
-   type Source_Tree_Interface is interface
-     and Aqua.External_Object_Interface;
+   type Source_Tree_Interface is interface;
 
    function Source_File_Name
      (Source : Source_Tree_Interface)
@@ -32,13 +28,5 @@ package Komnenos.Source is
       is abstract;
 
    type Source_Tree is access all Source_Tree_Interface'Class;
-
-   function Get
-     (Context : in out Aqua.Execution.Execution_Interface'Class;
-      Value   : Aqua.Word)
-      return Source_Tree
-   is (if Aqua.Is_External_Reference (Value)
-       then Source_Tree (Context.To_External_Object (Value))
-       else null);
 
 end Komnenos.Source;
