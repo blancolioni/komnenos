@@ -15,7 +15,7 @@ with Komnenos.Styles;
 with Komnenos.Session_Objects;
 with Komnenos.Source;
 
-with Aqua.Execution;
+with Aqua;
 
 package Komnenos.Entities is
 
