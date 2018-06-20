@@ -7,6 +7,8 @@ with Glib;
 with Gdk.Event;
 with Gdk.Window;
 
+with Gtkada.Types;
+
 with Komnenos.Configuration;
 
 with Komnenos.Keys.Gtk_Keys;
@@ -357,8 +359,8 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       Extents : aliased Cairo.Cairo_Text_Extents;
       Context : constant Cairo.Cairo_Context :=
                   Cairo.Create (Canvas.Layers (Layer));
-      C_Text  : Interfaces.C.Strings.chars_ptr :=
-                  Interfaces.C.Strings.New_String (Text);
+      C_Text  : Gtkada.Types.Chars_Ptr :=
+                  Gtkada.Types.New_String (Text);
    begin
       Komnenos.UI.Cairo_UI.Set_Font (Context, Font);
       Cairo.Text_Extents (Context, C_Text, Extents'Access);
@@ -369,7 +371,7 @@ package body Komnenos.UI.Gtk_UI.Canvas is
          Glib.Gdouble (Rectangle.Y + Rectangle.Height / 2)
          + Extents.Height / 2.0);
       Cairo.Show_Text (Context, Text);
-      Interfaces.C.Strings.Free (C_Text);
+      Gtkada.Types.Free (C_Text);
       Cairo.Destroy (Context);
 
    end Draw_Text;
@@ -492,12 +494,11 @@ package body Komnenos.UI.Gtk_UI.Canvas is
       Text      : String)
       return Layout_Rectangle
    is
-      use Glib;
       Extents   : aliased Cairo.Cairo_Text_Extents;
       Context   : constant Cairo.Cairo_Context :=
                     Cairo.Create (Canvas.Layers (Komnenos.Displays.Base));
-      C_Text    : Interfaces.C.Strings.chars_ptr :=
-                    Interfaces.C.Strings.New_String (Text);
+      C_Text    : Gtkada.Types.Chars_Ptr :=
+                    Gtkada.Types.New_String (Text);
       Rectangle : Layout_Rectangle;
       Config    : constant Komnenos.Configuration.Diagram_Config :=
                     Komnenos.Configuration.Get_Diagram_Config;
@@ -538,7 +539,7 @@ package body Komnenos.UI.Gtk_UI.Canvas is
          end if;
       end;
 
-      Interfaces.C.Strings.Free (C_Text);
+      Gtkada.Types.Free (C_Text);
 
       return Rectangle;
 
