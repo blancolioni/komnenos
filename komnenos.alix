@@ -5,6 +5,7 @@ source_dir = src/fragments
 source_dir = src/styles
 source_dir = src/ui
 source_dir = src/ui/gtk
+source_dir = src/ui/gtk/c-strings
 main_unit = komnenos-demo_driver
 exec_name = komnenos-demo
 depend = { project = gtkada external = yes }
@@ -16,4 +17,3 @@ depend = { project = wlib version = any }
 config_dir = config
 path_unit = { unit = Komnenos.Paths
               path = src/komnenos-paths.ads }
-              
