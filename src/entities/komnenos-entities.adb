@@ -21,8 +21,7 @@ package body Komnenos.Entities is
    overriding function Find_File
      (Item : Null_Program_Store_Record;
       Name : String)
-      return String
-   is ("");
+      return String;
 
    overriding procedure To_Config
      (Item   : Null_Program_Store_Record;
@@ -292,6 +291,20 @@ package body Komnenos.Entities is
       return null;
    end Find;
 
+   ---------------
+   -- Find_File --
+   ---------------
+
+   overriding function Find_File
+     (Item : Null_Program_Store_Record;
+      Name : String)
+      return String
+   is
+      pragma Unreferenced (Item, Name);
+   begin
+      return "";
+   end Find_File;
+
    ---------
    -- Get --
    ---------
@@ -304,6 +317,34 @@ package body Komnenos.Entities is
    begin
       return Table.Map.Element (Key);
    end Get;
+
+   ----------------
+   -- Get_Column --
+   ----------------
+
+   function Get_Column
+     (Entity   : Root_Entity_Reference;
+      Position : Text_Position)
+      return Column_Number
+   is
+      pragma Unreferenced (Entity, Position);
+   begin
+      return 1;
+   end Get_Column;
+
+   ----------------
+   -- Get_Cursor --
+   ----------------
+
+   function Get_Cursor
+     (Entity : Root_Entity_Reference;
+      Cursor : Cursor_Type)
+      return Text_Position
+   is
+      pragma Unreferenced (Entity, Cursor);
+   begin
+      return 1;
+   end Get_Cursor;
 
    -------------
    -- Get_Key --
@@ -318,6 +359,20 @@ package body Komnenos.Entities is
       return File_Name & Integer'Image (-Integer (Line))
         & Integer'Image (-Integer (Column));
    end Get_Key;
+
+   --------------
+   -- Get_Line --
+   --------------
+
+   function Get_Line
+     (Entity   : Root_Entity_Reference;
+      Position : Text_Position)
+      return Line_Number
+   is
+      pragma Unreferenced (Entity, Position);
+   begin
+      return 1;
+   end Get_Line;
 
    ------------------
    -- Get_Property --
@@ -359,6 +414,35 @@ package body Komnenos.Entities is
    begin
       return Reference.Referrer;
    end Get_Referrer;
+
+   ---------------------
+   -- Get_Region_Text --
+   ---------------------
+
+   function Get_Region_Text
+     (Item  : Root_Entity_Reference;
+      End_1 : Cursor_Type;
+      End_2 : Cursor_Type)
+      return String
+   is
+      pragma Unreferenced (Item, End_1, End_2);
+   begin
+      return "";
+   end Get_Region_Text;
+
+   -----------------------
+   -- Get_Start_Of_Line --
+   -----------------------
+
+   function Get_Start_Of_Line
+     (Entity : Root_Entity_Reference;
+      Line   : Line_Number)
+      return Text_Position
+   is
+      pragma Unreferenced (Entity, Line);
+   begin
+      return 1;
+   end Get_Start_Of_Line;
 
    ------------------
    -- Has_Property --
@@ -571,7 +655,6 @@ package body Komnenos.Entities is
       return String
    is
       pragma Unreferenced (Table);
-      use Ada.Strings, Ada.Strings.Fixed;
    begin
       return Reference.Referrer.Name
 --        return Table.Reference_File_Name (Reference)

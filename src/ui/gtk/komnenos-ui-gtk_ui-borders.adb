@@ -58,7 +58,6 @@ package body Komnenos.UI.Gtk_UI.Borders is
    procedure Add_Borders
      (Fragment : in out UI_Fragment_Interface'Class)
    is
-      use Gtk.Drawing_Area;
    begin
       for Corner in Border_Corner loop
          Fragment.Set_Corner_Widget
