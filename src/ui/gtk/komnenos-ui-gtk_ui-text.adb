@@ -128,7 +128,6 @@ package body Komnenos.UI.Gtk_UI.Text is
       Style         : Komnenos.Styles.Komnenos_Style;
       Remove        : Boolean)
    is
-      use Komnenos.Styles;
       Buffer     : constant Gtk.Text_Buffer.Gtk_Text_Buffer :=
                      View.Get_Buffer;
       Tag        : constant Gtk.Text_Tag.Gtk_Text_Tag :=
@@ -364,7 +363,6 @@ package body Komnenos.UI.Gtk_UI.Text is
 
             if Font.Has_Foreground_Color then
                declare
-                  use Glib;
                   use Komnenos.Colours;
                   Colour : constant Komnenos_Colour :=
                              Font.Foreground_Color;
@@ -384,7 +382,6 @@ package body Komnenos.UI.Gtk_UI.Text is
 
             if Font.Has_Background_Color then
                declare
-                  use Glib;
                   use Komnenos.Colours;
                   Colour : constant Komnenos_Colour :=
                              Font.Background_Color;
@@ -561,7 +558,6 @@ package body Komnenos.UI.Gtk_UI.Text is
      (Text_View    : in out Komnenos_Text_View_Record;
       New_Position : Text_Position)
    is
-      use Glib;
       Iter : Gtk.Text_Iter.Gtk_Text_Iter;
    begin
       Text_View.Buffer.Get_Iter_At_Offset

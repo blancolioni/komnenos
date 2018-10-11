@@ -128,7 +128,6 @@ package body Komnenos.UI.Gtk_UI.Navigation is
       return Boolean
    is
       pragma Unreferenced (Event);
-      use Glib;
       use type Cairo.Cairo_Surface;
       use type Komnenos.Layouts.Layout_Type;
       Navigator : constant Gtk_Navigation_Panel :=
@@ -164,7 +163,6 @@ package body Komnenos.UI.Gtk_UI.Navigation is
       Cr     : Cairo.Cairo_Context)
       return Boolean
    is
-      use Glib;
       Navigator : constant Gtk_Navigation_Panel :=
                     Gtk_Navigation_Panel (Object);
    begin

@@ -141,26 +141,22 @@ package Komnenos.Entities is
    function Get_Cursor
      (Entity : Root_Entity_Reference;
       Cursor : Cursor_Type)
-      return Text_Position
-   is (0);
+      return Text_Position;
 
    function Get_Line
      (Entity : Root_Entity_Reference;
       Position : Text_Position)
-      return Line_Number
-   is (1);
+      return Line_Number;
 
    function Get_Column
      (Entity   : Root_Entity_Reference;
       Position : Text_Position)
-      return Column_Number
-   is (1);
+      return Column_Number;
 
    function Get_Start_Of_Line
      (Entity : Root_Entity_Reference;
       Line   : Line_Number)
-      return Text_Position
-   is (0);
+      return Text_Position;
 
    procedure Set_Cursor
      (Entity       : in out Root_Entity_Reference;
@@ -187,8 +183,7 @@ package Komnenos.Entities is
      (Item  : Root_Entity_Reference;
       End_1 : Cursor_Type;
       End_2 : Cursor_Type)
-      return String
-   is ("");
+      return String;
 
 --     function Get_Offset_Position
 --       (Item     : in out Root_Entity_Reference;

@@ -278,7 +278,6 @@ package body Komnenos.Fragments is
 
       if Line <= Last_Line then
          declare
-            use Komnenos.Themes;
             Line_Offset  : Natural := 0;
             Style_Offset : constant Natural := Offset - Line_Start;
          begin
@@ -422,7 +421,6 @@ package body Komnenos.Fragments is
             for Style of Line.Styles loop
                declare
                   use Komnenos.Styles;
-                  use Komnenos.Entities;
                   Normal_Style : constant Komnenos.Styles.Komnenos_Style :=
                                    Style.Styles (Normal);
                   This_Style : constant Komnenos.Styles.Komnenos_Style :=
@@ -592,8 +590,6 @@ package body Komnenos.Fragments is
       Tool_Tip : in     String;
       Link     : access Komnenos.Entities.Root_Entity_Reference'Class)
    is
-      use type Komnenos.Styles.Komnenos_Style;
-      use type Komnenos.Entities.Entity_Reference;
       Line : constant Line_Info_Access := Fragment.Lines.Last_Element;
       Line_Style : Style_Info :=
                      (Length    => Text'Length,
@@ -686,7 +682,6 @@ package body Komnenos.Fragments is
       Cursor   : Cursor_Type;
       Position : Text_Position)
    is
-      use all type Cursor_Type;
    begin
       case Cursor is
          when Point =>
