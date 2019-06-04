@@ -417,7 +417,6 @@ package body Komnenos.Fragments.Diagrams is
       Straight : Boolean;
       Display  : not null access Komnenos.Displays.Canvas_Display'Class)
    is
-      use Komnenos.Entities.Visuals;
       Config : constant Komnenos.Configuration.Diagram_Config :=
                  Komnenos.Configuration.Get_Diagram_Config;
       Start  : constant Layout_Point :=
@@ -548,7 +547,6 @@ package body Komnenos.Fragments.Diagrams is
    overriding procedure Invalidate
      (Fragment : not null access Diagram_Fragment_Type)
    is
-      use Komnenos.Entities.Visuals;
    begin
       if Fragment.Canvas /= null then
          for Node of Fragment.Nodes loop
@@ -798,7 +796,6 @@ package body Komnenos.Fragments.Diagrams is
      (Node      : in out Diagram_Node;
       Display   : not null access Komnenos.Displays.Canvas_Display'Class)
    is
-      use Komnenos.Entities.Visuals;
       Label : constant String := -Node.Label_Text;
    begin
 
