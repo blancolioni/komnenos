@@ -35,12 +35,12 @@ package Komnenos.Fonts is
    function Foreground_Color
      (Font : Root_Komnenos_Font'Class)
       return Komnenos.Colours.Komnenos_Colour
-     with Pre => Font.Has_Foreground_Color;
+     with Pre => Has_Foreground_Color (Font);
 
    function Background_Color
      (Font : Root_Komnenos_Font'Class)
       return Komnenos.Colours.Komnenos_Colour
-     with Pre => Font.Has_Background_Color;
+     with Pre => Has_Background_Color (Font);
 
    procedure Set_Bold
      (Font  : in out Root_Komnenos_Font'Class;
