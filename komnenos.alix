@@ -5,7 +5,7 @@ source_dir = src/fragments
 source_dir = src/styles
 source_dir = src/ui
 source_dir = src/ui/gtk
-source_dir = src/ui/gtk/c-strings
+source_dir = src/ui/gtk/gtk-strings
 main_unit = komnenos-demo_driver
 exec_name = komnenos-demo
 depend = { project = gtkada external = yes }
