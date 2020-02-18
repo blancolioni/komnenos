@@ -3,6 +3,20 @@ with Tropos.Writer;
 
 package body Komnenos.UI.Sessions is
 
+   --------------------
+   -- Create_Session --
+   --------------------
+
+   procedure Create_Session
+     (UI                 : Komnenos_UI;
+      Store              : not null access
+        Komnenos.Entities.Program_Store_Interface'Class)
+   is
+   begin
+      UI.Store := Store;
+      UI.Store.Load;
+   end Create_Session;
+
    ------------------
    -- Load_Session --
    ------------------
