@@ -23,10 +23,11 @@ package Komnenos.Keys.Bindings is
 private
 
    type Binding_Table_Record;
+   type Binding_Table_Access is access Binding_Table_Record;
 
    type Binding_Table is tagged
       record
-         Table : access Binding_Table_Record;
+         Table : Binding_Table_Access;
       end record;
 
 end Komnenos.Keys.Bindings;

@@ -1,5 +1,3 @@
-private with Css;
-
 with Tropos;
 
 with Komnenos.Entities;

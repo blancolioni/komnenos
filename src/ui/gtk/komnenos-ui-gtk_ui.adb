@@ -4,6 +4,7 @@ with Ada.Text_IO;
 with Tropos;
 
 with Komnenos.Connectors;
+with Komnenos.Fragments;
 with Komnenos.Layouts;
 
 with Komnenos.UI.Gtk_UI.Entity_Lists;

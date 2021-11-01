@@ -93,7 +93,8 @@ package body Komnenos.Entities is
       end if;
 
       Item.References.Append
-        ((Referrer, Table.File_Map (File_Name),  Ref_Store, Line, Column));
+        (Reference_Record'
+           (Referrer, Table.File_Map (File_Name),  Ref_Store, Line, Column));
 
    end Add_Cross_Reference;
 

@@ -174,9 +174,11 @@ package body Komnenos.Themes is
                   Result.Default_Link_Style := Style;
                end if;
                Result.Entries.Append
-                 ((Class => Ada.Strings.Unbounded.To_Unbounded_String (Class),
-                   State => State,
-                   Style => Style));
+                 (Theme_Entry'
+                    (Class =>
+                         Ada.Strings.Unbounded.To_Unbounded_String (Class),
+                     State => State,
+                     Style => Style));
             end;
          end;
       end loop;

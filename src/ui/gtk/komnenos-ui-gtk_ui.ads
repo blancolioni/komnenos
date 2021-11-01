@@ -1,5 +1,4 @@
 private with Gdk.RGBA;
-private with Komnenos.Fragments;
 
 package Komnenos.UI.Gtk_UI is
 
